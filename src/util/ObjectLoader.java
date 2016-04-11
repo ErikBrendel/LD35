@@ -118,10 +118,20 @@ public class ObjectLoader {
         for (int i = 0; i < indizesList.size(); i++) {
             indizes[i] = indizesList.get(i);
         }
-
-        //indexMap.forEach((String str, Integer i) -> System.err.println("Map: " + str + " -> " + i));
+        
+        /* DEBUG STUFF
+        System.err.println("Data: ");
+        for (int i = 0; i < data.length; i++) {
+            System.err.println(data[i]);
+        }
+        System.err.println("\nMap: ");
+        indexMap.forEach((String str, Integer i) -> System.err.println("Map: " + str + " -> " + i));
+        System.err.println("\nIndizes: ");
+        indizesList.forEach(System.err::println);/**/
         System.err.println("[loadingLog] Loaded Object with " + indexMap.size() + " vertices "
                 + "and " + (indizesList.size() / 3) + " faces");
+        
+        
 
         return new Mesh(data, indizes);
     }
