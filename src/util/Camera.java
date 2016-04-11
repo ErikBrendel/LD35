@@ -35,7 +35,7 @@ public class Camera {
 		actualPitch = pitch;
 		front = new Vector3f(0, 0, -1);
 		movementSpeed = 2f;
-		rotationsSpeed = 5f;
+		rotationsSpeed = 10f;
 		sensitivity = 0.003f;
 		zoom = 45;
 	}
