@@ -18,6 +18,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
+import util.Shader;
 import util.Util;
 
 /**
@@ -48,8 +49,8 @@ public class Main {
 			System.exit(-1);
 		}
 
-		// Shader defaultShader = new Shader("default.vert", "default.frag");
-		// defaultShader.use();
+		Shader defaultShader = Shader.fromFile("default.vert", "default.frag");
+		defaultShader.use();
 		glEnable(GL_DEPTH_TEST);
 
 		// game loop
