@@ -4,7 +4,6 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
 import static org.lwjgl.opengl.GL20.glUniform3f;
-import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import static util.Util.lookAt;
 import static util.Util.vCross;

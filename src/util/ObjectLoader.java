@@ -20,7 +20,7 @@ public class ObjectLoader {
     public static float[] loadObject(String objectName) {
         String scanData;
         try {
-            URL shaderURL = Util.class.getResource("/res/" + objectName).toURI().toURL();
+            URL shaderURL = Util.class.getResource("/objects/" + objectName).toURI().toURL();
             Scanner sc = new Scanner(shaderURL.openStream(), "UTF-8");
             scanData = sc.useDelimiter("\\A").next();
             sc.close();

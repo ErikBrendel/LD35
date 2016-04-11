@@ -19,17 +19,17 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
  *
  * @author Erik
  */
-public class Object {
+public class Mesh {
     
     public static int stride = 8 * 4;
     
     private float[] data;
     
-    public Object(String filename) {
+    public Mesh(String filename) {
         this(ObjectLoader.loadObject(filename));
     }
     
-    public Object(float[] allData) {
+    public Mesh(float[] allData) {
         this.data = allData;
     }
 

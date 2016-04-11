@@ -31,7 +31,6 @@ import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
-import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -45,7 +44,7 @@ public class Util {
     }
     public static int loadTexture(String name, int id, boolean interpolate) {
         try {
-            URL url = Util.class.getResource("/res/" + name).toURI().toURL();
+            URL url = Util.class.getResource("/tex/" + name).toURI().toURL();
             BufferedImage img = ImageIO.read(url);
             return loadTexture(img, id, interpolate);
 
