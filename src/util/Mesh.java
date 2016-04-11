@@ -79,15 +79,11 @@ public class Mesh {
 	}
 
 	public int getVertCount() {
-<<<<<<< HEAD
 		if (EBOMode) {
 			return indices.length;
 		} else {
 			return data.length;
 		}
-=======
-		return EBOMode ? indices.length : data.length;
->>>>>>> origin/master
 	}
 
 	private void generateVAO() {
@@ -118,10 +114,10 @@ public class Mesh {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-		glBindVertexArray(0);
-
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glBindVertexArray(0);
 	}
 
 	public int getVAO() {
