@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import org.lwjgl.util.vector.Vector3f;
+import util.Camera;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
@@ -43,6 +44,7 @@ public class Main {
 
     static float deltaTime = 0;
     static long lastFrame = 0;
+    static Player player;
 
     public static void main(String[] args) {
         System.out.println("test!");
@@ -90,7 +92,7 @@ public class Main {
         bunny.loadToBuffer(VBO);
         glBindVertexArray(0);
 
-        Player player = new Player();
+        player = new Player();
 
         // game loop
         while (!Display.isCloseRequested()) {
@@ -102,6 +104,7 @@ public class Main {
 
             defaultShader.use();
             handleInputs(deltaTime, defaultShader);
+            player.update(deltaTime);
 
             //render
             glClearColor(0.05f, 0.075f, 0.075f, 1);
@@ -128,9 +131,29 @@ public class Main {
     }
 
     private static void handleInputs(float deltaTime, Shader defaultShader) {
+        Mouse.poll();
+
+        //zooming
+        int scrollDelta = Mouse.getDWheel();
+        //System.err.println("scrollDelta = " + scrollDelta);
+        player.getCamera().processMouseScroll(scrollDelta * deltaTime);
+        if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
+            player.getCamera().processMouseScroll(-60 * deltaTime);
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
+            player.getCamera().processMouseScroll(60 * deltaTime);
+        }
+
+        //moving
         if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             Display.destroy();
             System.exit(0);
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+            player.getCamera().processKeyboard(Camera.CameraMovement.UP, deltaTime);
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+            player.getCamera().processKeyboard(Camera.CameraMovement.DOWN, deltaTime);
         }
     }
 }

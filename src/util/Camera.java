@@ -17,7 +17,7 @@ import static util.Util.vScale;
  */
 public class Camera {
 
-    enum CameraMovement {
+    public enum CameraMovement {
         FORAWRD, BACKWARD, LEFT, RIGHT, UP, DOWN
     }
 
