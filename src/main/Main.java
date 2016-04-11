@@ -7,7 +7,6 @@
 package main;
 
 import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
-import static org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -17,7 +16,6 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 
 import java.awt.Color;
@@ -86,13 +84,7 @@ public class Main {
 
 		// bunny
 		Mesh bunny = new Mesh("bunny.obj");
-		int bunnyVAO = glGenVertexArrays();
-		int VBO = glGenBuffers();
-
-		// creating VAOs
-		glBindVertexArray(bunnyVAO);
-		bunny.loadToBuffer(VBO);
-		glBindVertexArray(0);
+		int bunnyVAO = bunny.generateVAO();
 
 		player = new Player();
 
