@@ -83,7 +83,7 @@ public class Main {
 		mat.apply(defaultShader);
 
 		// light
-		PointLight pl = new PointLight(Color.yellow, new Vector3f(2, 2, 2), 50);
+		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 2, 2), 50);
 		pl.apply(defaultShader, "pointLight");
 
 		// bunny
