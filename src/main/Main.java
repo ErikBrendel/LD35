@@ -103,8 +103,8 @@ public class Main {
 		sl.apply(defaultShader, "spotLight");
 
 		// bunny
-		//Mesh bunny = new Mesh("bunny.obj");
-                Mesh bunny = loadObjectEBO("bunny.obj");
+		// Mesh bunny = new Mesh("bunny.obj");
+		Mesh bunny = loadObjectEBO("bunny.obj");
 		int bunnyVAO = bunny.getVAO();
 
 		// game loop
@@ -112,7 +112,7 @@ public class Main {
 
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
-			System.out.println("FPS = " + (double) 1 / deltaTime);
+			// System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
 			defaultShader.use();
