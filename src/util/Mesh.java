@@ -79,7 +79,11 @@ public class Mesh {
 	}
 
 	public int getVertCount() {
-		return indices.length;
+		if (EBOMode) {
+			return indices.length;
+		} else {
+			return data.length;
+		}
 	}
 
 	private void generateVAO() {
@@ -88,18 +92,19 @@ public class Mesh {
 
 		int VBO;
 		VBO = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		FloatBuffer vertexB = BufferUtils.createFloatBuffer(data.length).put(data);
 		vertexB.flip();
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, vertexB, GL_STATIC_DRAW);
 
 		if (EBOMode) {
 			int EBO = glGenBuffers();
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-			IntBuffer indexB = BufferUtils.createIntBuffer(indices.length).put(indices);
+			IntBuffer indexB = BufferUtils.createIntBuffer(indices.length);
+			indexB.put(indices);
 			indexB.flip();
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexB, GL_STATIC_DRAW);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);

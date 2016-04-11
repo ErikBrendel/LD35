@@ -6,42 +6,31 @@
  */
 package main;
 
+import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+
 import light.PointLight;
 import light.SpotLight;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL20.glUniform3f;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import org.lwjgl.util.vector.Vector3f;
+
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
-import static util.ObjectLoader.loadObjectEBO;
 import util.Player;
 import util.Shader;
 import util.Util;
+import util.ObjectLoader;
 
 /**
  * Main class for LD project
@@ -53,7 +42,6 @@ public class Main {
 	static Player player;
 
 	public static void main(String[] args) {
-		System.out.println("test!");
 
 		// create window
 		Point windowSize;
@@ -64,7 +52,7 @@ public class Main {
 			Display.setDisplayMode(full);
 			Display.setFullscreen(true);
 			Display.setVSyncEnabled(true);
-			Display.setTitle("Learning openGL with Java");
+			Display.setTitle("LudumDare35!");
 			Display.create();
 
 			Mouse.create();
@@ -104,7 +92,7 @@ public class Main {
 
 		// bunny
 		// Mesh bunny = new Mesh("bunny.obj");
-		Mesh bunny = loadObjectEBO("bunny.obj");
+		Mesh bunny = ObjectLoader.loadObjectEBO("bunny.obj");
 		int bunnyVAO = bunny.getVAO();
 
 		// game loop
@@ -125,7 +113,7 @@ public class Main {
 
 			// render
 			glClearColor(0.05f, 0.075f, 0.075f, 1);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
 
@@ -138,6 +126,7 @@ public class Main {
 
 			glBindVertexArray(bunnyVAO);
 			glDrawArrays(GL_TRIANGLES, 0, bunny.getVertCount());
+			glDrawElements(GL_TRIANGLES, bunny.getVertCount(), GL_UNSIGNED_BYTE, 0);
 			glBindVertexArray(0);
 			// finish frame
 			Display.update();
