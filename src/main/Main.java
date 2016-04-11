@@ -125,7 +125,6 @@ public class Main {
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 
 			glBindVertexArray(bunnyVAO);
-			glDrawArrays(GL_TRIANGLES, 0, bunny.getVertCount());
 			glDrawElements(GL_TRIANGLES, bunny.getVertCount(), GL_UNSIGNED_BYTE, 0);
 			glBindVertexArray(0);
 			// finish frame
