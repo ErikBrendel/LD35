@@ -6,17 +6,8 @@
  */
 package main;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Toolkit;
-import light.PointLight;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
 import static org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -28,8 +19,20 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
+
+import light.PointLight;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.vector.Vector3f;
-import util.Camera;
+
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
@@ -42,118 +45,110 @@ import util.Util;
  */
 public class Main {
 
-    static float deltaTime = 0;
-    static long lastFrame = 0;
-    static Player player;
+	static float deltaTime = 0;
+	static long lastFrame = 0;
+	static Player player;
 
-    public static void main(String[] args) {
-        System.out.println("test!");
+	public static void main(String[] args) {
+		System.out.println("test!");
 
-        // create window
-        Point windowSize;
-        try {
-            Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-            windowSize = new Point((int) screen.getWidth(), (int) screen.getHeight());
-            DisplayMode full = Util.getBestDisplayMode();
-            Display.setDisplayMode(full);
-            Display.setFullscreen(true);
-            Display.setVSyncEnabled(true);
-            Display.setTitle("Learning openGL with Java");
-            Display.create();
+		// create window
+		Point windowSize;
+		try {
+			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+			windowSize = new Point((int) screen.getWidth(), (int) screen.getHeight());
+			DisplayMode full = Util.getBestDisplayMode();
+			Display.setDisplayMode(full);
+			Display.setFullscreen(true);
+			Display.setVSyncEnabled(true);
+			Display.setTitle("Learning openGL with Java");
+			Display.create();
 
-            Mouse.create();
-            Mouse.setGrabbed(true);
-            glViewport(0, 0, windowSize.x, windowSize.y);
-        } catch (Exception e) {
-            System.out.println("Error setting up display");
-            System.exit(-1);
-        }
+			Mouse.create();
+			Mouse.setGrabbed(true);
+			glViewport(0, 0, windowSize.x, windowSize.y);
+		} catch (Exception e) {
+			System.out.println("Error setting up display");
+			System.exit(-1);
+		}
 
-        Shader defaultShader = Shader.fromFile("default.vert", "default.frag");
-        defaultShader.use();
-        glEnable(GL_DEPTH_TEST);
-        
-        Util.loadTexture("minecraft.png", 0);
-        Material mat = new Material(0, 0, 32);
-        mat.apply(defaultShader);
-        
-        
-        //light
-        PointLight pl = new PointLight(Color.yellow, 1, new Vector3f(2, 2, 2), 50);
-        pl.apply(defaultShader, "pointLights[0]");
+		Shader defaultShader = Shader.fromFile("default.vert", "default.frag");
+		defaultShader.use();
+		glEnable(GL_DEPTH_TEST);
 
-        //bunny
-        Mesh bunny = new Mesh("bunny.obj");
-        int bunnyVAO = glGenVertexArrays();
-        int VBO = glGenBuffers();
+		Util.loadTexture("minecraft.png", 0);
+		Material mat = new Material(0, 0, 32);
+		mat.apply(defaultShader);
 
-        //creating VAOs
-        glBindVertexArray(bunnyVAO);
-        bunny.loadToBuffer(VBO);
-        glBindVertexArray(0);
+		// light
+		PointLight pl = new PointLight(Color.yellow, 1, new Vector3f(2, 2, 2), 50);
+		pl.apply(defaultShader, "pointLights[0]");
 
-        player = new Player();
+		// bunny
+		Mesh bunny = new Mesh("bunny.obj");
+		int bunnyVAO = glGenVertexArrays();
+		int VBO = glGenBuffers();
 
-        // game loop
-        while (!Display.isCloseRequested()) {
+		// creating VAOs
+		glBindVertexArray(bunnyVAO);
+		bunny.loadToBuffer(VBO);
+		glBindVertexArray(0);
 
-            long currentFrame = System.nanoTime();
-            deltaTime = (float) ((double) (currentFrame - lastFrame) / 1000000d / 1000d);
-            //System.err.println("deltaTime = " + deltaTime);
-            lastFrame = currentFrame;
+		player = new Player();
 
-            defaultShader.use();
-            handleInputs(deltaTime, defaultShader);
-            player.update(deltaTime);
+		// game loop
+		while (!Display.isCloseRequested()) {
 
-            //render
-            glClearColor(0.05f, 0.075f, 0.075f, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			long currentFrame = System.nanoTime();
+			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
+			System.out.println("FPS = " + (double) 1 / deltaTime);
+			lastFrame = currentFrame;
 
-            Matrix4f view = player.getViewMatrix();
-            glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
+			defaultShader.use();
+			handleInputs(deltaTime, defaultShader);
+			player.update(deltaTime);
 
-            Matrix4f projection = player.getProjectionMatrix();
-            glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
+			// render
+			glClearColor(0.05f, 0.075f, 0.075f, 1);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            Matrix4f model = new Matrix4f();
-            model.translate(new Vector3f(0, 0, -1));
-            glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
+			Matrix4f view = player.getViewMatrix();
+			glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
 
-            glBindVertexArray(bunnyVAO);
-            glDrawArrays(GL_TRIANGLES, 0, bunny.getVertCount());
-            glBindVertexArray(0);
+			Matrix4f projection = player.getProjectionMatrix();
+			glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
 
-            // finish frame
-            Display.update();
-            Display.sync(60);
-        }
-    }
+			Matrix4f model = new Matrix4f();
+			model.translate(new Vector3f(0, 0, -1));
+			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 
-    private static void handleInputs(float deltaTime, Shader defaultShader) {
-        Mouse.poll();
+			glBindVertexArray(bunnyVAO);
+			glDrawArrays(GL_TRIANGLES, 0, bunny.getVertCount());
+			glBindVertexArray(0);
+			// finish frame
+			Display.update();
+			Display.sync(500);
+		}
+	}
 
-        //zooming
-        int scrollDelta = Mouse.getDWheel();
-        //System.err.println("scrollDelta = " + scrollDelta);
-        player.getCamera().processMouseScroll(scrollDelta * deltaTime);
-        if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-            player.getCamera().processMouseScroll(-60 * deltaTime);
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
-            player.getCamera().processMouseScroll(60 * deltaTime);
-        }
+	private static void handleInputs(float deltaTime, Shader defaultShader) {
+		Mouse.poll();
 
-        //moving
-        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-            Display.destroy();
-            System.exit(0);
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-            player.getCamera().processKeyboard(Camera.CameraMovement.UP, deltaTime);
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
-            player.getCamera().processKeyboard(Camera.CameraMovement.DOWN, deltaTime);
-        }
-    }
+		// zooming
+		int scrollDelta = Mouse.getDWheel();
+		// System.err.println("scrollDelta = " + scrollDelta);
+		player.getCamera().processMouseScroll(scrollDelta * deltaTime);
+		if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
+			player.getCamera().processMouseScroll(-60 * deltaTime);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
+			player.getCamera().processMouseScroll(60 * deltaTime);
+		}
+
+		// moving
+		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+			Display.destroy();
+			System.exit(0);
+		}
+	}
 }

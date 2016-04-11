@@ -8,6 +8,7 @@ package util;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
@@ -18,88 +19,95 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Player {
 
-    Camera camera;
-    private ArrayList<ClickHandler> handlers;
-    static boolean btnDown = false;
-    static boolean btn2Down = false;
+	Camera camera;
+	private ArrayList<ClickHandler> handlers;
+	static boolean btnDown = false;
+	static boolean btn2Down = false;
 
-    public Player() {
-        camera = new Camera(new Vector3f(0, 0, 0), new Vector3f(0, 1, 0), -90, 0);
-        handlers = new ArrayList<>();
-    }
+	public Player() {
+		camera = new Camera(new Vector3f(0, 0, 0), new Vector3f(0, 1, 0), -90, 0);
+		handlers = new ArrayList<>();
+	}
 
-    public void teleportTo(Vector3f dest) {
-        camera.setPosition(dest);
-    }
+	public void teleportTo(Vector3f dest) {
+		camera.setPosition(dest);
+	}
 
-    public Camera getCamera() {
-        return camera;
-    }
+	public Camera getCamera() {
+		return camera;
+	}
 
-    public void addHandler(ClickHandler h) {
-        handlers.add(h);
-    }
-    
-    public Matrix4f getViewMatrix() {
-        return camera.getViewMatrix();
-    }
-    
-    public Matrix4f getProjectionMatrix() {
-        Dimension windowSize = Toolkit.getDefaultToolkit().getScreenSize();
-        return Util.perspective(getCamera().getFOV(), windowSize.width / (double) windowSize.height, 0.1, 100);
-    }
+	public void addHandler(ClickHandler h) {
+		handlers.add(h);
+	}
 
-    /**
-     * fetches input events (like lookaround and walking) and updates the
-     * uniform values to also show this progress
-     *
-     * @param deltaTime time passed since last frame
-     */
-    public void update(float deltaTime) {
-        //lClick
-        if (Mouse.isButtonDown(0)) {
-            if (!btnDown) {
-                btnDown = true;
-                handlers.forEach((ClickHandler h) -> h.onClickEvent(true, 1));
-            }
-        } else {
-            if (btnDown) {
-                btnDown = false;
-                handlers.forEach((ClickHandler h) -> h.onClickEvent(false, 1));
-            }
-        }
-        if (Mouse.isButtonDown(1)) {
-            if (!btn2Down) {
-                btn2Down = true;
-                handlers.forEach((ClickHandler h) -> h.onClickEvent(true, 2));
-            }
-        } else {
-            if (!btn2Down) {
-                btn2Down = false;
-                handlers.forEach((ClickHandler h) -> h.onClickEvent(false, 2));
-            }
-        }
+	public Matrix4f getViewMatrix() {
+		return camera.getViewMatrix();
+	}
 
-        //lookaround
-        camera.processMouseMovement(Mouse.getDX(), Mouse.getDY());
+	public Matrix4f getProjectionMatrix() {
+		Dimension windowSize = Toolkit.getDefaultToolkit().getScreenSize();
+		return Util.perspective(getCamera().getFOV(), windowSize.width / (double) windowSize.height, 0.1, 100);
+	}
 
-        //movement
-        if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            camera.processKeyboard(Camera.CameraMovement.FORAWRD, deltaTime);
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-            camera.processKeyboard(Camera.CameraMovement.BACKWARD, deltaTime);
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-            camera.processKeyboard(Camera.CameraMovement.LEFT, deltaTime);
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-            camera.processKeyboard(Camera.CameraMovement.RIGHT, deltaTime);
-        }
-    }
+	/**
+	 * fetches input events (like lookaround and walking) and updates the
+	 * uniform values to also show this progress
+	 *
+	 * @param deltaTime
+	 *            time passed since last frame
+	 */
+	public void update(float deltaTime) {
+		// lClick
+		if (Mouse.isButtonDown(0)) {
+			if (!btnDown) {
+				btnDown = true;
+				handlers.forEach((ClickHandler h) -> h.onClickEvent(true, 1));
+			}
+		} else {
+			if (btnDown) {
+				btnDown = false;
+				handlers.forEach((ClickHandler h) -> h.onClickEvent(false, 1));
+			}
+		}
+		if (Mouse.isButtonDown(1)) {
+			if (!btn2Down) {
+				btn2Down = true;
+				handlers.forEach((ClickHandler h) -> h.onClickEvent(true, 2));
+			}
+		} else {
+			if (!btn2Down) {
+				btn2Down = false;
+				handlers.forEach((ClickHandler h) -> h.onClickEvent(false, 2));
+			}
+		}
 
-    public static interface ClickHandler {
+		// lookaround
+		camera.processMouseMovement(Mouse.getDX(), Mouse.getDY(), deltaTime);
 
-        public void onClickEvent(boolean down, int mouseButton);
-    }
+		// movement
+		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+			camera.processKeyboard(Camera.CameraMovement.FORAWRD, deltaTime);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+			camera.processKeyboard(Camera.CameraMovement.BACKWARD, deltaTime);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+			camera.processKeyboard(Camera.CameraMovement.LEFT, deltaTime);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+			camera.processKeyboard(Camera.CameraMovement.RIGHT, deltaTime);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+			camera.processKeyboard(Camera.CameraMovement.UP, deltaTime);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+			camera.processKeyboard(Camera.CameraMovement.DOWN, deltaTime);
+		}
+	}
+
+	public static interface ClickHandler {
+
+		public void onClickEvent(boolean down, int mouseButton);
+	}
 }
