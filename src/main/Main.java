@@ -56,29 +56,39 @@ public class Main {
 
 			Mouse.create();
 			Mouse.setGrabbed(true);
+
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_STENCIL_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 			glViewport(0, 0, windowSize.x, windowSize.y);
 		} catch (Exception e) {
 			System.out.println("Error setting up display");
 			System.exit(-1);
 		}
 
-		Shader defaultShader = Shader.fromFile("default.vert", "default.frag");
+		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag");
 		defaultShader.use();
-		glEnable(GL_DEPTH_TEST);
+		glUniform1i(defaultShader.getUniform("alpha"), 1);
 
-		Util.loadTexture("minecraft.png", 0);
-		Material mat = new Material(0, 0, 32);
+		player = new Player();
+
+		Matrix4f projection = player.getProjectionMatrix();
+		glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
+
+		Util.loadTexture("container2.png", 0);
+		Util.loadTexture("container2_specular.png", 1);
+		Material mat = new Material(0, 1, 32);
 		mat.apply(defaultShader);
 
 		// light
-		PointLight pl = new PointLight(Color.yellow, 1, new Vector3f(2, 2, 2), 50);
-		pl.apply(defaultShader, "pointLights[0]");
+		PointLight pl = new PointLight(Color.yellow, new Vector3f(2, 2, 2), 50);
+		pl.apply(defaultShader, "pointLight");
 
 		// bunny
 		Mesh bunny = new Mesh("bunny.obj");
 		int bunnyVAO = bunny.getVAO();
-
-		player = new Player();
 
 		// game loop
 		while (!Display.isCloseRequested()) {
@@ -96,11 +106,10 @@ public class Main {
 			glClearColor(0.05f, 0.075f, 0.075f, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
+
 			Matrix4f view = player.getViewMatrix();
 			glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
-
-			Matrix4f projection = player.getProjectionMatrix();
-			glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
 
 			Matrix4f model = new Matrix4f();
 			model.translate(new Vector3f(0, 0, -1));

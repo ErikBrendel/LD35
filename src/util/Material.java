@@ -1,6 +1,5 @@
 package util;
 
-import static org.lwjgl.opengl.GL20.glUniform1f;
 import static org.lwjgl.opengl.GL20.glUniform1i;
 
 /**
@@ -9,35 +8,27 @@ import static org.lwjgl.opengl.GL20.glUniform1i;
  */
 public class Material {
 
-    int diffuseTex, specularTex;
-    private float shininess;
+	int diffuseTex, specularTex;
 
-    public Material(int diffuseTex, int specularTex, float shininess) {
-        this.diffuseTex = diffuseTex;
-        this.specularTex = specularTex;
-        this.shininess = shininess;
-    }
+	public Material(int diffuseTex, int specularTex, float shininess) {
+		this.diffuseTex = diffuseTex;
+		this.specularTex = specularTex;
+	}
 
-    public void setDiffuseTex(int diffuseTex) {
-        this.diffuseTex = diffuseTex;
-    }
+	public void setDiffuseTex(int diffuseTex) {
+		this.diffuseTex = diffuseTex;
+	}
 
-    public void setShininess(float shininess) {
-        this.shininess = shininess;
-    }
+	public void setSpecularTex(int specularTex) {
+		this.specularTex = specularTex;
+	}
 
-    public void setSpecularTex(int specularTex) {
-        this.specularTex = specularTex;
-    }
-    
-    
-    public void apply(Shader shader, String uniform) {
-        glUniform1i(shader.getUniform(uniform + ".diffuse"), diffuseTex);
-        glUniform1i(shader.getUniform(uniform + ".specular"), specularTex);
-        glUniform1f(shader.getUniform(uniform + ".shininess"), shininess);
-    }
-    
-    public void apply(Shader shader) {
-        apply(shader, "material");
-    }
+	public void apply(Shader shader, String uniform) {
+		glUniform1i(shader.getUniform(uniform + ".texture_diffuse0"), diffuseTex);
+		glUniform1i(shader.getUniform(uniform + ".texture_specular0"), specularTex);
+	}
+
+	public void apply(Shader shader) {
+		apply(shader, "material");
+	}
 }
