@@ -48,15 +48,14 @@ public class Main {
             System.exit(-1);
         }
 
-		// Shader defaultShader = new Shader("default.vert", "default.frag");
-        // defaultShader.use();
+	Shader defaultShader = Shader.fromFile("default.vert", "default.frag");
+        defaultShader.use();
         glEnable(GL_DEPTH_TEST);
 
         // game loop
         while (!Display.isCloseRequested()) {
             double timeVal = System.currentTimeMillis() / 300d;
             timeVal %= 100000;
-            float sinVal = (float) Math.sin(timeVal) * 0.5f + 0.5f;
 
             long currentFrame = System.nanoTime();
             deltaTime = (float) ((double) (currentFrame - lastFrame) / 1000000d / 1000d);
