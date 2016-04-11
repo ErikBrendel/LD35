@@ -6,26 +6,31 @@
  */
 package main;
 
-import static org.lwjgl.opengl.ARBVertexArrayObject.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-
 import light.PointLight;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import org.lwjgl.util.vector.Vector3f;
-
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
+import static util.ObjectLoader.loadObjectEBO;
 import util.Player;
 import util.Shader;
 import util.Util;
@@ -75,7 +80,8 @@ public class Main {
 		pl.apply(defaultShader, "pointLights[0]");
 
 		// bunny
-		Mesh bunny = new Mesh("bunny.obj");
+		//Mesh bunny = new Mesh("bunny.obj");
+                Mesh bunny = loadObjectEBO("bunny.obj");
 		int bunnyVAO = bunny.getVAO();
 
 		player = new Player();
