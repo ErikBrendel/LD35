@@ -71,7 +71,7 @@ void main(){
 	
 	//result += calcDirectionalLight(dirLight, norm, viewDir);
 
-	//result += calcSpotLight(spotLight, norm, viewDir);
+	result += calcSpotLight(spotLight, norm, viewDir);
 	
 	vec3 ambient = ambientStrength * vec3(texture(material.texture_diffuse0, tex));
 

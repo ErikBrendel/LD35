@@ -82,8 +82,8 @@ public class SpotLight extends Light {
 	public void apply(Shader shader, String uniform) {
 		glUniform3f(shader.getUniform(uniform + ".position"), position.x, position.y, position.z);
 		glUniform3f(shader.getUniform(uniform + ".direction"), direction.x, direction.y, direction.z);
-		glUniform1f(shader.getUniform(uniform + ".cutOff"), (float) Math.cos(Math.toRadians(cutOff)));
-		glUniform1f(shader.getUniform(uniform + ".outerCutOff"), (float) Math.cos(Math.toRadians(outerCutOff)));
+		glUniform1f(shader.getUniform(uniform + ".cutoff"), (float) Math.cos(Math.toRadians(cutOff)));
+		glUniform1f(shader.getUniform(uniform + ".outerCutoff"), (float) Math.cos(Math.toRadians(outerCutOff)));
 		glUniform1f(shader.getUniform(uniform + ".constant"), constant);
 		glUniform1f(shader.getUniform(uniform + ".linear"), linear);
 		glUniform1f(shader.getUniform(uniform + ".quadratic"), quadratic);

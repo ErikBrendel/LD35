@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 
 import light.PointLight;
+import light.SpotLight;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -86,6 +87,9 @@ public class Main {
 		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 2, 2), 50);
 		pl.apply(defaultShader, "pointLight");
 
+		SpotLight sl = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), player.getCamera().getPosition(), player.getCamera().getDirection(), 10, 20, 40);
+		sl.apply(defaultShader, "spotLight");
+
 		// bunny
 		Mesh bunny = new Mesh("bunny.obj");
 		int bunnyVAO = bunny.getVAO();
@@ -101,6 +105,10 @@ public class Main {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
+
+			sl.setDirection(player.getCamera().getDirection());
+			sl.setPosition(player.getCamera().getPosition());
+			sl.apply(defaultShader, "spotLight");
 
 			// render
 			glClearColor(0.05f, 0.075f, 0.075f, 1);

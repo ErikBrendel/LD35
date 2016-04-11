@@ -18,7 +18,7 @@ public class Light {
 	}
 
 	public Light(Color color) {
-		this.color = new Vector3f(color.getRed(), color.getGreen(), color.getBlue());
+		this.color = new Vector3f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);
 	}
 
 	public void setColor(Vector3f color) {
@@ -26,6 +26,6 @@ public class Light {
 	}
 
 	public void apply(Shader shader, String uniform) {
-		glUniform3f(shader.getUniform(uniform + ".color"), color.x / 255.0f, color.y / 255.0f, color.z / 255.0f);
+		glUniform3f(shader.getUniform(uniform + ".color"), color.x, color.y, color.z);
 	}
 }
