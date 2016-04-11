@@ -15,6 +15,8 @@ import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
+import util.Shader;
+import util.Util;
 
 /**
  * Main class for LD project
@@ -44,6 +46,8 @@ public class Main {
             System.exit(-1);
         }
         
+        Shader defaultShader = new Shader("default.vert", "default.frag");
+        defaultShader.use();
         glEnable(GL_DEPTH_TEST);
         
         //game loop
