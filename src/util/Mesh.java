@@ -5,16 +5,10 @@
  */
 package util;
 
-import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
-import static org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.ARBVertexArrayObject.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
 
 import java.nio.FloatBuffer;
 
@@ -30,12 +24,15 @@ public class Mesh {
 
 	private float[] data;
 
+	private int VAO;
+
 	public Mesh(String filename) {
 		this(ObjectLoader.loadObject(filename));
 	}
 
 	public Mesh(float[] allData) {
 		this.data = allData;
+		generateVAO();
 	}
 
 	/**
@@ -69,8 +66,8 @@ public class Mesh {
 		return data.length;
 	}
 
-	public int generateVAO() {
-		int VAO, VBO;
+	private void generateVAO() {
+		int VBO;
 		VAO = glGenVertexArrays();
 		VBO = glGenBuffers();
 
@@ -91,6 +88,9 @@ public class Mesh {
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+	}
+
+	public int getVAO() {
 		return VAO;
 	}
 }
