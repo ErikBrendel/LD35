@@ -79,11 +79,15 @@ public class Mesh {
 	}
 
 	public int getVertCount() {
+<<<<<<< HEAD
 		if (EBOMode) {
 			return indices.length;
 		} else {
 			return data.length;
 		}
+=======
+		return EBOMode ? indices.length : data.length;
+>>>>>>> origin/master
 	}
 
 	private void generateVAO() {
@@ -97,6 +101,13 @@ public class Mesh {
 		vertexB.flip();
 		glBufferData(GL_ARRAY_BUFFER, vertexB, GL_STATIC_DRAW);
 
+		glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3 * 4);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 3, GL_FLOAT, false, stride, 6 * 4);
+		glEnableVertexAttribArray(2);
+
 		if (EBOMode) {
 			int EBO = glGenBuffers();
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -107,16 +118,10 @@ public class Mesh {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3 * 4);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 3, GL_FLOAT, false, stride, 6 * 4);
-		glEnableVertexAttribArray(2);
-
 		glBindVertexArray(0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	public int getVAO() {
