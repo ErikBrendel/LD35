@@ -9,6 +9,7 @@ package main;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -54,8 +55,6 @@ public class Main {
 
         // game loop
         while (!Display.isCloseRequested()) {
-            double timeVal = System.currentTimeMillis() / 300d;
-            timeVal %= 100000;
 
             long currentFrame = System.nanoTime();
             deltaTime = (float) ((double) (currentFrame - lastFrame) / 1000000d / 1000d);
@@ -73,6 +72,9 @@ public class Main {
     }
     
     private static void handleInputs(float deltaTime, Shader defaultShader) {
-        
+        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+            Display.destroy();
+            System.exit(0);
+        }
     }
 }
