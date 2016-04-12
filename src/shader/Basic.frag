@@ -1,5 +1,3 @@
-#version 330 core
-
 in vec2 tex;
 in vec3 pos;
 in vec3 normal;
@@ -142,7 +140,7 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir){
 	float intensity = clamp((dot(direction, normalize(-light.direction)) - light.outerCutoff) / (light.cutoff - light.outerCutoff), 0.0f, 1.0f);
 
 	diffuse *= intensity;
-	specular *= intensity;
+	specular *= intensity * 2;
 
 	diffuse  *= attenuation;
 	specular *= attenuation;  

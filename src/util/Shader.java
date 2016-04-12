@@ -102,10 +102,10 @@ public class Shader {
      */
     public void recompile() {
         //generating parameters precompiler actions
-        String paramString = "";
+        String paramString = "#version 330 core " + System.getProperty("line.separator");
         for (String key: parameters.keySet()) {
             String value = getParameter(key);
-            paramString += "#define " + key + " " + value + "\n";
+            paramString += "#define " + key + " " + value + System.getProperty("line.separator");
         }
         
         
