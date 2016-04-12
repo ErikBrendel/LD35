@@ -96,9 +96,6 @@ public class Main {
 
 		player = new Player();
 
-		Matrix4f projection = player.getProjectionMatrix();
-		glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
-
 		int dif = Util.loadTexture("container2.png");
 		int spec = Util.loadTexture("container2_specular.png");
 		// Util.loadTexture("minecraft.png", 2, false);
@@ -143,6 +140,9 @@ public class Main {
 			defaultShader.use();
 
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
+
+			Matrix4f projection = player.getProjectionMatrix();
+			glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
 
 			Matrix4f view = player.getViewMatrix();
 			glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
