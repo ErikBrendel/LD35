@@ -126,16 +126,11 @@ public class Main {
 			defaultShader.use();
 			// reflectionShader.use();
 
-<<<<<<< HEAD
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
 			// glUniform3f(reflectionShader.getUniform("viewPos"),
 			// player.getCamera().getPosition().x,
 			// player.getCamera().getPosition().y,
 			// player.getCamera().getPosition().z);
-=======
-			//glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
-			glUniform3f(reflectionShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
->>>>>>> origin/master
 
 			Matrix4f projection = player.getProjectionMatrix();
 			// glUniformMatrix4(reflectionShader.getUniform("projection"),
