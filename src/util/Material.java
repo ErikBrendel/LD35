@@ -10,7 +10,7 @@ public class Material {
 
 	int diffuseTex, specularTex;
 
-	public Material(int diffuseTex, int specularTex, float shininess) {
+	public Material(int diffuseTex, int specularTex) {
 		this.diffuseTex = diffuseTex;
 		this.specularTex = specularTex;
 	}

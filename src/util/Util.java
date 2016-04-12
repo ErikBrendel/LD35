@@ -42,15 +42,15 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Util {
 
-	public static int loadTexture(String name, int id) {
-		return loadTexture(name, id, true);
+	public static int loadTexture(String name) {
+		return loadTexture(name, true);
 	}
 
-	public static int loadTexture(String name, int id, boolean interpolate) {
+	public static int loadTexture(String name, boolean interpolate) {
 		try {
 			URL url = Util.class.getResource("/tex/" + name).toURI().toURL();
 			BufferedImage img = ImageIO.read(url);
-			return loadTexture(img, id, interpolate);
+			return loadTexture(img, interpolate);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -58,11 +58,11 @@ public class Util {
 		}
 	}
 
-	public static int loadTexture(BufferedImage image, int id) {
-		return loadTexture(image, id, true);
+	public static int loadTexture(BufferedImage image) {
+		return loadTexture(image, true);
 	}
 
-	public static int loadTexture(BufferedImage image, int id, boolean interpolate) {
+	public static int loadTexture(BufferedImage image, boolean interpolate) {
 
 		// fetch all color data from image to array
 		int[] pixels = new int[image.getWidth() * image.getHeight()];
@@ -84,8 +84,9 @@ public class Util {
 		}
 		buffer.flip();
 
-		glActiveTexture(GL_TEXTURE0 + id);
 		int texture = glGenTextures();
+		glActiveTexture(GL_TEXTURE0 + texture);
+
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

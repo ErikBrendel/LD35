@@ -54,6 +54,10 @@ public class Camera {
 		return lookAt(position, vPlus(position, front), up);
 	}
 
+	public Matrix4f getSkyboxMatrix() {
+		return lookAt(new Vector3f(0, 0, 0), front, up);
+	}
+
 	public Matrix4f getViewMatrix2() {
 		Vector3f pos2 = new Vector3f(position);
 		pos2 = vPlus(pos2, vScale(right, 0.1f));

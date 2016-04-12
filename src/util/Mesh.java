@@ -7,18 +7,13 @@ package util;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+
 import org.lwjgl.BufferUtils;
-import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
-import static org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+
+import static org.lwjgl.opengl.ARBVertexArrayObject.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
 
 /**
  *
@@ -26,10 +21,11 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
  */
 public class Mesh {
 
-	public static int stride = 8 * 4;
+	public int stride;
 
 	private float[] data;
 	private int[] indices;
+	private int[] vertexDataSizes;
 	private boolean EBOMode;
 
 	private int VAO;
@@ -40,13 +36,26 @@ public class Mesh {
 
 	public Mesh(float[] allData) {
 		this.data = allData;
+		vertexDataSizes = new int[3];
+		vertexDataSizes[0] = 3;
+		vertexDataSizes[1] = 3;
+		vertexDataSizes[2] = 2;
+		this.stride = 0;
+		for (int i : vertexDataSizes) {
+			this.stride += 4 * i;
+		}
 		EBOMode = false;
 		generateVAO();
 	}
 
-	public Mesh(float[] data, int[] indices) {
+	public Mesh(float[] data, int[] indices, int[] vertexDataSizes) {
 		this.data = data;
 		this.indices = indices;
+		this.vertexDataSizes = vertexDataSizes;
+		this.stride = 0;
+		for (int i : vertexDataSizes) {
+			this.stride += 4 * i;
+		}
 		EBOMode = true;
 		generateVAO();
 	}
@@ -68,12 +77,12 @@ public class Mesh {
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, vertexB, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3 * 4);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 3, GL_FLOAT, false, stride, 6 * 4);
-		glEnableVertexAttribArray(2);
+		int offset = 0;
+		for (int i = 0; i < vertexDataSizes.length; i++) {
+			glVertexAttribPointer(i, vertexDataSizes[i], GL_FLOAT, false, stride, offset);
+			glEnableVertexAttribArray(i);
+			offset += vertexDataSizes[i];
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
@@ -112,10 +121,20 @@ public class Mesh {
 		glBindVertexArray(0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	public int getVAO() {
 		return VAO;
+	}
+
+	public void render() {
+		glBindVertexArray(VAO);
+		if (EBOMode) {
+			glDrawElements(GL_TRIANGLES, getVertCount(), GL_UNSIGNED_INT, 0);
+		} else {
+			glDrawArrays(GL_TRIANGLES, 0, getVertCount());
+		}
+		glBindVertexArray(0);
 	}
 }

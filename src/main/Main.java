@@ -6,42 +6,44 @@
  */
 package main;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Toolkit;
-import light.PointLight;
-import light.SpotLight;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL20.glUniform1i;
 import static org.lwjgl.opengl.GL20.glUniform3f;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
+import static util.ObjectLoader.loadObjectEBO;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
+
+import light.PointLight;
+import light.SpotLight;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.vector.Vector3f;
+
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
-import static util.ObjectLoader.loadObjectEBO;
 import util.Player;
 import util.Shader;
+import util.Skybox;
 import util.Util;
 
 /**
@@ -82,6 +84,7 @@ public class Main {
 			System.exit(-1);
 		}
 
+		Skybox skybox = new Skybox("Skybox.png");
 		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag");
 		defaultShader.use();
 		glUniform1i(defaultShader.getUniform("alpha"), 1);
@@ -91,10 +94,11 @@ public class Main {
 		Matrix4f projection = player.getProjectionMatrix();
 		glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
 
-		Util.loadTexture("window.png", 0);
-		Util.loadTexture("window_spec.png", 1);
+		int dif = Util.loadTexture("container2.png");
+		int spec = Util.loadTexture("container2_specular.png");
 		// Util.loadTexture("minecraft.png", 2, false);
-		Material mat = new Material(0, 1, 32);
+		Material mat = new Material(dif, spec);
+
 		mat.apply(defaultShader);
 
 		// light
@@ -107,7 +111,6 @@ public class Main {
 		// bunny
 		// Mesh bunny = new Mesh("bunny.obj");
 		Mesh bunny = loadObjectEBO("bunny.obj");
-		int bunnyVAO = bunny.getVAO();
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// glLineWidth(100);
@@ -129,7 +132,10 @@ public class Main {
 
 			// render
 			glClearColor(0.05f, 0.075f, 0.075f, 1);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+			skybox.render(player.getCamera());
+			defaultShader.use();
 
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
 
@@ -140,10 +146,7 @@ public class Main {
 			model.translate(new Vector3f(0, 0, -1));
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 
-			glBindVertexArray(bunnyVAO);
-			// glDrawArrays(GL_TRIANGLES, 0, bunny.getVertCount());
-			glDrawElements(GL_TRIANGLES, bunny.getVertCount(), GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
+			bunny.render();
 
 			// finish frame
 			Display.update();
