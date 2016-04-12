@@ -96,7 +96,7 @@ vec3 calcDirectionalLight(DirLight light, vec3 norm, vec3 viewDir){
 	vec3 diffuse = diff * light.color;
 
 	vec3 reflectDir = reflect(-dir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 64);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), SHININESS);
 	vec3 specular = specularStrength * spec * light.color;
 
 	return vec3(texture(material.texture_diffuse0, tex)) * diffuse + vec3(texture(material.texture_specular0, tex)) * specular;
@@ -112,7 +112,7 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir){
 	vec3 diffuse = diff * light.color;
 
 	vec3 reflectDir = reflect(-direction, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 64);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), SHININESS);
 	vec3 specular = specularStrength * spec * light.color;
 	
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * distance * distance);
@@ -134,7 +134,7 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir){
 	vec3 diffuse = diff * light.color;
 
 	vec3 reflectDir = reflect(-direction, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 64);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), SHININESS);
 	vec3 specular = specularStrength * spec * light.color;
 	
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * distance * distance);
