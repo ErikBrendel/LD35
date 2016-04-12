@@ -123,29 +123,32 @@ public class Main {
 			// render
 			glClearColor(0.05f, 0.075f, 0.075f, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-			// defaultShader.use();
-			reflectionShader.use();
+			defaultShader.use();
+			// reflectionShader.use();
 
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
-			glUniform3f(reflectionShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
+			// glUniform3f(reflectionShader.getUniform("viewPos"),
+			// player.getCamera().getPosition().x,
+			// player.getCamera().getPosition().y,
+			// player.getCamera().getPosition().z);
 
 			Matrix4f projection = player.getProjectionMatrix();
-			glUniformMatrix4(reflectionShader.getUniform("projection"), false, projection.getData());
-			// glUniformMatrix4(defaultShader.getUniform("projection"), false,
-			// projection.getData());
+			// glUniformMatrix4(reflectionShader.getUniform("projection"),
+			// false, projection.getData());
+			glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
 
 			Matrix4f view = player.getViewMatrix();
-			glUniformMatrix4(reflectionShader.getUniform("view"), false, view.getData());
-			// glUniformMatrix4(defaultShader.getUniform("view"), false,
+			// glUniformMatrix4(reflectionShader.getUniform("view"), false,
 			// view.getData());
+			glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
 
 			Matrix4f model = new Matrix4f();
 			model.translate(new Vector3f(0, 0, -1));
-			glUniformMatrix4(reflectionShader.getUniform("model"), false, model.getData());
-			// glUniformMatrix4(defaultShader.getUniform("model"), false,
+			// glUniformMatrix4(reflectionShader.getUniform("model"), false,
 			// model.getData());
+			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 
-			glUniform1i(reflectionShader.getUniform("skybox"), skybox.getTexture());
+			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
 
 			bunny.render();
 			skybox.render(player.getCamera());

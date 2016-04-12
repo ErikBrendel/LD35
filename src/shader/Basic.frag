@@ -39,6 +39,7 @@ struct SpotLight{
 
 float ambientStrength = 0.1f;
 float specularStrength = 0.5f;
+float reflectionStrength = 1.0f;
 
 uniform PointLight pointLight;
 
@@ -51,6 +52,8 @@ uniform Material material;
 uniform int alpha;
 
 uniform vec3 viewPos;
+
+uniform samplerCube skybox;
 
 vec3 calcDirectionalLight(DirLight light, vec3 norm, vec3 viewDir);
 vec3 calcPointLight(PointLight pl, vec3 norm, vec3 viewDir);
@@ -75,6 +78,12 @@ void main(){
 
 	result += ambient;
 
+	vec3 I = normalize(pos - viewPos);
+	vec3 R = reflect(I, normalize(norm));
+	vec3 reflectionColor = vec3(texture(skybox, R));
+	
+	result = texture(material.texture_specular0, tex).x * reflectionStrength * reflectionColor + (1.0f - texture(material.texture_specular0, tex).x * reflectionStrength) * result;
+ 	
 	if(alpha == 0){
 		color = vec4(result.x, result.y, result.z, 1.0f);
 	}else if(alpha == 1){
