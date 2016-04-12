@@ -84,7 +84,7 @@ public class Main {
 			System.exit(-1);
 		}
 
-		Skybox skybox = new Skybox("Skybox.png");
+		Skybox skybox = new Skybox("day");
 		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag");
 		defaultShader.use();
 		glUniform1i(defaultShader.getUniform("alpha"), 1);

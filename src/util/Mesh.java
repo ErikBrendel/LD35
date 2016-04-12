@@ -81,7 +81,7 @@ public class Mesh {
 		for (int i = 0; i < vertexDataSizes.length; i++) {
 			glVertexAttribPointer(i, vertexDataSizes[i], GL_FLOAT, false, stride, offset);
 			glEnableVertexAttribArray(i);
-			offset += vertexDataSizes[i];
+			offset += vertexDataSizes[i] * 4;
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -5,25 +5,10 @@
  */
 package util;
 
-import static org.lwjgl.opengl.GL11.GL_LINEAR;
-import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_REPEAT;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
-import static org.lwjgl.opengl.GL11.GL_RGBA8;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL11.glTexParameteri;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL30.*;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -101,6 +86,63 @@ public class Util {
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 		glGenerateMipmap(GL_TEXTURE_2D);
+
+		// glBindTexture(GL_TEXTURE_2D, 0);
+		return texture;
+	}
+
+	public static int loadCubeMap(String name) {
+		try {
+			BufferedImage[] img = new BufferedImage[6];
+			img[0] = ImageIO.read(Util.class.getResource("/tex/" + name + "_r.jpg").toURI().toURL());
+			img[1] = ImageIO.read(Util.class.getResource("/tex/" + name + "_l.jpg").toURI().toURL());
+			img[2] = ImageIO.read(Util.class.getResource("/tex/" + name + "_top.jpg").toURI().toURL());
+			img[3] = ImageIO.read(Util.class.getResource("/tex/" + name + "_bot.jpg").toURI().toURL());
+			img[4] = ImageIO.read(Util.class.getResource("/tex/" + name + "_b.jpg").toURI().toURL());
+			img[5] = ImageIO.read(Util.class.getResource("/tex/" + name + "_f.jpg").toURI().toURL());
+			return loadCubeMap(img);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return 0;
+		}
+	}
+
+	public static int loadCubeMap(BufferedImage[] images) {
+
+		int texture = glGenTextures();
+		glActiveTexture(GL_TEXTURE_CUBE_MAP + texture);
+
+		for (int i = 0; i < images.length; i++) {
+			// fetch all color data from image to array
+			int[] pixels = new int[images[i].getWidth() * images[i].getHeight()];
+			images[i].getRGB(0, 0, images[i].getWidth(), images[i].getHeight(), pixels, 0, images[i].getWidth());
+
+			// create the openGL Buffer object
+			ByteBuffer buffer = BufferUtils.createByteBuffer(images[i].getWidth() * images[i].getHeight() * (images[i].getType() == BufferedImage.TYPE_INT_ARGB ? 4 : 4));
+
+			// copy data to the buffer
+			for (int y = 0; y < images[i].getHeight(); y++) {
+				for (int x = 0; x < images[i].getWidth(); x++) {
+					int pixel = pixels[y * images[i].getWidth() + x];
+					buffer.put((byte) (pixel >> 16 & 0xFF)); // Red component
+					buffer.put((byte) (pixel >> 8 & 0xFF)); // Green component
+					buffer.put((byte) (pixel & 0xFF)); // Blue component
+					buffer.put((byte) (pixel >> 24 & 0xFF)); // Alpha component.
+																// Only for RGBA
+				}
+			}
+			buffer.flip();
+			glBindTexture(GL_TEXTURE_2D, texture);
+
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, images[i].getWidth(), images[i].getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		}
 
 		// glBindTexture(GL_TEXTURE_2D, 0);
 		return texture;
