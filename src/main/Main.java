@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.util.HashMap;
 
 import light.PointLight;
 import light.SpotLight;
@@ -85,7 +86,11 @@ public class Main {
 		}
 
 		Skybox skybox = new Skybox("day");
-		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag");
+
+		HashMap<String, Object> parameters = new HashMap<>();
+		parameters.put("SHININESS", 64);
+		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag", parameters);
+
 		defaultShader.use();
 		glUniform1i(defaultShader.getUniform("alpha"), 1);
 
@@ -102,7 +107,7 @@ public class Main {
 		mat.apply(defaultShader);
 
 		// light
-		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 2, 2), 50);
+		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 2, 2), 10);
 		pl.apply(defaultShader, "pointLight");
 
 		SpotLight sl = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), player.getCamera().getPosition(), player.getCamera().getDirection(), 10, 20, 40);
@@ -154,6 +159,8 @@ public class Main {
 		}
 	}
 
+	public static boolean down = false;
+
 	private static void handleInputs(float deltaTime, Shader defaultShader) {
 		Mouse.poll();
 
@@ -166,6 +173,16 @@ public class Main {
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 			player.getCamera().processMouseScroll(60 * deltaTime);
+		}
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
+			if (!down) {
+				down = true;
+				defaultShader.updateParameter("SHININESS", Integer.valueOf(defaultShader.getParameter("SHININESS")) * 2);
+				defaultShader.use();
+			}
+		} else {
+			down = false;
 		}
 
 		// moving
