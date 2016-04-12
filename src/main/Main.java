@@ -100,7 +100,7 @@ public class Main {
 
 		// bunny
 		// Mesh bunny = new Mesh("bunny.obj");
-		Mesh bunny = loadObjectEBO("bunny.obj");
+		Mesh bunny = loadObjectEBO("icoSphere.obj");
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// glLineWidth(100);
@@ -126,11 +126,16 @@ public class Main {
 			defaultShader.use();
 			// reflectionShader.use();
 
+<<<<<<< HEAD
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
 			// glUniform3f(reflectionShader.getUniform("viewPos"),
 			// player.getCamera().getPosition().x,
 			// player.getCamera().getPosition().y,
 			// player.getCamera().getPosition().z);
+=======
+			//glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
+			glUniform3f(reflectionShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
+>>>>>>> origin/master
 
 			Matrix4f projection = player.getProjectionMatrix();
 			// glUniformMatrix4(reflectionShader.getUniform("projection"),
