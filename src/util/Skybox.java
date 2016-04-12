@@ -46,6 +46,10 @@ public class Skybox {
 		texture = Util.loadCubeMap(texturePath);
 	}
 
+	public int getTexture() {
+		return texture;
+	}
+
 	public void render(Camera camera) {
 		shader.use();
 

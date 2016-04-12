@@ -6,23 +6,9 @@
  */
 package main;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL20.glUniform3f;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4;
-import static util.ObjectLoader.loadObjectEBO;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
+import static util.ObjectLoader.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -75,6 +61,7 @@ public class Main {
 			Mouse.setGrabbed(true);
 
 			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LEQUAL);
 			glEnable(GL_STENCIL_TEST);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -89,6 +76,7 @@ public class Main {
 
 		HashMap<String, Object> parameters = new HashMap<>();
 		parameters.put("SHININESS", 64);
+		Shader reflectionShader = Shader.fromFile("Reflect.vert", "Reflect.frag");
 		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag", parameters);
 
 		defaultShader.use();
@@ -135,23 +123,32 @@ public class Main {
 			// render
 			glClearColor(0.05f, 0.075f, 0.075f, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-			skybox.render(player.getCamera());
-			defaultShader.use();
+			// defaultShader.use();
+			reflectionShader.use();
 
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
+			glUniform3f(reflectionShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
 
 			Matrix4f projection = player.getProjectionMatrix();
-			glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
+			glUniformMatrix4(reflectionShader.getUniform("projection"), false, projection.getData());
+			// glUniformMatrix4(defaultShader.getUniform("projection"), false,
+			// projection.getData());
 
 			Matrix4f view = player.getViewMatrix();
-			glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
+			glUniformMatrix4(reflectionShader.getUniform("view"), false, view.getData());
+			// glUniformMatrix4(defaultShader.getUniform("view"), false,
+			// view.getData());
 
 			Matrix4f model = new Matrix4f();
 			model.translate(new Vector3f(0, 0, -1));
-			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
+			glUniformMatrix4(reflectionShader.getUniform("model"), false, model.getData());
+			// glUniformMatrix4(defaultShader.getUniform("model"), false,
+			// model.getData());
+
+			glUniform1i(reflectionShader.getUniform("skybox"), skybox.getTexture());
 
 			bunny.render();
+			skybox.render(player.getCamera());
 
 			// finish frame
 			Display.update();
