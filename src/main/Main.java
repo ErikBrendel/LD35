@@ -125,18 +125,14 @@ public class Main {
 		// light
 		DirectionalLight sun = new DirectionalLight(new Color(255, 255, 220), new Vector3f(2, -1, 2));
 
-		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 2, 5, 15);
+		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 10, 20, 15);
 
 		PointLight pl = new PointLight(Color.ORANGE, new Vector3f(0, 0, 4), 30);
 
 		lh.addLight(flashlight, shaders);
-		lh.addLight(sun, shaders);
-		lh.addLight(sun, shaders);
-		lh.addLight(pl, shaders);
-		lh.addLight(flashlight, shaders);
-		lh.addLight(flashlight, shaders);
 		lh.addLight(flashlight, shaders);
 		lh.addLight(pl, shaders);
+		lh.addLight(sun, shaders);
 
 		// bunny
 		Mesh earth = loadObjectEBO("earth.obj");
@@ -158,6 +154,8 @@ public class Main {
 
 			flashlight.setDirection(player.getCamera().getDirection());
 			flashlight.setPosition(player.getCamera().getPosition());
+
+			lh.updateLight(flashlight);
 
 			// render init and background
 			defaultShader.use();

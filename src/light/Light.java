@@ -1,20 +1,27 @@
 package light;
 
 import java.awt.Color;
+
 import static org.lwjgl.opengl.GL20.glUniform3f;
+
 import org.lwjgl.util.vector.Vector3f;
+
 import util.Shader;
 
 /**
  *
  * @author Erik
  */
-public class Light {
+public abstract class Light {
 
 	protected Vector3f color;
+	private static int count = 0;
+	private int id;
 
 	public Light(Vector3f color) {
 		this.color = color;
+		this.id = count;
+		count++;
 	}
 
 	public Light(Color color) {
@@ -28,4 +35,14 @@ public class Light {
 	public void apply(Shader shader, String uniform) {
 		glUniform3f(shader.getUniform(uniform + ".color"), color.x, color.y, color.z);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Light) {
+			return id == ((Light) obj).id;
+		}
+		return false;
+	}
+
+	public abstract float[] getData();
 }
