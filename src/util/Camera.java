@@ -159,6 +159,7 @@ public class Camera {
 		Matrix4f rotUp = new Matrix4f();
 		rotUp.rotate(degrees, front);
 		up = vmMult(up, rotUp);
+		right = vmMult(right, rotUp);
 		updateCameraVectors();
 	}
 
