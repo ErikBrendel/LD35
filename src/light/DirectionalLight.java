@@ -26,8 +26,8 @@ public class DirectionalLight extends Light {
 		this.direction = direction;
 	}
 
-	public void setPosition(Vector3f position) {
-		this.direction = position;
+	public void setDirection(Vector3f direction) {
+		this.direction = direction;
 	}
 
 	@Override
@@ -36,6 +36,7 @@ public class DirectionalLight extends Light {
 		super.apply(shader, uniform);
 	}
 
+	@Override
 	public float[] getData() {
 		float[] data = new float[8];
 		data[0] = direction.x;

@@ -35,7 +35,7 @@ public class Camera {
 		actualYaw = yaw;
 		actualPitch = pitch;
 		front = new Vector3f(0, 0, -1);
-		movementSpeed = 2f;
+		movementSpeed = 8f;
 		rotationsSpeed = 10f;
 		sensitivity = 0.003f;
 		zoom = 45;
@@ -150,10 +150,12 @@ public class Camera {
 	public void setPosition(Vector3f position) {
 		this.position = position;
 	}
-	
+
 	/**
 	 * roll the camera
-	 * @param degrees roll in degrees
+	 * 
+	 * @param degrees
+	 *            roll in degrees
 	 */
 	public void roll(float degrees) {
 		Matrix4f rotUp = new Matrix4f();

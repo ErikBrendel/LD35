@@ -137,10 +137,11 @@ public class Main {
 		// bunny
 		Mesh earth = loadObjectEBO("earth.obj");
 
+		Vector3f sunPos, earthPos = new Vector3f(0, 0, 0);
+
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// game loop
 		while (!Display.isCloseRequested()) {
-
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
@@ -148,6 +149,8 @@ public class Main {
 			lastFrame = currentFrame;
 
 			// handle all inputs
+			sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
+			sun.setDirection(Vector3f.sub(earthPos, sunPos, null));
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
@@ -156,6 +159,7 @@ public class Main {
 			flashlight.setPosition(player.getCamera().getPosition());
 
 			lh.updateLight(flashlight);
+			lh.updateLight(sun);
 
 			// render init and background
 			defaultShader.use();
@@ -194,7 +198,7 @@ public class Main {
 
 			// sun
 			model = new Matrix4f();
-			model.translate(new Vector3f(-20, 10, -20));
+			model.translate(sunPos);
 			model.scale(new Vector3f(5f, 5f, 5f));
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 			sunMat.apply(defaultShader);
