@@ -47,7 +47,7 @@ public class Player {
 
 	public Matrix4f getProjectionMatrix() {
 		Dimension windowSize = Toolkit.getDefaultToolkit().getScreenSize();
-		return Util.perspective(getCamera().getFOV(), windowSize.width / (double) windowSize.height, 0.1, 100);
+		return Util.perspective(getCamera().getFOV(), windowSize.width / (double) windowSize.height, 0.01, 100);
 	}
 
 	/**

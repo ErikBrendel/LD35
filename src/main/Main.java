@@ -76,7 +76,6 @@ public class Main {
 
 		HashMap<String, Object> parameters = new HashMap<>();
 		parameters.put("SHININESS", 64);
-		Shader reflectionShader = Shader.fromFile("Reflect.vert", "Reflect.frag");
 		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag", parameters);
 
 		defaultShader.use();
@@ -88,35 +87,32 @@ public class Main {
 		int spec = Util.loadTexture("earth_spec.jpg");
 		int cloud = Util.loadTexture("cloudSphere.png");
 		
-		//int windowDif = Util.loadTexture("window.png");
-		//int windowSpec = Util.loadTexture("window_spec.png");
-		// Util.loadTexture("minecraft.png", 2, false);
 		Material earthMat = new Material(dif, spec);
 		Material cloudMat = new Material(cloud, 0);
 
 		earthMat.apply(defaultShader);
 
 		// light
-		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 2, 2), 10);
+		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 10, 2), 80);
 		pl.apply(defaultShader, "pointLight");
 
 		SpotLight sl = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), player.getCamera().getPosition(), player.getCamera().getDirection(), 10, 20, 40);
 		sl.apply(defaultShader, "spotLight");
 
 		// bunny
-		// Mesh bunny = new Mesh("bunny.obj");
 		Mesh earth = loadObjectEBO("earth.obj");
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		// glLineWidth(100);
 		// game loop
 		while (!Display.isCloseRequested()) {
-
+			
+			//get deltaTime and FPS
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
 			// System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
-
+			
+			//handle all inputs
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
@@ -125,38 +121,32 @@ public class Main {
 			sl.setPosition(player.getCamera().getPosition());
 			sl.apply(defaultShader, "spotLight");
 
-			// render
+			//render init and background
+			defaultShader.use();
 			glClearColor(0.05f, 0.075f, 0.075f, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-			defaultShader.use();
-			// reflectionShader.use();
 
+			//update player position uniform
 			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
-			// glUniform3f(reflectionShader.getUniform("viewPos"),
-			// player.getCamera().getPosition().x,
-			// player.getCamera().getPosition().y,
-			// player.getCamera().getPosition().z);
 
+			//projection matrix
 			Matrix4f projection = player.getProjectionMatrix();
-			// glUniformMatrix4(reflectionShader.getUniform("projection"),
-			// false, projection.getData());
 			glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
 
+			//view matrix
 			Matrix4f view = player.getViewMatrix();
-			// glUniformMatrix4(reflectionShader.getUniform("view"), false,
-			// view.getData());
 			glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
 
+			//earth
 			Matrix4f model = new Matrix4f();
 			model.translate(new Vector3f(0, 0, -1));
 			float angle = (float)(System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
 			model.rotate(angle, new Vector3f(0, 1, 0));
-			// glUniformMatrix4(reflectionShader.getUniform("model"), false,
-			// model.getData());
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 			earthMat.apply(defaultShader);
 			earth.render();
 			
+			//clouds
 			model.invalidate();
 			model.rotate(angle * 0.2f, new Vector3f(0, 1, 0));
 			float cloudScale = 1.01f;
@@ -166,9 +156,8 @@ public class Main {
 			earth.render();
 			
 			
-
+			//skybox
 			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
-			
 			skybox.render(player.getCamera());
 
 			// finish frame
