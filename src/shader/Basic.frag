@@ -39,7 +39,7 @@ struct SpotLight{
 
 float ambientStrength = 0.1f;
 float specularStrength = 0.5f;
-float reflectionStrength = 0.8f;
+float reflectionStrength = 0.4f;
 
 uniform PointLight pointLight;
 

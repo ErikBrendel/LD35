@@ -84,13 +84,13 @@ public class Main {
 
 		player = new Player();
 
-		int dif = Util.loadTexture("mars.jpg");
-		int spec = Util.loadTexture("container2_specular.png");
+		int dif = Util.loadTexture("earth.jpg");
+		int spec = Util.loadTexture("earth_spec.jpg");
 		
 		//int windowDif = Util.loadTexture("window.png");
 		//int windowSpec = Util.loadTexture("window_spec.png");
 		// Util.loadTexture("minecraft.png", 2, false);
-		Material mat = new Material(dif, 0);
+		Material mat = new Material(dif, spec);
 
 		mat.apply(defaultShader);
 
@@ -103,7 +103,7 @@ public class Main {
 
 		// bunny
 		// Mesh bunny = new Mesh("bunny.obj");
-		Mesh bunny = loadObjectEBO("earth.obj");
+		Mesh earth = loadObjectEBO("earth.obj");
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// glLineWidth(100);
@@ -147,13 +147,15 @@ public class Main {
 
 			Matrix4f model = new Matrix4f();
 			model.translate(new Vector3f(0, 0, -1));
+			float angle = (float)(System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f;
+			model.rotate(angle, new Vector3f(0, 1, 0));
 			// glUniformMatrix4(reflectionShader.getUniform("model"), false,
 			// model.getData());
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 
 			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
 
-			bunny.render();
+			earth.render();
 			skybox.render(player.getCamera());
 
 			// finish frame
