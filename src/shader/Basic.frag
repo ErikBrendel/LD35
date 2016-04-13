@@ -78,16 +78,19 @@ void main(){
 
 	result += ambient;
 
-	vec3 I = normalize(pos - viewPos);
-	vec3 R = reflect(I, normalize(norm));
-	vec3 reflectionColor = vec3(texture(skybox, R));
+	float a = texture(material.texture_specular0, tex).r * reflectionStrength;
+	if(a > 0){
+		vec3 I = normalize(pos - viewPos);
+		vec3 R = reflect(I, normalize(norm));
+		vec3 reflectionColor = vec3(texture(skybox, R));
 	
-	result = texture(material.texture_specular0, tex).x * reflectionStrength * reflectionColor + (1.0f - texture(material.texture_specular0, tex).x * reflectionStrength) * result;
- 	
+		result = mix(reflectionColor, result, a);	
+	}
+	
 	if(alpha == 0){
 		color = vec4(result.x, result.y, result.z, 1.0f);
 	}else if(alpha == 1){
-		vec4 texColor = vec4(result.x, result.y, result.z, (texture(material.texture_diffuse0, tex)).w);
+		vec4 texColor = vec4(result.x, result.y, result.z, (texture(material.texture_diffuse0, tex)).a);
 		if(texColor.a > 0.01){	
 			color = texColor;
 		}else{	
