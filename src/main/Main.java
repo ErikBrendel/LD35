@@ -189,8 +189,12 @@ public class Main {
 		}
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_Y)) {
-			//player.getCamera().set
+			player.getCamera().roll(1 * deltaTime);
 		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
+			player.getCamera().roll(-1 * deltaTime);
+		}
+		
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
 			if (!down) {
