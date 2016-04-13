@@ -39,7 +39,7 @@ struct SpotLight{
 
 float ambientStrength = 0.1f;
 float specularStrength = 0.5f;
-float reflectionStrength = 1.0f;
+float reflectionStrength = 0.8f;
 
 uniform PointLight pointLight;
 
@@ -84,7 +84,7 @@ void main(){
 		vec3 R = reflect(I, normalize(norm));
 		vec3 reflectionColor = vec3(texture(skybox, R));
 	
-		result = mix(reflectionColor, result, a);	
+		result = mix(result, reflectionColor, a);	
 	}
 	
 	if(alpha == 0){

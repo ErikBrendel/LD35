@@ -84,13 +84,13 @@ public class Main {
 
 		player = new Player();
 
-		int dif = Util.loadTexture("container2.png");
+		int dif = Util.loadTexture("mars.jpg");
 		int spec = Util.loadTexture("container2_specular.png");
 		
 		//int windowDif = Util.loadTexture("window.png");
 		//int windowSpec = Util.loadTexture("window_spec.png");
 		// Util.loadTexture("minecraft.png", 2, false);
-		Material mat = new Material(dif, spec);
+		Material mat = new Material(dif, 0);
 
 		mat.apply(defaultShader);
 
@@ -103,7 +103,7 @@ public class Main {
 
 		// bunny
 		// Mesh bunny = new Mesh("bunny.obj");
-		Mesh bunny = loadObjectEBO("bigSphere.obj");
+		Mesh bunny = loadObjectEBO("earth.obj");
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// glLineWidth(100);
