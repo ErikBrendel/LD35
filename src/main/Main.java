@@ -114,9 +114,11 @@ public class Main {
 		int dif = Util.loadTexture("earth.jpg");
 		int spec = Util.loadTexture("earth_spec.jpg");
 		int cloud = Util.loadTexture("cloudSphere.png");
+		int sunTex = Util.loadTexture("sun.jpg");
 
 		Material earthMat = new Material(dif, spec);
 		Material cloudMat = new Material(cloud, 0);
+		Material sunMat = new Material(sunTex, 0);
 
 		earthMat.apply(defaultShader);
 
@@ -176,7 +178,7 @@ public class Main {
 
 			// earth
 			Matrix4f model = new Matrix4f();
-			model.translate(new Vector3f(0, 0, -1));
+			model.translate(new Vector3f(0, 0, -2));
 			float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
 			model.rotate(angle, new Vector3f(0, 1, 0));
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
@@ -190,6 +192,14 @@ public class Main {
 			model.scale(new Vector3f(cloudScale, cloudScale, cloudScale));
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
 			cloudMat.apply(defaultShader);
+			earth.render();
+
+			// sun
+			model = new Matrix4f();
+			model.translate(new Vector3f(-20, 10, -20));
+			model.scale(new Vector3f(5f, 5f, 5f));
+			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
+			sunMat.apply(defaultShader);
 			earth.render();
 
 			// skybox
@@ -225,7 +235,10 @@ public class Main {
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_Y)) {
-			// player.getCamera().set
+			player.getCamera().roll(1 * deltaTime);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
+			player.getCamera().roll(-1 * deltaTime);
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {

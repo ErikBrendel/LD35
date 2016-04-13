@@ -10,6 +10,7 @@ import static util.Util.vPlus;
 import static util.Util.vScale;
 
 import org.lwjgl.util.vector.Vector3f;
+import static util.Util.vmMult;
 
 /**
  *
@@ -148,6 +149,18 @@ public class Camera {
 
 	public void setPosition(Vector3f position) {
 		this.position = position;
+	}
+	
+	/**
+	 * roll the camera
+	 * @param degrees roll in degrees
+	 */
+	public void roll(float degrees) {
+		Matrix4f rotUp = new Matrix4f();
+		rotUp.rotate(degrees, front);
+		up = vmMult(up, rotUp);
+		right = vmMult(right, rotUp);
+		updateCameraVectors();
 	}
 
 }
