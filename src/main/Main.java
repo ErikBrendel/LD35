@@ -53,7 +53,7 @@ public class Main {
 			DisplayMode full = Util.getBestDisplayMode();
 			Display.setDisplayMode(full);
 			Display.setFullscreen(true);
-			Display.setVSyncEnabled(true);
+			//Display.setVSyncEnabled(true);
 			Display.setTitle("Learning openGL with Java");
 			Display.create();
 
@@ -86,6 +86,9 @@ public class Main {
 
 		int dif = Util.loadTexture("container2.png");
 		int spec = Util.loadTexture("container2_specular.png");
+		
+		//int windowDif = Util.loadTexture("window.png");
+		//int windowSpec = Util.loadTexture("window_spec.png");
 		// Util.loadTexture("minecraft.png", 2, false);
 		Material mat = new Material(dif, spec);
 
@@ -100,7 +103,7 @@ public class Main {
 
 		// bunny
 		// Mesh bunny = new Mesh("bunny.obj");
-		Mesh bunny = loadObjectEBO("icoSphere.obj");
+		Mesh bunny = loadObjectEBO("bigSphere.obj");
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// glLineWidth(100);
