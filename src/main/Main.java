@@ -6,17 +6,17 @@
  */
 package main;
 
+import java.awt.Color;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import static util.ObjectLoader.*;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.util.HashMap;
+import light.DirectionalLight;
 
-import light.PointLight;
 import light.SpotLight;
 
 import org.lwjgl.input.Keyboard;
@@ -41,9 +41,9 @@ public class Main {
 	static float deltaTime = 0;
 	static long lastFrame = 0;
 	static Player player;
+	static SpotLight flashlight;
 
 	public static void main(String[] args) {
-		System.out.println("test!");
 
 		// create window
 		Point windowSize;
@@ -54,7 +54,7 @@ public class Main {
 			Display.setDisplayMode(full);
 			Display.setFullscreen(true);
 			//Display.setVSyncEnabled(true);
-			Display.setTitle("Learning openGL with Java");
+			Display.setTitle("Space explorer");
 			Display.create();
 
 			Mouse.create();
@@ -93,11 +93,11 @@ public class Main {
 		earthMat.apply(defaultShader);
 
 		// light
-		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 10, 2), 80);
-		pl.apply(defaultShader, "pointLight");
+		DirectionalLight sun = new DirectionalLight(new Color(255, 255, 220), new Vector3f(2, -1, 2));
+		sun.apply(defaultShader, "dirLight");
 
-		SpotLight sl = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), player.getCamera().getPosition(), player.getCamera().getDirection(), 10, 20, 40);
-		sl.apply(defaultShader, "spotLight");
+		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), player.getCamera().getPosition(), player.getCamera().getDirection(), 10, 20, 40);
+		flashlight.apply(defaultShader, "spotLight");
 
 		// bunny
 		Mesh earth = loadObjectEBO("earth.obj");
@@ -117,9 +117,9 @@ public class Main {
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
 
-			sl.setDirection(player.getCamera().getDirection());
-			sl.setPosition(player.getCamera().getPosition());
-			sl.apply(defaultShader, "spotLight");
+			flashlight.setDirection(player.getCamera().getDirection());
+			flashlight.setPosition(player.getCamera().getPosition());
+			flashlight.apply(defaultShader, "spotLight");
 
 			//render init and background
 			defaultShader.use();
@@ -170,6 +170,12 @@ public class Main {
 
 	private static void handleInputs(float deltaTime, Shader defaultShader) {
 		Mouse.poll();
+        if (Mouse.isButtonDown(0)) {
+			flashlight.setColor(new Vector3f(1, 1, 1));
+        } else {
+			flashlight.setColor(new Vector3f(0, 0, 0));
+        }
+		//flashlight.apply(defaultShader, null);
 
 		// zooming
 		int scrollDelta = Mouse.getDWheel();
@@ -180,6 +186,10 @@ public class Main {
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 			player.getCamera().processMouseScroll(60 * deltaTime);
+		}
+		
+		if (Keyboard.isKeyDown(Keyboard.KEY_Y)) {
+			//player.getCamera().set
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {

@@ -65,12 +65,12 @@ void main(){
 	vec3 viewDir = normalize(viewPos - pos);
 
 	if(dot(norm, viewDir) < 0){
-		norm = -norm;
+		//norm = -norm;
 	}
 	
-	vec3 result = calcPointLight(pointLight, norm, viewDir);
+	vec3 result = vec3(0); //calcPointLight(pointLight, norm, viewDir);
 	
-	//result += calcDirectionalLight(dirLight, norm, viewDir);
+	result += calcDirectionalLight(dirLight, norm, viewDir);
 
 	result += calcSpotLight(spotLight, norm, viewDir);
 	
