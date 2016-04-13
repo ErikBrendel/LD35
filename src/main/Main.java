@@ -72,7 +72,7 @@ public class Main {
 			System.exit(-1);
 		}
 
-		Skybox skybox = new Skybox("day");
+		Skybox skybox = new Skybox("ownSky");
 
 		HashMap<String, Object> parameters = new HashMap<>();
 		parameters.put("SHININESS", 64);
