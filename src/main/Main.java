@@ -86,13 +86,15 @@ public class Main {
 
 		int dif = Util.loadTexture("earth.jpg");
 		int spec = Util.loadTexture("earth_spec.jpg");
+		int cloud = Util.loadTexture("cloudSphere.png");
 		
 		//int windowDif = Util.loadTexture("window.png");
 		//int windowSpec = Util.loadTexture("window_spec.png");
 		// Util.loadTexture("minecraft.png", 2, false);
-		Material mat = new Material(dif, spec);
+		Material earthMat = new Material(dif, spec);
+		Material cloudMat = new Material(cloud, 0);
 
-		mat.apply(defaultShader);
+		earthMat.apply(defaultShader);
 
 		// light
 		PointLight pl = new PointLight(Color.WHITE, new Vector3f(2, 2, 2), 10);
@@ -147,15 +149,26 @@ public class Main {
 
 			Matrix4f model = new Matrix4f();
 			model.translate(new Vector3f(0, 0, -1));
-			float angle = (float)(System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f;
+			float angle = (float)(System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
 			model.rotate(angle, new Vector3f(0, 1, 0));
 			// glUniformMatrix4(reflectionShader.getUniform("model"), false,
 			// model.getData());
 			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
+			earthMat.apply(defaultShader);
+			earth.render();
+			
+			model.invalidate();
+			model.rotate(angle * 0.2f, new Vector3f(0, 1, 0));
+			float cloudScale = 1.01f;
+			model.scale(new Vector3f(cloudScale, cloudScale, cloudScale));
+			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
+			cloudMat.apply(defaultShader);
+			earth.render();
+			
+			
 
 			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
-
-			earth.render();
+			
 			skybox.render(player.getCamera());
 
 			// finish frame

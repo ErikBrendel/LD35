@@ -28,4 +28,8 @@ public class Matrix4f extends org.lwjgl.util.vector.Matrix4f {
         }
         return matrixBuffer;
     }
+	
+	public void invalidate() {
+		matrixBuffer = null;
+	}
 }
