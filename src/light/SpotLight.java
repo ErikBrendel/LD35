@@ -7,7 +7,9 @@ package light;
 
 import static org.lwjgl.opengl.GL20.glUniform1f;
 import static org.lwjgl.opengl.GL20.glUniform3f;
+
 import org.lwjgl.util.vector.Vector3f;
+
 import util.Shader;
 
 /**
@@ -88,6 +90,34 @@ public class SpotLight extends Light {
 		glUniform1f(shader.getUniform(uniform + ".linear"), linear);
 		glUniform1f(shader.getUniform(uniform + ".quadratic"), quadratic);
 		super.apply(shader, uniform);
+	}
+
+	public float[] getData() {
+		float[] data = new float[16];
+
+		data[0] = position.x;
+		data[1] = position.y;
+		data[2] = position.z;
+
+		data[4] = direction.x;
+		data[5] = direction.y;
+		data[6] = direction.z;
+
+		data[8] = color.x;
+		data[9] = color.y;
+		data[10] = color.z;
+
+		data[11] = (float) Math.cos(Math.toRadians(cutOff));
+
+		data[12] = (float) Math.cos(Math.toRadians(outerCutOff));
+
+		data[13] = constant;
+
+		data[14] = linear;
+
+		data[15] = quadratic;
+
+		return data;
 	}
 
 }

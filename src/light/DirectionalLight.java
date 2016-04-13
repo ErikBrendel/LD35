@@ -1,8 +1,11 @@
 package light;
 
 import java.awt.Color;
+
 import static org.lwjgl.opengl.GL20.glUniform3f;
+
 import org.lwjgl.util.vector.Vector3f;
+
 import util.Shader;
 
 /**
@@ -33,4 +36,16 @@ public class DirectionalLight extends Light {
 		super.apply(shader, uniform);
 	}
 
+	public float[] getData() {
+		float[] data = new float[8];
+		data[0] = direction.x;
+		data[1] = direction.y;
+		data[2] = direction.z;
+
+		data[4] = color.x;
+		data[5] = color.y;
+		data[6] = color.z;
+
+		return data;
+	}
 }

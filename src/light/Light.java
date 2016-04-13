@@ -11,7 +11,7 @@ import util.Shader;
  */
 public class Light {
 
-	private Vector3f color;
+	protected Vector3f color;
 
 	public Light(Vector3f color) {
 		this.color = color;

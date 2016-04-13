@@ -9,11 +9,13 @@ struct Material{
 	sampler2D texture_specular0;
 };
 
+//size 32
 struct DirLight{
 	vec3 direction;
 	vec3 color;
 };
 	
+//size 48
 struct PointLight{
 	vec3 position;
 
@@ -24,6 +26,7 @@ struct PointLight{
 	float quadratic;
 };
 
+//size 80
 struct SpotLight{
 	vec3 position;
 	vec3 direction;
@@ -41,11 +44,31 @@ float ambientStrength = 0.1f;
 float specularStrength = 0.5f;
 float reflectionStrength = 0.4f;
 
-uniform PointLight pointLight;
-
-uniform DirLight dirLight;
-
-uniform SpotLight spotLight;
+layout (std140) uniform Lights{		
+	DirLight[
+	#if NUM_DIR_LIGHTS == 0
+	1
+	#else
+	NUM_DIR_LIGHTS
+	#endif
+	] dirLights;
+	
+	SpotLight[
+	#if NUM_SPOT_LIGHTS == 0
+	1
+	#else
+	NUM_SPOT_LIGHTS
+	#endif
+	] spotLights;
+	
+	PointLight[
+	#if NUM_POINT_LIGHTS == 0
+	1
+	#else
+	NUM_POINT_LIGHTS
+	#endif
+	] pointLights;
+};
 
 uniform Material material;
 
@@ -68,11 +91,19 @@ void main(){
 		//norm = -norm;
 	}
 	
-	vec3 result = vec3(0); //calcPointLight(pointLight, norm, viewDir);
+	vec3 result = vec3(0); 
 	
-	result += calcDirectionalLight(dirLight, norm, viewDir);
-
-	result += calcSpotLight(spotLight, norm, viewDir);
+	for(int i = 0; i < NUM_POINT_LIGHTS; i++){
+		result += calcPointLight(pointLights[i], norm, viewDir);
+	}
+	
+	for(int i = 0; i < NUM_DIR_LIGHTS; i++){
+		result += calcDirectionalLight(dirLights[i], norm, viewDir);
+	}
+	
+	for(int i = 0; i < NUM_SPOT_LIGHTS; i++){
+		result += calcSpotLight(spotLights[i], norm, viewDir);
+	}
 	
 	vec3 ambient = ambientStrength * vec3(texture(material.texture_diffuse0, tex));
 
