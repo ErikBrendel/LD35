@@ -62,16 +62,10 @@ public class LightHandler {
 			float[] data = pl.getData();
 			pointLightsBuffer.put(data);
 			pointLightsBuffer.flip();
-
-			for (float f : data) {
-				System.out.println(f);
-			}
-
 			glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + pointLightOffset) * 4, pointLightsBuffer);
 			pointLightOffset += 12;
 		}
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		System.out.println(pointLightOffset + " " + spotLightOffset + " " + dirLightOffset);
 	}
 
 	public void addLight(Light light, ArrayList<Shader> shaders) {
@@ -142,5 +136,17 @@ public class LightHandler {
 
 		}
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	public int getNumDirLights() {
+		return numDirLights;
+	}
+
+	public int getNumSpotLights() {
+		return numSpotLights;
+	}
+
+	public int getNumPointLights() {
+		return numPointLights;
 	}
 }

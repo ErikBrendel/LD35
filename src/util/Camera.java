@@ -92,8 +92,15 @@ public class Camera {
 			pitch = -1.5f;
 		}
 
-		float deltaYaw = (yaw - actualYaw) * deltaTime * rotationsSpeed;
-		float deltaPitch = (pitch - actualPitch) * deltaTime * rotationsSpeed;
+		float deltaYaw;
+		float deltaPitch;
+		if (deltaTime * rotationsSpeed > 1) {
+			deltaYaw = yaw - actualYaw;
+			deltaPitch = pitch - actualPitch;
+		} else {
+			deltaYaw = (yaw - actualYaw) * deltaTime * rotationsSpeed;
+			deltaPitch = (pitch - actualPitch) * deltaTime * rotationsSpeed;
+		}
 
 		actualYaw += deltaYaw;
 		actualPitch += deltaPitch;
@@ -153,7 +160,7 @@ public class Camera {
 
 	/**
 	 * roll the camera
-	 * 
+	 *
 	 * @param degrees
 	 *            roll in degrees
 	 */

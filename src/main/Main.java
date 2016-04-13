@@ -145,7 +145,7 @@ public class Main {
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
-			// System.out.println("FPS = " + (double) 1 / deltaTime);
+			System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
 			// handle all inputs
