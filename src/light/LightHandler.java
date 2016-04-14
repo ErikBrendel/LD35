@@ -32,7 +32,7 @@ public class LightHandler {
 
 	private void generateUBO() {
 		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-		glBufferData(GL_UNIFORM_BUFFER, 32 * Math.max(1, numDirLights) + 48 * Math.max(1, numPointLights) + 64 * Math.max(1, numSpotLights), GL_STATIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, 32 * Math.max(1, numDirLights) + 48 * Math.max(1, numPointLights) + 64 * Math.max(1, numSpotLights), GL_DYNAMIC_DRAW);
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, UBO);
 

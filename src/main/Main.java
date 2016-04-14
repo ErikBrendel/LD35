@@ -74,7 +74,7 @@ public class Main {
 
 		int matricesUBO = glGenBuffers();
 		glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
-		glBufferData(GL_UNIFORM_BUFFER, 128, GL_STATIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, 128, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, 1, matricesUBO);
 		Matrix4f projection = player.getProjectionMatrix();
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
