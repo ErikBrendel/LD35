@@ -6,12 +6,11 @@
  */
 package main;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
 import static util.ObjectLoader.loadObjectEBO;
 
 import java.awt.Color;
@@ -20,7 +19,6 @@ import java.util.HashMap;
 
 import light.DirectionalLight;
 import light.LightHandler;
-import light.PointLight;
 import light.SpotLight;
 
 import org.lwjgl.input.Keyboard;
@@ -29,6 +27,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 import util.Material;
+import util.Matrix4f;
 import util.Mesh;
 import util.MeshInstance;
 import util.Player;
@@ -51,7 +50,9 @@ public class Main {
 	public static void main(String[] args) {
 
 		// create window
-		Util.createWindow("Space explorer", false);
+		Util.createWindow("Space explorer", true);
+
+		player = new Player();
 
 		shaders = new ArrayList<>();
 		lh = new LightHandler();
@@ -59,7 +60,7 @@ public class Main {
 		Skybox skybox = new Skybox("ownSky");
 
 		HashMap<String, Object> parameters = new HashMap<>();
-		parameters.put("SHININESS", 64);
+		parameters.put("SHININESS", 128);
 		parameters.put("NUM_DIR_LIGHTS", 0);
 		parameters.put("NUM_SPOT_LIGHTS", 0);
 		parameters.put("NUM_POINT_LIGHTS", 0);
@@ -68,9 +69,20 @@ public class Main {
 
 		defaultShader.use();
 		defaultShader.addUniformBlockIndex(0, "Lights");
-		shaders.add(defaultShader);
+		defaultShader.addUniformBlockIndex(1, "Matrices");
+		noLightShader.addUniformBlockIndex(1, "Matrices");
 
-		player = new Player();
+		int matricesUBO = glGenBuffers();
+		glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+		glBufferData(GL_UNIFORM_BUFFER, 128, GL_STATIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 1, matricesUBO);
+		Matrix4f projection = player.getProjectionMatrix();
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
+		Matrix4f view = player.getViewMatrix();
+		glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		shaders.add(defaultShader);
 
 		int dif = Util.loadTexture("earth.jpg");
 		int spec = Util.loadTexture("earth_spec.jpg");
@@ -88,24 +100,20 @@ public class Main {
 
 		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 10, 20, 15);
 
-		PointLight pl = new PointLight(Color.ORANGE, new Vector3f(0, 0, 4), 30);
-
 		lh.addLight(flashlight, shaders);
-		lh.addLight(flashlight, shaders);
-		lh.addLight(pl, shaders);
 		lh.addLight(sunLight, shaders);
 
 		// planets
 		Mesh planetSphere = loadObjectEBO("torus.obj");
-		
+
 		MeshInstance earth = new MeshInstance(planetSphere, earthMat);
 		earth.setLocation(new Vector3f(0, 0, -2));
-		
+
 		MeshInstance clouds = new MeshInstance(planetSphere, cloudMat);
 		clouds.setLocation(new Vector3f(0, 0, -2));
 		float cloudScale = 1.01f;
 		clouds.setScale(new Vector3f(cloudScale, cloudScale, cloudScale));
-		
+
 		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
 
@@ -126,6 +134,15 @@ public class Main {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
+
+			// Update Matrices Uniform Buffer Block
+			view = player.getViewMatrix();
+			projection = player.getProjectionMatrix();
+
+			glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
+			glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 			flashlight.setDirection(player.getCamera().getDirection());
 			flashlight.setPosition(player.getCamera().getPosition());
@@ -150,7 +167,7 @@ public class Main {
 			// clouds
 			clouds.setRotation(new Vector3f(0, angle * 1f, 0));
 			clouds.render(defaultShader);
-			
+
 			// sun
 			sun.setLocation(sunPos);
 			noLightShader.use();
@@ -164,7 +181,7 @@ public class Main {
 
 			// finish frame
 			Display.update();
-			Display.sync(500);
+			Display.sync(60);
 		}
 	}
 

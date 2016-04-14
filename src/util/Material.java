@@ -25,7 +25,9 @@ public class Material {
 
 	public void apply(Shader shader, String uniform) {
 		glUniform1i(shader.getUniform(uniform + ".texture_diffuse0"), diffuseTex);
-		glUniform1i(shader.getUniform(uniform + ".texture_specular0"), specularTex);
+		if (specularTex != 0) {
+			glUniform1i(shader.getUniform(uniform + ".texture_specular0"), specularTex);
+		}
 	}
 
 	public void apply(Shader shader) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 
+ *  Copyright 2016
  *  Markus Brand and Erik Brendel, Potsdam.
  *  This File is part of a game created
  *  for LudumDare 35.
@@ -7,7 +7,6 @@
 package util;
 
 import java.util.ArrayList;
-import light.DirectionalLight;
 import light.Light;
 import light.LightHandler;
 import static org.lwjgl.opengl.GL20.glUniform1i;
@@ -71,7 +70,7 @@ public class World {
 	public void update(float deltaTime) {
 		player.update(deltaTime);
 		// update player position uniform
-		player.applyToShader(shaders.get(0));
+		player.applyToShader(shaders.get(0), false);
 	}
 
 	public void updateLight(Light sunLight) {

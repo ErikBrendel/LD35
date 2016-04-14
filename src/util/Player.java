@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import static org.lwjgl.opengl.GL20.glUniform3f;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -61,21 +60,14 @@ public class Player {
 		if (setViewPos) {
 			glUniform3f(shader.getUniform("viewPos"), getCamera().getPosition().x, getCamera().getPosition().y, getCamera().getPosition().z);
 		}
-
-		// projection matrix
-		Matrix4f projection = getProjectionMatrix();
-		glUniformMatrix4(shader.getUniform("projection"), false, projection.getData());
-
-		// view matrix
-		Matrix4f view = getViewMatrix();
-		glUniformMatrix4(shader.getUniform("view"), false, view.getData());
 	}
 
 	/**
 	 * fetches input events (like lookaround and walking) and updates the
 	 * uniform values to also show this progress
 	 *
-	 * @param deltaTime time passed since last frame
+	 * @param deltaTime
+	 *            time passed since last frame
 	 */
 	public void update(float deltaTime) {
 		// lClick

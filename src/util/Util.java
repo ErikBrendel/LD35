@@ -184,11 +184,9 @@ public class Util {
 	public static Vector3f vCross(Vector3f a, Vector3f b) {
 		return new Vector3f(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 	}
-	
+
 	public static Vector3f vmMult(Vector3f v, Matrix4f m) {
-		return new Vector3f(v.x * m.m00 + v.y * m.m01 + v.z * m.m02, 
-							v.x * m.m10 + v.y * m.m11 + v.z * m.m12,
-							v.x * m.m20 + v.y * m.m21 + v.z * m.m22);
+		return new Vector3f(v.x * m.m00 + v.y * m.m01 + v.z * m.m02, v.x * m.m10 + v.y * m.m11 + v.z * m.m12, v.x * m.m20 + v.y * m.m21 + v.z * m.m22);
 	}
 
 	public static Matrix4f lookAt(Vector3f eye, Vector3f center, Vector3f up) {
@@ -227,7 +225,7 @@ public class Util {
 			return null;
 		}
 	}
-	
+
 	public static void createWindow(String title, boolean vSync) {
 		Point windowSize;
 		try {
@@ -246,6 +244,7 @@ public class Util {
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LEQUAL);
 			glEnable(GL_STENCIL_TEST);
+			// glEnable(GL_FRAMEBUFFER_SRGB);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

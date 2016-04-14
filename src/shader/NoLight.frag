@@ -13,5 +13,7 @@ struct Material{
 uniform Material material;
 
 void main(){
-	color = texture(material.texture_diffuse0, tex);
+	color = texture(material.texture_diffuse0, tex);	
+	float gamma = 2.0;
+   	color.xyz = pow(color.xyz, vec3(1.0/gamma));
 }

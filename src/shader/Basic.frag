@@ -40,7 +40,7 @@ struct SpotLight{
 	float quadratic;
 };
 
-float ambientStrength = 0.1f;
+float ambientStrength = 0.01f;
 float specularStrength = 0.5f;
 float reflectionStrength = 0.4f;
 
@@ -109,6 +109,9 @@ void main(){
 
 	result += ambient;
 
+	float gamma = 2.0;
+   	result = pow(result, vec3(1.0/gamma));
+    	
 	float a = texture(material.texture_specular0, tex).r * reflectionStrength;
 	if(a > 0){
 		vec3 I = normalize(pos - viewPos);
@@ -131,13 +134,13 @@ void main(){
 }
 
 vec3 calcDirectionalLight(DirLight light, vec3 norm, vec3 viewDir){	
-	vec3 dir = normalize(-light.direction);
+	vec3 direction = normalize(-light.direction);
 
-	float diff = max(dot(norm, dir), 0.0);
+	float diff = max(dot(norm, direction), 0.0);
 	vec3 diffuse = diff * light.color;
 
-	vec3 reflectDir = reflect(-dir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), SHININESS);
+	vec3 halfwayDir = normalize(direction + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0f), SHININESS);
 	vec3 specular = specularStrength * spec * light.color;
 
 	return vec3(texture(material.texture_diffuse0, tex)) * diffuse + vec3(texture(material.texture_specular0, tex)) * specular;
@@ -152,8 +155,8 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir){
 	float diff = max(dot(norm, direction), 0.0);
 	vec3 diffuse = diff * light.color;
 
-	vec3 reflectDir = reflect(-direction, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), SHININESS);
+	vec3 halfwayDir = normalize(direction + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0f), SHININESS);
 	vec3 specular = specularStrength * spec * light.color;
 	
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * distance * distance);
@@ -174,8 +177,8 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir){
 	float diff = max(dot(norm, direction), 0.0);
 	vec3 diffuse = diff * light.color;
 
-	vec3 reflectDir = reflect(-direction, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), SHININESS);
+	vec3 halfwayDir = normalize(direction + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0f), SHININESS);
 	vec3 specular = specularStrength * spec * light.color;
 	
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * distance * distance);
