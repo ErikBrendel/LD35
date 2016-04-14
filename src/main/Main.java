@@ -47,6 +47,7 @@ import org.lwjgl.util.vector.Vector3f;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
+import util.MeshInstance;
 import util.Player;
 import util.Shader;
 import util.Skybox;
@@ -67,31 +68,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		// create window
-		Point windowSize;
-		try {
-			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-			windowSize = new Point((int) screen.getWidth(), (int) screen.getHeight());
-			DisplayMode full = Util.getBestDisplayMode();
-			Display.setDisplayMode(full);
-			Display.setFullscreen(true);
-			// Display.setVSyncEnabled(true);
-			Display.setTitle("Space explorer");
-			Display.create();
-
-			Mouse.create();
-			Mouse.setGrabbed(true);
-
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LEQUAL);
-			glEnable(GL_STENCIL_TEST);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-			glViewport(0, 0, windowSize.x, windowSize.y);
-		} catch (Exception e) {
-			System.out.println("Error setting up display");
-			System.exit(-1);
-		}
+		Util.createWindow("Space explorer", true);
 
 		shaders = new ArrayList<>();
 		lh = new LightHandler();
@@ -123,7 +100,7 @@ public class Main {
 		earthMat.apply(defaultShader);
 
 		// light
-		DirectionalLight sun = new DirectionalLight(new Color(255, 255, 220), new Vector3f(2, -1, 2));
+		DirectionalLight sunLight = new DirectionalLight(new Color(255, 255, 220), new Vector3f(2, -1, 2));
 
 		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 10, 20, 15);
 
@@ -132,10 +109,21 @@ public class Main {
 		lh.addLight(flashlight, shaders);
 		lh.addLight(flashlight, shaders);
 		lh.addLight(pl, shaders);
-		lh.addLight(sun, shaders);
+		lh.addLight(sunLight, shaders);
 
-		// bunny
-		Mesh earth = loadObjectEBO("earth.obj");
+		// planets
+		Mesh planetSphere = loadObjectEBO("earth.obj");
+		
+		MeshInstance earth = new MeshInstance(planetSphere, earthMat);
+		earth.setLocation(new Vector3f(0, 0, -2));
+		
+		MeshInstance clouds = new MeshInstance(planetSphere, cloudMat);
+		clouds.setLocation(new Vector3f(0, 0, -2));
+		float cloudScale = 1.01f;
+		clouds.setScale(new Vector3f(cloudScale, cloudScale, cloudScale));
+		
+		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
+		sun.setScale(new Vector3f(5, 5, 5));
 
 		Vector3f sunPos, earthPos = new Vector3f(0, 0, 0);
 
@@ -150,7 +138,7 @@ public class Main {
 
 			// handle all inputs
 			sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
-			sun.setDirection(Vector3f.sub(earthPos, sunPos, null));
+			sunLight.setDirection(Vector3f.sub(earthPos, sunPos, null));
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
@@ -159,7 +147,7 @@ public class Main {
 			flashlight.setPosition(player.getCamera().getPosition());
 
 			lh.updateLight(flashlight);
-			lh.updateLight(sun);
+			lh.updateLight(sunLight);
 
 			// render init and background
 			defaultShader.use();
@@ -168,41 +156,20 @@ public class Main {
 
 			glUniform1i(defaultShader.getUniform("alpha"), 1);
 			// update player position uniform
-			glUniform3f(defaultShader.getUniform("viewPos"), player.getCamera().getPosition().x, player.getCamera().getPosition().y, player.getCamera().getPosition().z);
-
-			// projection matrix
-			Matrix4f projection = player.getProjectionMatrix();
-			glUniformMatrix4(defaultShader.getUniform("projection"), false, projection.getData());
-
-			// view matrix
-			Matrix4f view = player.getViewMatrix();
-			glUniformMatrix4(defaultShader.getUniform("view"), false, view.getData());
+			player.applyToShader(defaultShader);
 
 			// earth
-			Matrix4f model = new Matrix4f();
-			model.translate(new Vector3f(0, 0, -2));
 			float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
-			model.rotate(angle, new Vector3f(0, 1, 0));
-			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
-			earthMat.apply(defaultShader);
-			earth.render();
+			earth.setRotation(new Vector3f(0, angle, 0));
+			earth.render(defaultShader);
 
 			// clouds
-			model.invalidate();
-			model.rotate(angle * 0.2f, new Vector3f(0, 1, 0));
-			float cloudScale = 1.01f;
-			model.scale(new Vector3f(cloudScale, cloudScale, cloudScale));
-			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
-			cloudMat.apply(defaultShader);
-			earth.render();
-
+			clouds.setRotation(new Vector3f(0, angle * 0.2f, 0));
+			clouds.render(defaultShader);
+			
 			// sun
-			model = new Matrix4f();
-			model.translate(sunPos);
-			model.scale(new Vector3f(5f, 5f, 5f));
-			glUniformMatrix4(defaultShader.getUniform("model"), false, model.getData());
-			sunMat.apply(defaultShader);
-			earth.render();
+			sun.setLocation(sunPos);
+			sun.render(defaultShader);
 
 			// skybox
 			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());

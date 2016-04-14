@@ -5,6 +5,9 @@
  */
 package util;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL12.*;
@@ -17,6 +20,7 @@ import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.vector.Vector3f;
@@ -221,6 +225,34 @@ public class Util {
 			return full;
 		} catch (Exception ex) {
 			return null;
+		}
+	}
+	
+	public static void createWindow(String title, boolean vSync) {
+		Point windowSize;
+		try {
+			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+			windowSize = new Point((int) screen.getWidth(), (int) screen.getHeight());
+			DisplayMode full = Util.getBestDisplayMode();
+			Display.setDisplayMode(full);
+			Display.setFullscreen(true);
+			Display.setVSyncEnabled(vSync);
+			Display.setTitle(title);
+			Display.create();
+
+			Mouse.create();
+			Mouse.setGrabbed(true);
+
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LEQUAL);
+			glEnable(GL_STENCIL_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			glViewport(0, 0, windowSize.x, windowSize.y);
+		} catch (Exception e) {
+			System.out.println("Error setting up display");
+			System.exit(-1);
 		}
 	}
 }

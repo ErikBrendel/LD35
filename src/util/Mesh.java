@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package util;
 
 import java.nio.FloatBuffer;
@@ -16,7 +11,8 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 
 /**
- *
+ * A Mesh object only consists of the vertex data.
+ * To render an object, create a MeshInstance
  * @author Erik
  */
 public class Mesh {
