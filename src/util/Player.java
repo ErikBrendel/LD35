@@ -57,8 +57,10 @@ public class Player {
 	 *
 	 * @param shader
 	 */
-	public void applyToShader(Shader shader) {
-		glUniform3f(shader.getUniform("viewPos"), getCamera().getPosition().x, getCamera().getPosition().y, getCamera().getPosition().z);
+	public void applyToShader(Shader shader, boolean setViewPos) {
+		if (setViewPos) {
+			glUniform3f(shader.getUniform("viewPos"), getCamera().getPosition().x, getCamera().getPosition().y, getCamera().getPosition().z);
+		}
 
 		// projection matrix
 		Matrix4f projection = getProjectionMatrix();

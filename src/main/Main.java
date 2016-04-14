@@ -6,30 +6,15 @@
  */
 package main;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL20.glUniform3f;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import static util.ObjectLoader.loadObjectEBO;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,11 +26,9 @@ import light.SpotLight;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.vector.Vector3f;
 
 import util.Material;
-import util.Matrix4f;
 import util.Mesh;
 import util.MeshInstance;
 import util.Player;
@@ -68,7 +51,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		// create window
-		Util.createWindow("Space explorer", true);
+		Util.createWindow("Space explorer", false);
 
 		shaders = new ArrayList<>();
 		lh = new LightHandler();
@@ -81,6 +64,7 @@ public class Main {
 		parameters.put("NUM_SPOT_LIGHTS", 0);
 		parameters.put("NUM_POINT_LIGHTS", 0);
 		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag", parameters);
+		Shader noLightShader = Shader.fromFile("Basic.vert", "NoLight.frag");
 
 		defaultShader.use();
 		defaultShader.addUniformBlockIndex(0, "Lights");
@@ -112,7 +96,7 @@ public class Main {
 		lh.addLight(sunLight, shaders);
 
 		// planets
-		Mesh planetSphere = loadObjectEBO("earth.obj");
+		Mesh planetSphere = loadObjectEBO("torus.obj");
 		
 		MeshInstance earth = new MeshInstance(planetSphere, earthMat);
 		earth.setLocation(new Vector3f(0, 0, -2));
@@ -156,7 +140,7 @@ public class Main {
 
 			glUniform1i(defaultShader.getUniform("alpha"), 1);
 			// update player position uniform
-			player.applyToShader(defaultShader);
+			player.applyToShader(defaultShader, true);
 
 			// earth
 			float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
@@ -164,12 +148,15 @@ public class Main {
 			earth.render(defaultShader);
 
 			// clouds
-			clouds.setRotation(new Vector3f(0, angle * 0.2f, 0));
+			clouds.setRotation(new Vector3f(0, angle * 1f, 0));
 			clouds.render(defaultShader);
 			
 			// sun
 			sun.setLocation(sunPos);
-			sun.render(defaultShader);
+			noLightShader.use();
+			player.applyToShader(noLightShader, false);
+			sun.render(noLightShader);
+			defaultShader.use();
 
 			// skybox
 			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
