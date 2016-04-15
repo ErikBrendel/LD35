@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL20.glUniform3f;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import util.Scene;
 import util.Shader;
 
 /**
@@ -92,6 +93,7 @@ public class SpotLight extends Light {
 		super.apply(shader, uniform);
 	}
 
+	@Override
 	public float[] getData() {
 		float[] data = new float[16];
 
@@ -118,6 +120,12 @@ public class SpotLight extends Light {
 		data[15] = quadratic;
 
 		return data;
+	}
+
+	@Override
+	public void renderShadows(Scene scene) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

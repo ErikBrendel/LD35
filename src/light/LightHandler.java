@@ -3,12 +3,16 @@ package light;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.Display;
+
+import util.Scene;
 import util.Shader;
 
 import com.sun.prism.impl.BufferUtil;
 
 import static org.lwjgl.opengl.GL31.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL15.*;
 
 public class LightHandler {
@@ -136,6 +140,22 @@ public class LightHandler {
 
 		}
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	public void renderLightShadows(Scene scene) {
+		for (DirectionalLight dl : dirLights) {
+			dl.renderShadows(scene);
+		}
+
+		for (SpotLight sl : spotLights) {
+			sl.renderShadows(scene);
+		}
+
+		for (PointLight pl : pointLights) {
+			pl.renderShadows(scene);
+		}
+
+		glViewport(0, 0, Display.getWidth(), Display.getHeight());
 	}
 
 	public int getNumDirLights() {

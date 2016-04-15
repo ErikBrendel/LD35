@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL20.glUniform3f;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import util.Scene;
 import util.Shader;
 
 /**
@@ -17,6 +18,12 @@ public abstract class Light {
 	protected Vector3f color;
 	private static int count = 0;
 	private int id;
+
+	protected static Shader shadowShader;
+
+	static {
+		shadowShader = Shader.fromFile("Shadow.vert", "Shadow.frag");
+	}
 
 	public Light(Vector3f color) {
 		this.color = color;
@@ -45,4 +52,6 @@ public abstract class Light {
 	}
 
 	public abstract float[] getData();
+
+	public abstract void renderShadows(Scene scene);
 }

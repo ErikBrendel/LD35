@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL20.glUniform3f;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import util.Scene;
 import util.Shader;
 
 /**
@@ -96,6 +97,7 @@ public class PointLight extends Light {
 		super.apply(shader, uniform);
 	}
 
+	@Override
 	public float[] getData() {
 		float[] data = new float[12];
 
@@ -113,6 +115,12 @@ public class PointLight extends Light {
 		data[9] = quadratic;
 
 		return data;
+	}
+
+	@Override
+	public void renderShadows(Scene scene) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

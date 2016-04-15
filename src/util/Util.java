@@ -169,6 +169,20 @@ public class Util {
 		return mat;
 	}
 
+	public static Matrix4f orthographic(float l, float r, float b, float t, float n, float f) {
+		Matrix4f mat = new Matrix4f();
+
+		mat.m00 = 2 / (r + l);
+		mat.m11 = 2 / (t - b);
+		mat.m22 = -2 / (f - n);
+		mat.m03 = -(r + l) / (r - l);
+		mat.m13 = -(t + b) / (t - b);
+		mat.m23 = -(f + n) / (f - n);
+		mat.m33 = 1;
+
+		return mat;
+	}
+
 	public static Vector3f vPlus(Vector3f v1, Vector3f v2) {
 		return new Vector3f(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 	}
