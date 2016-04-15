@@ -60,16 +60,19 @@ public class Main {
 		Skybox skybox = new Skybox("ownSky");
 
 		HashMap<String, Object> parameters = new HashMap<>();
-		parameters.put("SHININESS", 128);
+		parameters.put("SHININESS", 256);
 		parameters.put("NUM_DIR_LIGHTS", 0);
 		parameters.put("NUM_SPOT_LIGHTS", 0);
 		parameters.put("NUM_POINT_LIGHTS", 0);
 		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag", parameters);
 		Shader noLightShader = Shader.fromFile("Basic.vert", "NoLight.frag");
+		Shader instancedShader = Shader.fromFile("Instanced.vert", "Instanced.frag", parameters);
 
 		defaultShader.use();
 		defaultShader.addUniformBlockIndex(0, "Lights");
 		defaultShader.addUniformBlockIndex(1, "Matrices");
+		instancedShader.addUniformBlockIndex(0, "Lights");
+		instancedShader.addUniformBlockIndex(1, "Matrices");
 		noLightShader.addUniformBlockIndex(1, "Matrices");
 
 		int matricesUBO = glGenBuffers();
@@ -83,17 +86,19 @@ public class Main {
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		shaders.add(defaultShader);
+		shaders.add(instancedShader);
 
 		int dif = Util.loadTexture("earth.jpg");
 		int spec = Util.loadTexture("earth_spec.jpg");
 		int cloud = Util.loadTexture("cloudSphere.png");
 		int sunTex = Util.loadTexture("sun.jpg");
+		int rock = Util.loadTexture("container2.png");
+		int rockSpec = Util.loadTexture("container2_specular.png");
 
 		Material earthMat = new Material(dif, spec);
 		Material cloudMat = new Material(cloud, 0);
 		Material sunMat = new Material(sunTex, 0);
-
-		earthMat.apply(defaultShader);
+		Material rockMat = new Material(rock, rockSpec);
 
 		// light
 		DirectionalLight sunLight = new DirectionalLight(new Color(255, 255, 220), new Vector3f(2, -1, 2));
@@ -104,7 +109,8 @@ public class Main {
 		lh.addLight(sunLight, shaders);
 
 		// planets
-		Mesh planetSphere = loadObjectEBO("torus.obj");
+		Mesh planetSphere = loadObjectEBO("earth.obj");
+		Mesh asteroid = loadObjectEBO("asteroid.obj");
 
 		MeshInstance earth = new MeshInstance(planetSphere, earthMat);
 		earth.setLocation(new Vector3f(0, 0, -2));
