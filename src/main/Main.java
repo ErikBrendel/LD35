@@ -55,7 +55,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		// create window
-		Util.createWindow("Space explorer", true);
+		Util.createWindow("Space explorer", false);
 
 		player = new Player();
 
@@ -130,7 +130,7 @@ public class Main {
 		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
 
-		int amount = 100000;
+		int amount = 10000;
 		Matrix4f[] matrices = new Matrix4f[amount];
 		Random ran = new Random(System.currentTimeMillis());
 		float radius = 9;
@@ -149,7 +149,7 @@ public class Main {
 			model.translate(new Vector3f(x, y, z));
 
 			// 2. Scale: Scale between 0.05 and 0.25f
-			float scale = ran.nextInt() % 20 / 100.0f + 0.05f;
+			float scale = ran.nextInt() % 20 / 20.0f + 0.2f;
 			model.scale(new Vector3f(scale, scale, scale));
 
 			// 3. Rotation: add random rotation around a (semi)randomly picked

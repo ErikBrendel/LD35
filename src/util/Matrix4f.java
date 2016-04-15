@@ -37,6 +37,28 @@ public class Matrix4f extends org.lwjgl.util.vector.Matrix4f {
 		}
 		return data;
 	}
+	
+	public void loadData(float[] data) {
+		assert data.length >= 16;
+		m00 = data[0];
+		m01 = data[1];
+		m02 = data[2];
+		m03 = data[3];
+		m10 = data[4];
+		m11 = data[5];
+		m12 = data[6];
+		m13 = data[7];
+		m20 = data[8];
+		m21 = data[9];
+		m22 = data[10];
+		m23 = data[11];
+		m30 = data[12];
+		m31 = data[13];
+		m32 = data[14];
+		m33 = data[15];
+		
+		getDataArray();
+	}
 
 	public void invalidate() {
 		matrixBuffer = null;
