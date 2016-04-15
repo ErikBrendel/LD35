@@ -9,22 +9,27 @@ package main;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL33.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static util.ObjectLoader.loadObjectEBO;
 
 import java.awt.Color;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
-import light.DirectionalLight;
 import light.LightHandler;
+import light.PointLight;
 import light.SpotLight;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
+
+import com.sun.prism.impl.BufferUtil;
 
 import util.Material;
 import util.Matrix4f;
@@ -66,7 +71,7 @@ public class Main {
 		parameters.put("NUM_POINT_LIGHTS", 0);
 		Shader defaultShader = Shader.fromFile("Basic.vert", "Basic.frag", parameters);
 		Shader noLightShader = Shader.fromFile("Basic.vert", "NoLight.frag");
-		Shader instancedShader = Shader.fromFile("Instanced.vert", "Instanced.frag", parameters);
+		Shader instancedShader = Shader.fromFile("Instanced.vert", "Basic.frag", parameters);
 
 		defaultShader.use();
 		defaultShader.addUniformBlockIndex(0, "Lights");
@@ -100,8 +105,10 @@ public class Main {
 		Material sunMat = new Material(sunTex, 0);
 		Material rockMat = new Material(rock, rockSpec);
 
+		Vector3f sunPos = new Vector3f();
+
 		// light
-		DirectionalLight sunLight = new DirectionalLight(new Color(255, 255, 220), new Vector3f(2, -1, 2));
+		PointLight sunLight = new PointLight(new Color(255, 255, 220), sunPos, 1000f);
 
 		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 10, 20, 15);
 
@@ -113,17 +120,72 @@ public class Main {
 		Mesh asteroid = loadObjectEBO("asteroid.obj");
 
 		MeshInstance earth = new MeshInstance(planetSphere, earthMat);
-		earth.setLocation(new Vector3f(0, 0, -2));
+		earth.setLocation(new Vector3f(0, 0, 0));
 
 		MeshInstance clouds = new MeshInstance(planetSphere, cloudMat);
-		clouds.setLocation(new Vector3f(0, 0, -2));
+		clouds.setLocation(new Vector3f(0, 0, 0));
 		float cloudScale = 1.01f;
 		clouds.setScale(new Vector3f(cloudScale, cloudScale, cloudScale));
 
 		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
 
-		Vector3f sunPos, earthPos = new Vector3f(0, 0, 0);
+		int amount = 100000;
+		Matrix4f[] matrices = new Matrix4f[amount];
+		Random ran = new Random(System.currentTimeMillis());
+		float radius = 9;
+		float offset = 1.5f;
+		for (int i = 0; i < amount; i++) {
+			Matrix4f model = new Matrix4f();
+			float angle = (float) i / amount * 360f;
+			float displacement = ran.nextInt() % (offset * 200) / 100f - offset;
+			float x = (float) Math.sin(Math.toDegrees(angle)) * radius + displacement;
+			displacement = ran.nextInt() % (int) (2 * offset * 100) / 100.0f - offset;
+			float y = displacement * 0.4f; // Keep height of asteroid
+											// field smaller compared to
+											// width of x and z
+			displacement = ran.nextInt() % (int) (2 * offset * 100) / 100.0f - offset;
+			float z = (float) Math.cos(Math.toDegrees(angle)) * radius + displacement;
+			model.translate(new Vector3f(x, y, z));
+
+			// 2. Scale: Scale between 0.05 and 0.25f
+			float scale = ran.nextInt() % 20 / 100.0f + 0.05f;
+			model.scale(new Vector3f(scale, scale, scale));
+
+			// 3. Rotation: add random rotation around a (semi)randomly picked
+			// rotation axis vector
+			float rotAngle = ran.nextInt() % 360;
+			model.rotate((float) Math.toDegrees(rotAngle), new Vector3f(0.4f, 0.6f, 0.8f));
+
+			matrices[i] = model;
+		}
+
+		FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
+		for (int i = 0; i < amount; i++) {
+			data.put(matrices[i].getDataArray());
+		}
+		data.flip();
+
+		int VAO = asteroid.getVAO();
+		glBindVertexArray(VAO);
+		int buffer = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, false, 64, 0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, false, 64, 16);
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, false, 64, 32);
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, false, 64, 48);
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// game loop
@@ -131,12 +193,12 @@ public class Main {
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
-			System.out.println("FPS = " + (double) 1 / deltaTime);
+			// System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
 			// handle all inputs
 			sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
-			sunLight.setDirection(Vector3f.sub(earthPos, sunPos, null));
+			sunLight.setPosition(sunPos);
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
@@ -180,6 +242,12 @@ public class Main {
 			player.applyToShader(noLightShader, false);
 			sun.render(noLightShader);
 			defaultShader.use();
+
+			instancedShader.use();
+			rockMat.apply(instancedShader);
+			glBindVertexArray(VAO);
+			glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(), GL_UNSIGNED_INT, 0, amount);
+			glBindVertexArray(0);
 
 			// skybox
 			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
