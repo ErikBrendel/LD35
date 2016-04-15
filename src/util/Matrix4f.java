@@ -21,6 +21,10 @@ public class Matrix4f extends org.lwjgl.util.vector.Matrix4f {
 		super();
 	}
 
+	public Matrix4f(org.lwjgl.util.vector.Matrix4f src) {
+		super(src);
+	}
+
 	public FloatBuffer getData() {
 		if (matrixBuffer == null) {
 			matrixBuffer = BufferUtils.createFloatBuffer(16);

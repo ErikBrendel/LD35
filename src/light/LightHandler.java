@@ -154,7 +154,6 @@ public class LightHandler {
 		for (PointLight pl : pointLights) {
 			pl.renderShadows(scene);
 		}
-
 		glViewport(0, 0, Display.getWidth(), Display.getHeight());
 	}
 
