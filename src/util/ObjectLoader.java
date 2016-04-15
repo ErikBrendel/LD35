@@ -369,6 +369,7 @@ public class ObjectLoader {
 			
 			
 			
+			System.err.println("Loaded Object: " + animatedMesh);
 			
 			
 			return animatedMesh;

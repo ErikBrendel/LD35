@@ -6,11 +6,29 @@
  */
 package util;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import org.lwjgl.BufferUtils;
+import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
+import static org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -29,8 +47,9 @@ public class Animation {
 	private ArrayList<Integer> indizes;
 	private boolean invalidVAO;
 	private int VAO;
+	private Shader shader;
 
-	public Animation() {
+	Animation() {
 		keyframes = new SortedArrayList<>();
 		vertices = new ArrayList<>();
 		indizes = new ArrayList<>();
@@ -40,10 +59,10 @@ public class Animation {
 	/**
 	 * add a keyframe for a bone to this animation. If there is already a
 	 * keyframe at this timestamp, they will be merged to a certain degree.
-	 * 
+	 *
 	 * @param f a new keyframe for this animation
 	 */
-	public void addKeyframe(Keyframe f) {
+	void addKeyframe(Keyframe f) {
 		invalidVAO = true;
 		//perform keyframe merging if necessary
 		Keyframe sameTime = null;
@@ -68,7 +87,7 @@ public class Animation {
 
 	}
 
-	public void addVertex(Vertex v) {
+	void addVertex(Vertex v) {
 		//check if an equal vertex i alreay present
 		int index = -1;
 		for (int i = 0; i < vertices.size(); i++) {
@@ -89,34 +108,170 @@ public class Animation {
 		invalidVAO = true;
 	}
 
-	public int getVAO() {
+	private int getVAO() {
 		if (invalidVAO) {
+			//
+			//
+			//
 			//re-generate VAO
+			int boneCount = getBoneCount();
+			int vertexFloatCount = 8 + boneCount;
+			int stride = vertexFloatCount * SIZEOF_FLOAT;
 
-			int stride = (8 + getBoneCount()) * SIZEOF_FLOAT;
+			//create VAO
+			VAO = glGenVertexArrays();
+			glBindVertexArray(VAO);
 
+			//create the big buffer array
+			float[] buffer = new float[vertexFloatCount * vertices.size()];
+			for (int v = 0; v < vertices.size(); v++) {
+				int bp = v * vertexFloatCount; //bufferPointer
+				Vertex vert = vertices.get(v);
+				buffer[bp++] = vert.getPosition().x;
+				buffer[bp++] = vert.getPosition().y;
+				buffer[bp++] = vert.getPosition().z;
+				buffer[bp++] = vert.getNormal().x;
+				buffer[bp++] = vert.getNormal().y;
+				buffer[bp++] = vert.getNormal().z;
+				buffer[bp++] = vert.getUV().x;
+				buffer[bp++] = vert.getUV().y;
+				for (int b = 0; b < boneCount; b++) {
+					buffer[bp++] = vert.getBoneWeights().get(b);
+				}
+			}
+			
+			//for buffer data debugging
+			/*for (int i = 0; i < buffer.length; i++) {
+				if (i % vertexFloatCount == 0) {
+					System.err.println();
+				}
+				System.err.print(buffer[i] + "  ");
+				if (i % vertexFloatCount == 7) {
+					System.err.print("     ");
+				}
+			}/**/
+			//paste float[] array into FloatBuffer
+			int VBO;
+			VBO = glGenBuffers();
+			FloatBuffer vertexB = BufferUtils.createFloatBuffer(buffer.length).put(buffer);
+			vertexB.flip();
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, vertexB, GL_STATIC_DRAW);
+
+			//set the reading paradigmas for the vertex shader
 			glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3 * SIZEOF_FLOAT);
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, 6 * SIZEOF_FLOAT);
 			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(3, boneCount, GL_FLOAT, false, stride, 8 * SIZEOF_FLOAT);
+			glEnableVertexAttribArray(3);
 
+			//create EBO
+			int EBO = glGenBuffers();
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+			//paste EBO data into IntBuffer
+			int[] indizesArray = new int[indizes.size()];
+			for (int i = 0; i < indizes.size(); i++) {
+				indizesArray[i] = indizes.get(i);
+			}
+			IntBuffer indexB = BufferUtils.createIntBuffer(indizesArray.length).put(indizesArray);
+			indexB.flip();
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexB, GL_STATIC_DRAW);
+
+			//finished, clean up
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+			//
+			//
+			//
+			//
 		}
 		return VAO;
 	}
 
-	public int getKeyFrameCount() {
+	/**
+	 * return the Shader to draw this object. Be sure to call generateShader
+	 * first.
+	 *
+	 * @return the Shader to draw this object
+	 */
+	public Shader getShader() {
+		return shader;
+	}
+
+	/**
+	 * Generate a shader-Object for this Animation. Each animation object needs
+	 * an own (dynamically generated) Vertex shader, and this method thakes care
+	 * of this.
+	 * <br><br>
+	 * You can pass optional parameters for your fragment shader to this
+	 * function, or leave the second argument at null.
+	 * <br><br>
+	 * This method calls Shader.use() on its own shader to be able to set its
+	 * uniforms.
+	 *
+	 *
+	 * @param frag the name of the fragment shader to use
+	 * @param params optional parameters
+	 */
+	public void generateShader(String frag, HashMap<String, Object> params) {
+		params = (params == null) ? new HashMap<>() : params;
+		
+		//make sure the VAO is instantiated
+		getVAO();
+
+		//create the shader object
+		params.put("BONE_COUNT", getBoneCount());
+		params.put("KEY_FRAME_COUNT", getKeyFrameCount());
+		shader = Shader.fromFile("Animation.vert", frag, params);
+		shader.use();
+
+		//set uniform data
+		int bonecount = getBoneCount();
+		for (int k = 0; k < keyframes.size(); k++) {
+			Keyframe frame = keyframes.get(k);
+			glUniform1f(shader.getUniform("key_frame_time[" + k + "]"), frame.getTimestamp());
+			for (int b = 0; b < bonecount; b++) {
+				String arr = "[" + (k * bonecount + b) + "]";
+				boolean forThisBone = frame.getBones().get(b) != null;
+				glUniform1i(shader.getUniform("forThisBone" + arr), forThisBone ? 1 : 0);
+
+				glUniformMatrix4(shader.getUniform("bones" + arr), false, frame.getBones().get(b).getData());
+			}
+		}
+	}
+
+	/**
+	 * Renders the object with its shader
+	 */
+	public void render() {
+		shader.use();
+
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+
+	private int getKeyFrameCount() {
 		return keyframes.size();
 	}
 
-	public int getBoneCount() {
-		return keyframes.isEmpty() ? 0 : keyframes.get(0).getBones().size();
+	private int getBoneCount() {
+		int count = 0;
+		for (int k = 0; k < keyframes.size(); k++) {
+			count = Math.max(count, keyframes.get(k).getBones().size());
+		}
+		return count;
 	}
 
 	@Override
 	public String toString() {
-		return "Animation(" + indizes.size() + " vertizes, " + vertices.size() + " unique ones, " + getKeyFrameCount() + " keyframes for " + getBoneCount() + "bones)";
+		return "Animation(" + indizes.size() + " vertizes, " + vertices.size() + " unique ones, " + getKeyFrameCount() + " keyframes for " + getBoneCount() + " bones)";
 	}
 
 	/**
@@ -195,7 +350,7 @@ public class Animation {
 			return normal;
 		}
 
-		public Vector2f getUv() {
+		public Vector2f getUV() {
 			return uv;
 		}
 

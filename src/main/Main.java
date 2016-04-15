@@ -30,11 +30,13 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 import com.sun.prism.impl.BufferUtil;
+import util.Animation;
 
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
 import util.MeshInstance;
+import util.ObjectLoader;
 import util.Player;
 import util.Shader;
 import util.Skybox;
@@ -90,6 +92,8 @@ public class Main {
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+		
+		
 		shaders.add(defaultShader);
 		shaders.add(instancedShader);
 
@@ -130,7 +134,7 @@ public class Main {
 		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
 
-		int amount = 10000;
+		int amount = 1000;
 		Matrix4f[] matrices = new Matrix4f[amount];
 		Random ran = new Random(System.currentTimeMillis());
 		float radius = 9;
@@ -186,6 +190,18 @@ public class Main {
 		glVertexAttribDivisor(6, 1);
 
 		glBindVertexArray(0);
+		
+		
+		//load animation object
+		
+		Animation test = ObjectLoader.loadAnimation("dummy.dae");
+		test.generateShader("NoLight.frag", null);
+		test.getShader().addUniformBlockIndex(1, "Matrices");
+		sunMat.apply(test.getShader());
+		
+		
+		
+		
 
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// game loop
@@ -226,15 +242,17 @@ public class Main {
 			glUniform1i(defaultShader.getUniform("alpha"), 1);
 			// update player position uniform
 			player.applyToShader(defaultShader, true);
+			
+			test.render();
 
 			// earth
 			float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
 			earth.setRotation(new Vector3f(0, angle, 0));
-			earth.render(defaultShader);
+			//earth.render(defaultShader);
 
 			// clouds
 			clouds.setRotation(new Vector3f(0, angle * 1f, 0));
-			clouds.render(defaultShader);
+			//clouds.render(defaultShader);
 
 			// sun
 			sun.setLocation(sunPos);
@@ -255,7 +273,7 @@ public class Main {
 
 			// finish frame
 			Display.update();
-			Display.sync(60);
+			Display.sync(600);
 		}
 	}
 
