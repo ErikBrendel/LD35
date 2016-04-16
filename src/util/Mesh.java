@@ -9,10 +9,12 @@ import static org.lwjgl.opengl.ARBVertexArrayObject.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
- * A Mesh object only consists of the vertex data.
- * To render an object, create a MeshInstance
+ * A Mesh object only consists of the vertex data. To render an object, create a
+ * MeshInstance
+ *
  * @author Erik
  */
 public class Mesh {
@@ -64,8 +66,7 @@ public class Mesh {
 	 * This function uses GL_ARRAY_BUFFER, so make sure no other VBO is bound to
 	 * this currently
 	 *
-	 * @param VBO
-	 *            the VBO
+	 * @param VBO the VBO
 	 */
 	public void loadToBuffer(int VBO) {
 		FloatBuffer vertexB = BufferUtils.createFloatBuffer(data.length).put(data);
@@ -132,5 +133,29 @@ public class Mesh {
 			glDrawArrays(GL_TRIANGLES, 0, getVertCount());
 		}
 		glBindVertexArray(0);
+	}
+
+	/**
+	 * get the Vertex of this mesh wich is closest to a given 3D-Point (in global
+	 * space)
+	 *
+	 * @param point
+	 * @return
+	 */
+	public Vector3f getNearestVertex(Vector3f point) {
+		Vector3f result = null;
+		float distance = Float.MAX_VALUE;
+
+		for (int v = 0; v < (data.length * 4 / stride); v++) {
+			int pointer = v * stride / 4;
+
+			float myDist = (float) (Math.pow(point.x - data[pointer], 2) + Math.pow(point.y - data[pointer + 1], 2) + Math.pow(point.z - data[pointer + 2], 2));
+			if (myDist < distance) {
+				distance = myDist;
+				result = new Vector3f(data[pointer], data[pointer + 1], data[pointer + 2]);
+			}
+		}
+
+		return result;
 	}
 }
