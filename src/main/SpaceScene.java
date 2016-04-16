@@ -78,7 +78,7 @@ public class SpaceScene implements Scene {
 	public SpaceScene() {
 		Util.createWindow("Space explorer", true);
 
-		player = new Player(new Vector3f(1, 0, 0));
+		player = new Player(new Vector3f((float) Math.sqrt(2), (float) Math.sqrt(2), 0));
 
 		enemy = new Enemy(new Vector3f(0, 1, 0));
 
@@ -139,7 +139,7 @@ public class SpaceScene implements Scene {
 		int blackTex = Util.loadTexture("black.png");
 
 		Material cloudMat = new Material(cloud, blackTex);
-		Material sunMat = new Material(sunTex, blackTex);
+		Material sunMat = new Material(sunTex, 0);
 		rockMat = new Material(rock, rockSpec);
 		Material sandMat = new Material(sandTex, blackTex);
 		Material landMat = new Material(landTex, blackTex);
@@ -231,7 +231,11 @@ public class SpaceScene implements Scene {
 			// System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
-			enemy.setPosition(new Vector3f((float) Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f), 0.1f, (float) Math.cos(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f)));
+			// enemy.setPosition(new Vector3f((float)
+			// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f *
+			// Math.PI) / 3000f), 0.1f, (float)
+			// Math.cos(System.currentTimeMillis() % (int) (3000f * 2f *
+			// Math.PI) / 3000f)));
 			camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
 			// handle all inputs
 			sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
@@ -239,6 +243,7 @@ public class SpaceScene implements Scene {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
+			enemy.setPosition(new Vector3f((float) -Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f), 0.0f, (float) Math.cos(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f)));
 
 			// Update Matrices Uniform Buffer Block
 			view = camera.getViewMatrix();
@@ -249,7 +254,7 @@ public class SpaceScene implements Scene {
 			glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-			Vector3f flashLightDirection = (Vector3f) camera.getPosition().negate();
+			Vector3f flashLightDirection = new Vector3f(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
 			flashlight.setDirection(flashLightDirection);
 			flashlight.setPosition(camera.getPosition());
 
@@ -281,19 +286,20 @@ public class SpaceScene implements Scene {
 		camera.apply(shaders[0]);
 
 		// earth
-		float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
-		Vector3f rot = new Vector3f(0, angle, 0);
-		underwater.setRotation(rot);
+		// float angle = (float) (System.currentTimeMillis() % (1000 * 360 *
+		// Math.PI)) / 5000f / 2f;
+		// Vector3f rot = new Vector3f(0, angle, 0);
 		underwater.render(defaultShader);
-		land.setRotation(rot);
 		land.render(defaultShader);
-		water.setRotation(rot);
 		water.render(defaultShader);
+
+		// player
+		player.render(shaders[0]);
+		enemy.render(shaders[0]);
 
 		// sun
 		sun.setLocation(sunPos);
 		shaders[1].use();
-		camera.apply(shaders[1]);
 		sun.render(shaders[1]);
 
 		shaders[2].use();
