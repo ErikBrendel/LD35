@@ -32,7 +32,7 @@ public class Player {
 		int dif = Util.loadTexture("container2.png");
 		int spec = Util.loadTexture("container2_specular.png");
 		playerMat = new Material(dif, spec);
-		playerMesh = new Mesh("arrow.obj");
+		playerMesh = new Mesh("bird.obj");
 	}
 
 	Camera camera;
@@ -98,7 +98,7 @@ public class Player {
 		rot.rotate(baseRotationAngle, worldNorth);
 
 		model.setRotationMatrix(rot);
-		model.setScale(new Vector3f(0.1f, 0.1f, 0.1f));
+		model.setScale(new Vector3f(0.04f, 0.04f, 0.04f));
 		model.render(shader);
 	}
 
