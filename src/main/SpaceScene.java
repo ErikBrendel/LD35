@@ -248,7 +248,8 @@ public class SpaceScene implements Scene {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
-			enemy.setPosition(new Vector3f((float) -Math.sin(System.currentTimeMillis() % (int) (9000f * 2f * Math.PI) / 9000f), 0.0f, (float) Math.cos(System.currentTimeMillis() % (int) (9000f * 2f * Math.PI) / 9000f)));
+			enemy.update(deltaTime);
+			
 
 			// Update Matrices Uniform Buffer Block
 			view = camera.getViewMatrix();
