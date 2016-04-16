@@ -70,12 +70,12 @@ public class Player {
 
 		float baseRotationAngle = (float) Math.PI - (float) Math.acos(Vector3f.dot(plainPos, worldFront));
 
-		Vector3f äquatorparallel = new Vector3f();
-		äquatorparallel = Vector3f.cross(normPos, worldNorth, äquatorparallel);
-		äquatorparallel.normalise();
+		Vector3f aequatorparallel = new Vector3f();
+		aequatorparallel = Vector3f.cross(normPos, worldNorth, aequatorparallel);
+		aequatorparallel.normalise();
 
 		Vector3f nordDirection = new Vector3f();
-		nordDirection = Vector3f.cross(normPos, äquatorparallel, nordDirection);
+		nordDirection = Vector3f.cross(normPos, aequatorparallel, nordDirection);
 		nordDirection.normalise();
 
 		float viewDirAngle = (float) Math.acos(Vector3f.dot(viewDir, nordDirection));
