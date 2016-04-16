@@ -260,13 +260,9 @@ public class SpaceScene implements Scene {
 
 			lh.updateLight(flashlight);
 			lh.updateLight(sunLight);
+			
 
-			Shader[] shaders = new Shader[3];
-			shaders[0] = defaultShader;
-			shaders[1] = noLightShader;
-			shaders[2] = instancedShader;
-
-			render(shaders);
+			render();
 
 			// finish frame
 			Display.update();
@@ -275,15 +271,15 @@ public class SpaceScene implements Scene {
 	}
 
 	@Override
-	public void render(Shader[] shaders) {
-		shaders[0].use();
+	public void render() {
+		defaultShader.use();
 		glClearColor(0.05f, 0.075f, 0.075f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		glUniform1i(shaders[0].getUniform("skybox"), skybox.getTexture());
-		glUniform1i(shaders[0].getUniform("alpha"), 1);
+		glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
+		glUniform1i(defaultShader.getUniform("alpha"), 1);
 		// update player position uniform
-		camera.apply(shaders[0]);
+		camera.apply(defaultShader);
 
 		// earth
 		// float angle = (float) (System.currentTimeMillis() % (1000 * 360 *
@@ -294,16 +290,16 @@ public class SpaceScene implements Scene {
 		water.render(defaultShader);
 
 		// player
-		player.render(shaders[0]);
-		enemy.render(shaders[0]);
+		player.render(defaultShader);
+		enemy.render(defaultShader);
 
 		// sun
 		sun.setLocation(sunPos);
-		shaders[1].use();
-		sun.render(shaders[1]);
+		noLightShader.use();
+		sun.render(noLightShader);
 
-		shaders[2].use();
-		camera.apply(shaders[2]);
+		instancedShader.use();
+		camera.apply(instancedShader);
 		rockMat.apply(instancedShader);
 		glBindVertexArray(VAO);
 		glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(), GL_UNSIGNED_INT, 0, amount);

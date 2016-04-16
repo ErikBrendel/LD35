@@ -40,7 +40,6 @@ public class Player {
 	}
 
 	Camera camera;
-	private ArrayList<ClickHandler> handlers;
 
 	private Vector3f position;
 
@@ -52,7 +51,6 @@ public class Player {
 	public Player(Vector3f position) {
 		this.position = position;
 		this.position.normalise();
-		handlers = new ArrayList<>();
 		model = new MeshInstance(playerMesh, playerMat);
 		viewDir = new Vector3f(1, 0, 0);
 		viewDirAngle = 0;
@@ -91,8 +89,9 @@ public class Player {
 		camera.setPosition(dest);
 	}
 
-	public void addHandler(ClickHandler h) {
-		handlers.add(h);
+
+	public Vector3f getPosition() {
+		return position;
 	}
 
 	/**
@@ -102,11 +101,6 @@ public class Player {
 	 * @param deltaTime
 	 *            time passed since last frame
 	 */
-
-	public Vector3f getPosition() {
-		return position;
-	}
-
 	public void update(float deltaTime) {
 		position = new Vector3f((float) Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f), 0.9f, (float) Math.cos(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f));
 		position.normalise();
@@ -124,22 +118,16 @@ public class Player {
 
 		// movement
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-			// camera.processKeyboard(Camera.CameraMovement.FORAWRD, deltaTime);
+			
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-			// camera.processKeyboard(Camera.CameraMovement.BACKWARD,
-			// deltaTime);
+			
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-			// camera.processKeyboard(Camera.CameraMovement.LEFT, deltaTime);
+			
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-			// camera.processKeyboard(Camera.CameraMovement.RIGHT, deltaTime);
+			
 		}
-	}
-
-	public static interface ClickHandler {
-
-		public void onClickEvent(boolean down, int mouseButton);
 	}
 }
