@@ -36,9 +36,11 @@ public class Camera {
 	}
 
 	public void setWorldView(Vector3f origin, Vector3f playerPos, Vector3f enemyPos) {
+		Vector3f dif = new Vector3f();
+		dif = Vector3f.sub(enemyPos, playerPos, dif);
+		dif.scale(0.2f);
 		Vector3f midpoint = new Vector3f();
-		midpoint = Vector3f.add(playerPos, enemyPos, midpoint);
-		midpoint.scale(0.5f);
+		midpoint = Vector3f.add(playerPos, dif, midpoint);
 		Vector3f direction = new Vector3f();
 		direction = Vector3f.sub(midpoint, origin, direction);
 		direction.normalise();

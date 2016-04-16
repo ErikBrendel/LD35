@@ -244,7 +244,8 @@ public class SpaceScene implements Scene {
 			camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
 			// handle all inputs
 			sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
-			sunLight.setDirection(sunPos);
+			Vector3f sunDir = new Vector3f(-sunPos.x, -sunPos.y, -sunPos.z);
+			sunLight.setDirection(sunDir);
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
@@ -334,7 +335,7 @@ public class SpaceScene implements Scene {
 		 * player.getCamera().processMouseScroll(-60 * deltaTime); } if
 		 * (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 		 * player.getCamera().processMouseScroll(60 * deltaTime); }
-		 *
+		 * 
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_Y)) { player.getCamera().roll(1 *
 		 * deltaTime); } if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
 		 * player.getCamera().roll(-1 * deltaTime); }
