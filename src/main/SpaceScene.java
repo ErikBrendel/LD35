@@ -78,12 +78,6 @@ public class SpaceScene implements Scene {
 	public SpaceScene() {
 		Util.createWindow("Space explorer", true);
 
-		player = new Player(new Vector3f((float) Math.sqrt(2), (float) Math.sqrt(2), 0));
-
-		enemy = new Enemy(new Vector3f(0, 1, 0));
-
-		camera = new Camera(new Vector3f(0, 0, 0), player.getPosition(), enemy.getPosition(), 3f);
-
 		shaders = new ArrayList<>();
 		lh = new LightHandler();
 
@@ -105,18 +99,14 @@ public class SpaceScene implements Scene {
 		instancedShader.addUniformBlockIndex(1, "Matrices");
 		noLightShader.addUniformBlockIndex(1, "Matrices");
 
-		matricesUBO = glGenBuffers();
-		glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
-		glBufferData(GL_UNIFORM_BUFFER, 128, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, 1, matricesUBO);
-		projection = camera.getProjectionMatrix();
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
-		view = camera.getViewMatrix();
-		glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 		shaders.add(defaultShader);
 		shaders.add(instancedShader);
+
+		player = new Player(new Vector3f((float) Math.sqrt(2), (float) Math.sqrt(2), 0));
+
+		enemy = new Enemy(new Vector3f(0, 1, 0), player, lh, shaders);
+
+		camera = new Camera(new Vector3f(0, 0, 0), player.getPosition(), enemy.getPosition(), 3f);
 
 		sunPos = new Vector3f(1, 1, 1);
 
@@ -127,6 +117,16 @@ public class SpaceScene implements Scene {
 
 		lh.addLight(flashlight, shaders);
 		lh.addLight(sunLight, shaders);
+
+		matricesUBO = glGenBuffers();
+		glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+		glBufferData(GL_UNIFORM_BUFFER, 128, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 1, matricesUBO);
+		projection = camera.getProjectionMatrix();
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
+		view = camera.getViewMatrix();
+		glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		int cloud = Util.loadTexture("cloudSphere.png");
 		int sunTex = Util.loadTexture("sun.jpg");
@@ -250,7 +250,6 @@ public class SpaceScene implements Scene {
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
 			enemy.update(deltaTime);
-			
 
 			// Update Matrices Uniform Buffer Block
 			view = camera.getViewMatrix();
