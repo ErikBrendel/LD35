@@ -32,7 +32,7 @@ public class Player {
 		int dif = Util.loadTexture("container2.png");
 		int spec = Util.loadTexture("container2_specular.png");
 		playerMat = new Material(dif, spec);
-		playerMesh = new Mesh("bunny.obj");
+		playerMesh = new Mesh("arrow.obj");
 	}
 
 	Camera camera;
@@ -48,8 +48,10 @@ public class Player {
 		this.position = position;
 		this.position.normalise();
 		model = new MeshInstance(playerMesh, playerMat);
-		viewDir = new Vector3f(1, 0, 0);
+		viewDir = new Vector3f(1.1f, 0.1f, 0.1f);
 		viewDirAngle = 0;
+		walk(0.01f, new Vector3f(0.1f, 0.1f, 0.1f));
+		update(0.001f);
 	}
 
 	public void render(Shader shader) {
@@ -68,7 +70,24 @@ public class Player {
 
 		float baseRotationAngle = (float) Math.PI - (float) Math.acos(Vector3f.dot(plainPos, worldFront));
 
-		viewDirAngle = (float) Math.acos(Vector3f.dot(viewDir, worldNorth));
+		Vector3f äquatorparallel = new Vector3f();
+		äquatorparallel = Vector3f.cross(normPos, worldNorth, äquatorparallel);
+		äquatorparallel.normalise();
+
+		Vector3f nordDirection = new Vector3f();
+		nordDirection = Vector3f.cross(normPos, äquatorparallel, nordDirection);
+		nordDirection.normalise();
+
+		float viewDirAngle = (float) Math.acos(Vector3f.dot(viewDir, nordDirection));
+
+		Vector3f minustestvektor = Vector3f.cross(nordDirection, viewDir, null);
+		minustestvektor.normalise();
+		minustestvektor.scale(0.2f);
+		Vector3f testPoint = Vector3f.add(normPos, minustestvektor, null);
+
+		if (testPoint.length() < 1.0) {
+			viewDirAngle *= -1;
+		}
 
 		if (Vector3f.cross(worldFront, plainPos, null).y > 0) {
 			baseRotationAngle *= -1;
@@ -79,7 +98,7 @@ public class Player {
 		rot.rotate(baseRotationAngle, worldNorth);
 
 		model.setRotationMatrix(rot);
-		model.setScale(new Vector3f(0.5f, 0.5f, 0.5f));
+		model.setScale(new Vector3f(0.1f, 0.1f, 0.1f));
 		model.render(shader);
 	}
 
@@ -115,7 +134,7 @@ public class Player {
 			dy++;
 
 		}
-		float viewDirAngleDelta = dy * deltaTime * 5f;
+		float viewDirAngleDelta = dy * deltaTime * 2f;
 		// position = new Vector3f(0.1f, (float)
 		// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) /
 		// 3000f), (float) Math.cos(System.currentTimeMillis() % (int) (3000f *
@@ -133,7 +152,11 @@ public class Player {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float speed = dx * deltaTime;
+		float speed = dx * deltaTime * 0.3f;
+		walk(speed, prePos);
+	}
+
+	private void walk(float speed, Vector3f prePos) {
 		if (speed != 0) {
 			Vector3f walkDir = new Vector3f(viewDir);
 			walkDir.normalise();
@@ -149,6 +172,7 @@ public class Player {
 			Vector3f right = new Vector3f();
 			right = Vector3f.cross(positionDelta, position, right);
 			viewDir = Vector3f.cross(right, position, viewDir);
+			viewDir.normalise();
 		}
 	}
 }
