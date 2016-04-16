@@ -16,7 +16,7 @@ public class Camera {
 		FORAWRD, BACKWARD, LEFT, RIGHT, UP, DOWN
 	}
 
-	private Vector3f position, up;
+	private Vector3f position, up, lookAt;
 	private float zoom;
 	private float cameraDistance;
 	private Matrix4f projection;
@@ -24,6 +24,7 @@ public class Camera {
 	public void restoreDefault() {
 		position = new Vector3f(0, 0, 0);
 		up = new Vector3f(0, 1, 0);
+		lookAt = new Vector3f(0, 0, 0);
 		zoom = 45;
 		cameraDistance = 2;
 	}
@@ -50,7 +51,17 @@ public class Camera {
 		playerDir = Vector3f.sub(playerPos, enemyPos, playerDir);
 		up = Vector3f.cross(direction, playerDir, up);
 		up.normalise();
-		cameraDistance = playerDir.length() / 1.2f + 1.2f;
+		cameraDistance = playerDir.length() / 1.2f + 1.4f;
+		if (cameraDistance < 2.3) {
+			lookAt = Vector3f.cross(dif, direction, null);
+			lookAt.normalise();
+			lookAt.scale(2.3f - cameraDistance);
+			Vector3f posOffset = new Vector3f(lookAt);
+			posOffset.scale(0.6f);
+			Vector3f.sub(position, posOffset, position);
+		} else {
+			lookAt = new Vector3f();
+		}
 	}
 
 	public Matrix4f getProjectionMatrix() {
@@ -58,7 +69,7 @@ public class Camera {
 	}
 
 	public Matrix4f getViewMatrix() {
-		return lookAt(position, new Vector3f(0, 0, 0), up);
+		return lookAt(position, lookAt, up);
 	}
 
 	public Matrix4f getSkyboxMatrix() {

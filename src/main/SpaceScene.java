@@ -249,6 +249,7 @@ public class SpaceScene implements Scene {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
+			player.setNearest(land.getMesh());
 			enemy.update(deltaTime);
 
 			// Update Matrices Uniform Buffer Block
@@ -292,11 +293,12 @@ public class SpaceScene implements Scene {
 		// Vector3f rot = new Vector3f(0, angle, 0);
 		underwater.render(defaultShader);
 		land.render(defaultShader);
-		water.render(defaultShader);
 
 		// player
 		player.render(defaultShader);
 		enemy.render(defaultShader);
+
+		water.render(defaultShader);
 
 		// sun
 		sun.setLocation(sunPos);

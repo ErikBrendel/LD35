@@ -8,7 +8,6 @@ package entities;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
-import util.Camera;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
@@ -21,26 +20,34 @@ import util.Util;
  */
 public class Player extends WorldObject {
 
-	private static final Mesh playerMesh;
-	private static final Material playerMat;
+	private static final Mesh eagleMesh;
+	private static final Material eagleMat;
+	private static final Mesh sharkMesh;
+	private static final Material sharkMat;
 
 	static {
-		int dif = Util.loadTexture("bird.png");
+		int eagle = Util.loadTexture("bird.png");
+		int shark = Util.loadTexture("shark.jpg");
 		int spec = Util.loadTexture("black.png");
-		playerMat = new Material(dif, spec);
-		playerMesh = new Mesh("bird.obj");
+		eagleMat = new Material(eagle, spec);
+		sharkMat = new Material(shark, spec);
+		eagleMesh = new Mesh("bird.obj");
+		sharkMesh = new Mesh("shark.obj");
 	}
 
-	Camera camera;
+	private Vector3f neighbour;
+	private float speed;
 
 	public Player(Vector3f position) {
-		super(new MeshInstance(playerMesh, playerMat));
+		super(new MeshInstance(eagleMesh, eagleMat), new MeshInstance(sharkMesh, sharkMat, false));
 		model[0].setScale(new Vector3f(0.07f, 0.07f, 0.07f));
+		model[1].setScale(new Vector3f(0.12f, 0.12f, 0.12f));
 		this.position = position;
 		this.position.normalise();
 		viewDir = new Vector3f(1.1f, 0.1f, 0.1f);
 		walk(0.01f, new Vector3f(0.1f, 0.1f, 0.1f));
 		update(0.001f);
+		speed = 0.15f;
 	}
 
 	/**
@@ -50,6 +57,23 @@ public class Player extends WorldObject {
 	 * @param deltaTime
 	 *            time passed since last frame
 	 */
+
+	public void setNearest(Mesh m) {
+		neighbour = m.getNearestVertex(position);
+
+		System.out.println(neighbour.length());
+
+		if (neighbour.length() < 1.01f) {
+			model[0].setVisible(false);
+			model[1].setVisible(true);
+			speed = 0.15f;
+		} else {
+			model[0].setVisible(true);
+			model[1].setVisible(false);
+			speed = 0.15f;
+		}
+	}
+
 	public void update(float deltaTime) {
 
 		int dx = 0, dy = 0;
@@ -73,13 +97,14 @@ public class Player extends WorldObject {
 
 		Vector3f normPos = getPosition();
 		normPos.normalise();
-		
+
 		Matrix4f rot = new Matrix4f();
 		rot.rotate(viewDirAngleDelta, normPos);
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float speed = dx * deltaTime * 0.15f;
-		walk(speed, prePos);
+		float s = dx * deltaTime * speed;
+
+		walk(s, prePos);
 	}
 }

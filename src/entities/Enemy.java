@@ -87,12 +87,12 @@ public class Enemy extends WorldObject {
 		destinationDir.normalise();
 
 		Vector3f deltaDir = Vector3f.sub(destinationDir, viewDir, null);
-		deltaDir.scale(deltaTime);
+		deltaDir.scale(deltaTime * 2);
 		viewDir = Vector3f.add(viewDir, deltaDir, null);
 
 		viewDir.normalise();
 
-		float speed = dx * deltaTime * 0.15f;
+		float speed = dx * deltaTime * 0.05f;
 		walk(speed, prePos);
 	}
 }

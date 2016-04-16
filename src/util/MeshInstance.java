@@ -20,9 +20,16 @@ public class MeshInstance {
 	private Material material;
 	private Vector3f location, rotation, scale;
 	private org.lwjgl.util.vector.Matrix4f rotationMatrix;
+	private boolean visible;
+
+	public MeshInstance(Mesh mesh, Material material, boolean visible) {
+		this(mesh, material, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
+		this.visible = visible;
+	}
 
 	public MeshInstance(Mesh mesh, Material material) {
 		this(mesh, material, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
+		visible = true;
 	}
 
 	public MeshInstance(Mesh mesh, Material material, Vector3f location, Vector3f rotation, Vector3f scale) {
@@ -31,6 +38,10 @@ public class MeshInstance {
 		this.location = location;
 		this.rotation = rotation;
 		this.scale = scale;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 
 	public void setLocation(Vector3f location) {
@@ -62,6 +73,9 @@ public class MeshInstance {
 	}
 
 	public void render(Shader shader) {
+		if (!visible) {
+			return;
+		}
 		material.apply(shader);
 
 		Matrix4f model = new Matrix4f();
@@ -78,6 +92,10 @@ public class MeshInstance {
 		glUniformMatrix4(shader.getUniform("model"), false, model.getData());
 
 		mesh.render();
+	}
+
+	public Mesh getMesh() {
+		return mesh;
 	}
 
 }
