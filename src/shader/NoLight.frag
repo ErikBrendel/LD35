@@ -14,6 +14,6 @@ uniform Material material;
 
 void main(){
 	color = texture(material.texture_diffuse0, tex);	
-	float gamma = 2.0;
+	float gamma = 2.2;
    	color.xyz = pow(color.xyz, vec3(1.0/gamma));
 }

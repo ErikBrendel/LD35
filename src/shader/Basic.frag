@@ -130,7 +130,13 @@ void main(){
 		}else{	
 			discard;
 		}
+	}	
+	/*
+	if(gl_FragCoord.x > 960){
+		float gamma = 1.2;
+   		color.xyz = pow(color.xyz, vec3(1.0/gamma));
 	}
+	*/
 }
 
 vec3 calcDirectionalLight(DirLight light, vec3 norm, vec3 viewDir){	

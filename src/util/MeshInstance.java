@@ -66,6 +66,7 @@ public class MeshInstance {
 
 		Matrix4f model = new Matrix4f();
 		model.translate(location);
+		model.scale(scale);
 		if (rotationMatrix != null) {
 			model = (Matrix4f) Matrix4f.mul(model, rotationMatrix, model);
 		} else {
@@ -73,7 +74,6 @@ public class MeshInstance {
 			model.rotate(rotation.y * (float) Math.PI, new Vector3f(0, 1, 0));
 			model.rotate(rotation.z * (float) Math.PI, new Vector3f(0, 0, 1));
 		}
-		model.scale(scale);
 
 		glUniformMatrix4(shader.getUniform("model"), false, model.getData());
 

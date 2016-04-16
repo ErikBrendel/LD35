@@ -26,8 +26,6 @@ public class Player {
 
 	private static Mesh playerMesh;
 	private static Material playerMat;
-	private static boolean btnDown = false;
-	private static boolean btn2Down = false;
 
 	private static Vector3f worldFront = new Vector3f(1, 0, 0);
 	private static Vector3f worldNorth = new Vector3f(0, 1, 0);
@@ -62,6 +60,7 @@ public class Player {
 		model.setLocation(position);
 		Vector3f rotationAxis = new Vector3f();
 		rotationAxis = Vector3f.cross(worldNorth, position, rotationAxis);
+		rotationAxis.normalise();
 
 		Vector3f normPos = new Vector3f(position);
 		normPos.normalise();
@@ -76,9 +75,8 @@ public class Player {
 		if (Vector3f.cross(worldFront, plainPos, null).y > 0) {
 			baseRotationAngle *= -1;
 		}
-		System.out.println(baseRotationAngle);
 		Matrix4f rot = new Matrix4f();
-		rot.rotate(viewDirAngle, position);
+		rot.rotate(viewDirAngle, normPos);
 		rot.rotate(angle, rotationAxis);
 		rot.rotate(baseRotationAngle, worldNorth);
 
@@ -108,34 +106,46 @@ public class Player {
 	}
 
 	public void update(float deltaTime) {
-		position = new Vector3f((float) Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f), 0.9f, (float) Math.cos(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f));
-		position.normalise();
-		viewDirAngle += deltaTime;
+
+		int dx = 0, dy = 0;
+		// movement
+		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+			dx--;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+			dx++;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+			dy--;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+			dy++;
+		}
+		viewDirAngle += dy * deltaTime;
+		// position = new Vector3f(0.1f, (float)
+		// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) /
+		// 3000f), (float) Math.cos(System.currentTimeMillis() % (int) (3000f *
+		// 2f * Math.PI) / 3000f));
+		// viewDirAngle += deltaTime;
 		Vector3f right = new Vector3f();
 		right = Vector3f.cross(worldNorth, position, right);
 		Vector3f front = new Vector3f();
 		front = Vector3f.cross(right, position, front);
 
+		Vector3f normPos = new Vector3f(position);
+		normPos.normalise();
 		Matrix4f rot = new Matrix4f();
-		rot.rotate(viewDirAngle, position);
+		rot.rotate(viewDirAngle, normPos);
 
 		viewDir = Util.vmMult(front, rot);
 		viewDir.normalise();
 
-		// movement
-		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-			// camera.processKeyboard(Camera.CameraMovement.FORAWRD, deltaTime);
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-			// camera.processKeyboard(Camera.CameraMovement.BACKWARD,
-			// deltaTime);
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-			// camera.processKeyboard(Camera.CameraMovement.LEFT, deltaTime);
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-			// camera.processKeyboard(Camera.CameraMovement.RIGHT, deltaTime);
-		}
+		float speed = dx * deltaTime;
+		Vector3f walkDir = new Vector3f(viewDir);
+		walkDir.normalise();
+		walkDir.scale(speed);
+		position = Vector3f.add(position, walkDir, position);
+		position.normalise();
 	}
 
 	public static interface ClickHandler {
