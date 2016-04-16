@@ -18,9 +18,14 @@ public abstract class WorldObject {
 	protected Vector3f position;
 	protected Vector3f viewDir;
 	protected MeshInstance[] model;
+	protected Matrix4f[] modelMatrix;
 
 	public WorldObject(MeshInstance... model) {
 		this.model = model;
+		modelMatrix = new Matrix4f[model.length];
+		for (int i = 0 ; i < modelMatrix.length; i++) {
+			modelMatrix[i] = new Matrix4f();
+		}
 	}
 
 	/**
@@ -72,10 +77,12 @@ public abstract class WorldObject {
 			if (Vector3f.cross(WORLD_FRONT, plainPos, null).y > 0) {
 				baseRotationAngle *= -1;
 			}
-			Matrix4f rot = new Matrix4f();
+			org.lwjgl.util.vector.Matrix4f rot = new org.lwjgl.util.vector.Matrix4f();
 			rot.rotate(viewDirAngle, normPos);
 			rot.rotate(angle, rotationAxis);
 			rot.rotate(baseRotationAngle, WORLD_NORTH);
+			
+			rot = Matrix4f.mul(rot, modelMatrix[m], rot);
 
 			model[m].setRotationMatrix(rot);
 			//model[m].setScale(new Vector3f(0.07f, 0.07f, 0.07f));

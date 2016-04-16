@@ -21,6 +21,8 @@ public class Enemy extends WorldObject {
 		enemyMesh = new Mesh("Enemy.obj");
 		enemyPropMesh = new Mesh("Enemy_propeler.obj");
 	}
+	
+	private float propellerRot = 0f;
 
 	public Enemy(Vector3f position) {
 		super(new MeshInstance(enemyMesh, enemyMat), new MeshInstance(enemyPropMesh, enemyMat));
@@ -35,6 +37,15 @@ public class Enemy extends WorldObject {
 	}
 
 	public void update(float deltaTime) {
+		
+		//set prop rot
+		propellerRot += deltaTime * 10f;
+		Matrix4f propRot = new Matrix4f();
+		propRot.rotate(propellerRot, new Vector3f(0, 1, 0));
+		modelMatrix[1] = propRot;
+		
+		
+		
 		int dx = -1, dy = 0;
 		
 		float viewDirAngleDelta = dy * deltaTime * 2f;

@@ -19,7 +19,7 @@ public class MeshInstance {
 	private Mesh mesh;
 	private Material material;
 	private Vector3f location, rotation, scale;
-	private Matrix4f rotationMatrix;
+	private org.lwjgl.util.vector.Matrix4f rotationMatrix;
 
 	public MeshInstance(Mesh mesh, Material material) {
 		this(mesh, material, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
@@ -41,7 +41,7 @@ public class MeshInstance {
 		this.rotation = rotation;
 	}
 
-	public void setRotationMatrix(Matrix4f rotationMatrix) {
+	public void setRotationMatrix(org.lwjgl.util.vector.Matrix4f rotationMatrix) {
 		this.rotationMatrix = rotationMatrix;
 	}
 
