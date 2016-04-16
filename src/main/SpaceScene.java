@@ -154,8 +154,13 @@ public class SpaceScene implements Scene {
 		Mesh waterMesh = loadObjectEBO("gamePlanetWater.obj");
 
 		underwater = new MeshInstance(underwaterMesh, sandMat);
+		float worldScale = 1f / 1.015f;
+		Vector3f scaleVec = new Vector3f(worldScale, worldScale, worldScale);
+		underwater.setScale(scaleVec);
 		land = new MeshInstance(landMesh, landMat);
+		land.setScale(scaleVec);
 		water = new MeshInstance(waterMesh, waterMat);
+		water.setScale(scaleVec);
 
 		sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
@@ -243,7 +248,7 @@ public class SpaceScene implements Scene {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
-			enemy.setPosition(new Vector3f((float) -Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f), 0.0f, (float) Math.cos(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) / 3000f)));
+			enemy.setPosition(new Vector3f((float) -Math.sin(System.currentTimeMillis() % (int) (9000f * 2f * Math.PI) / 9000f), 0.0f, (float) Math.cos(System.currentTimeMillis() % (int) (9000f * 2f * Math.PI) / 9000f)));
 
 			// Update Matrices Uniform Buffer Block
 			view = camera.getViewMatrix();
@@ -260,7 +265,6 @@ public class SpaceScene implements Scene {
 
 			lh.updateLight(flashlight);
 			lh.updateLight(sunLight);
-			
 
 			render();
 
@@ -329,7 +333,7 @@ public class SpaceScene implements Scene {
 		 * player.getCamera().processMouseScroll(-60 * deltaTime); } if
 		 * (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 		 * player.getCamera().processMouseScroll(60 * deltaTime); }
-		 * 
+		 *
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_Y)) { player.getCamera().roll(1 *
 		 * deltaTime); } if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
 		 * player.getCamera().roll(-1 * deltaTime); }

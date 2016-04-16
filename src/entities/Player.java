@@ -98,7 +98,7 @@ public class Player {
 		rot.rotate(baseRotationAngle, worldNorth);
 
 		model.setRotationMatrix(rot);
-		model.setScale(new Vector3f(0.04f, 0.04f, 0.04f));
+		model.setScale(new Vector3f(0.07f, 0.07f, 0.07f));
 		model.render(shader);
 	}
 
@@ -152,7 +152,7 @@ public class Player {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float speed = dx * deltaTime * 0.3f;
+		float speed = dx * deltaTime * 0.15f;
 		walk(speed, prePos);
 	}
 

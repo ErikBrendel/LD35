@@ -48,7 +48,7 @@ public class Camera {
 		playerDir = Vector3f.sub(playerPos, enemyPos, playerDir);
 		up = Vector3f.cross(direction, playerDir, up);
 		up.normalise();
-		cameraDistance = playerDir.length() + 1.6f;
+		cameraDistance = playerDir.length() + 1.2f;
 	}
 
 	public Matrix4f getProjectionMatrix() {
