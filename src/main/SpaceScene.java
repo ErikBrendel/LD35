@@ -59,9 +59,6 @@ public class SpaceScene implements Scene {
 	private Shader defaultShader;
 	private Shader noLightShader;
 	private Shader instancedShader;
-	private MeshInstance earth;
-	private MeshInstance clouds;
-	private MeshInstance sun;
 	private Vector3f sunPos;
 	private Mesh asteroid;
 	private int VAO;
@@ -72,6 +69,8 @@ public class SpaceScene implements Scene {
 	private Matrix4f view;
 	private Skybox skybox;
 	private int matricesUBO;
+
+	private MeshInstance sun;
 	private MeshInstance underwater;
 	private MeshInstance land;
 	private MeshInstance water;
@@ -141,7 +140,7 @@ public class SpaceScene implements Scene {
 
 		Material cloudMat = new Material(cloud, blackTex);
 		Material sunMat = new Material(sunTex, blackTex);
-		Material rockMat = new Material(rock, rockSpec);
+		rockMat = new Material(rock, rockSpec);
 		Material sandMat = new Material(sandTex, blackTex);
 		Material landMat = new Material(landTex, blackTex);
 		Material waterMat = new Material(waterTex, whiteTex);
@@ -149,7 +148,7 @@ public class SpaceScene implements Scene {
 
 		// planets
 		Mesh planetSphere = loadObjectEBO("earth.obj");
-		Mesh asteroid = loadObjectEBO("asteroid.obj");
+		asteroid = loadObjectEBO("asteroid.obj");
 		Mesh underwaterMesh = loadObjectEBO("gamePlanetUnderwater.obj");
 		Mesh landMesh = loadObjectEBO("gamePlanetLand.obj");
 		Mesh waterMesh = loadObjectEBO("gamePlanetWater.obj");
@@ -158,12 +157,7 @@ public class SpaceScene implements Scene {
 		land = new MeshInstance(landMesh, landMat);
 		water = new MeshInstance(waterMesh, waterMat);
 
-		MeshInstance clouds = new MeshInstance(planetSphere, cloudMat);
-		clouds.setLocation(new Vector3f(0, 0, 0));
-		float cloudScale = 1.01f;
-		clouds.setScale(new Vector3f(cloudScale, cloudScale, cloudScale));
-
-		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
+		sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
 
 		amount = 100000;
@@ -296,10 +290,6 @@ public class SpaceScene implements Scene {
 		water.setRotation(rot);
 		water.render(defaultShader);
 
-		// clouds
-		clouds.setRotation(new Vector3f(0, angle * 1f, 0));
-		clouds.render(shaders[0]);
-
 		// sun
 		sun.setLocation(sunPos);
 		shaders[1].use();
@@ -337,7 +327,7 @@ public class SpaceScene implements Scene {
 		 * player.getCamera().processMouseScroll(-60 * deltaTime); } if
 		 * (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 		 * player.getCamera().processMouseScroll(60 * deltaTime); }
-		 *
+		 * 
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_Y)) { player.getCamera().roll(1 *
 		 * deltaTime); } if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
 		 * player.getCamera().roll(-1 * deltaTime); }
