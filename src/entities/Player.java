@@ -68,6 +68,8 @@ public class Player {
 
 		float baseRotationAngle = (float) Math.PI - (float) Math.acos(Vector3f.dot(plainPos, worldFront));
 
+		viewDirAngle = (float) Math.acos(Vector3f.dot(viewDir, worldNorth));
+
 		if (Vector3f.cross(worldFront, plainPos, null).y > 0) {
 			baseRotationAngle *= -1;
 		}
@@ -113,30 +115,40 @@ public class Player {
 			dy++;
 
 		}
-		viewDirAngle += dy * deltaTime;
+		float viewDirAngleDelta = dy * deltaTime * 5f;
 		// position = new Vector3f(0.1f, (float)
 		// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f * Math.PI) /
 		// 3000f), (float) Math.cos(System.currentTimeMillis() % (int) (3000f *
 		// 2f * Math.PI) / 3000f));
 		// viewDirAngle += deltaTime;
-		Vector3f right = new Vector3f();
-		right = Vector3f.cross(worldNorth, position, right);
-		Vector3f front = new Vector3f();
-		front = Vector3f.cross(right, position, front);
+
+		Vector3f prePos = new Vector3f(position);
 
 		Vector3f normPos = new Vector3f(position);
 		normPos.normalise();
 		Matrix4f rot = new Matrix4f();
-		rot.rotate(viewDirAngle, normPos);
 
-		viewDir = Util.vmMult(front, rot);
+		rot.rotate(viewDirAngleDelta, normPos);
+
+		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
 		float speed = dx * deltaTime;
-		Vector3f walkDir = new Vector3f(viewDir);
-		walkDir.normalise();
-		walkDir.scale(speed);
-		position = Vector3f.add(position, walkDir, position);
-		position.normalise();
+		if (speed != 0) {
+			Vector3f walkDir = new Vector3f(viewDir);
+			walkDir.normalise();
+			walkDir.scale(speed);
+			position = Vector3f.add(position, walkDir, position);
+			position.normalise();
+			Vector3f positionDelta = new Vector3f();
+			if (speed < 0) {
+				positionDelta = Vector3f.sub(position, prePos, positionDelta);
+			} else {
+				positionDelta = Vector3f.sub(prePos, position, positionDelta);
+			}
+			Vector3f right = new Vector3f();
+			right = Vector3f.cross(positionDelta, position, right);
+			viewDir = Vector3f.cross(right, position, viewDir);
+		}
 	}
 }
