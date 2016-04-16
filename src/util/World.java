@@ -7,6 +7,8 @@
 package util;
 
 import java.util.ArrayList;
+
+import entities.Player;
 import light.Light;
 import light.LightHandler;
 import static org.lwjgl.opengl.GL20.glUniform1i;

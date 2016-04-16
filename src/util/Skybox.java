@@ -4,9 +4,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUniform1i;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-
 public class Skybox {
 	private int texture;
 	private static Mesh mesh;
@@ -53,8 +50,7 @@ public class Skybox {
 	public void render(Camera camera) {
 		shader.use();
 
-		Dimension windowSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Matrix4f projection = Util.perspective(camera.getFOV(), windowSize.width / (double) windowSize.height, 0.1, 100);
+		Matrix4f projection = camera.getProjectionMatrix();
 		glUniformMatrix4(shader.getUniform("projection"), false, projection.getData());
 
 		Matrix4f view = camera.getSkyboxMatrix();
