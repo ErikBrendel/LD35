@@ -5,8 +5,6 @@
  */
 package entities;
 
-import java.util.ArrayList;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -38,7 +36,6 @@ public class Player {
 	}
 
 	Camera camera;
-	private ArrayList<ClickHandler> handlers;
 
 	private Vector3f position;
 
@@ -50,7 +47,6 @@ public class Player {
 	public Player(Vector3f position) {
 		this.position = position;
 		this.position.normalise();
-		handlers = new ArrayList<>();
 		model = new MeshInstance(playerMesh, playerMat);
 		viewDir = new Vector3f(1, 0, 0);
 		viewDirAngle = 0;
@@ -89,8 +85,8 @@ public class Player {
 		camera.setPosition(dest);
 	}
 
-	public void addHandler(ClickHandler h) {
-		handlers.add(h);
+	public Vector3f getPosition() {
+		return position;
 	}
 
 	/**
@@ -100,11 +96,6 @@ public class Player {
 	 * @param deltaTime
 	 *            time passed since last frame
 	 */
-
-	public Vector3f getPosition() {
-		return position;
-	}
-
 	public void update(float deltaTime) {
 
 		int dx = 0, dy = 0;
@@ -120,6 +111,7 @@ public class Player {
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
 			dy++;
+
 		}
 		viewDirAngle += dy * deltaTime;
 		// position = new Vector3f(0.1f, (float)
@@ -146,10 +138,5 @@ public class Player {
 		walkDir.scale(speed);
 		position = Vector3f.add(position, walkDir, position);
 		position.normalise();
-	}
-
-	public static interface ClickHandler {
-
-		public void onClickEvent(boolean down, int mouseButton);
 	}
 }
