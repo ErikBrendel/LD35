@@ -45,6 +45,11 @@ public class Enemy extends WorldObject {
 		modelMatrix[1] = propRot;
 		
 		
+		//AI
+		
+		
+		
+		
 		
 		int dx = -1, dy = 0;
 		

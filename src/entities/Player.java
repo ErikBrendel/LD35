@@ -25,8 +25,8 @@ public class Player extends WorldObject {
 	private static final Material playerMat;
 
 	static {
-		int dif = Util.loadTexture("container2.png");
-		int spec = Util.loadTexture("container2_specular.png");
+		int dif = Util.loadTexture("bird.png");
+		int spec = Util.loadTexture("black.png");
 		playerMat = new Material(dif, spec);
 		playerMesh = new Mesh("bird.obj");
 	}
