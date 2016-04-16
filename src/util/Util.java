@@ -23,6 +23,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -145,7 +146,7 @@ public class Util {
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, images[i].getWidth(), images[i].getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+			//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		}
 
 		// glBindTexture(GL_TEXTURE_2D, 0);

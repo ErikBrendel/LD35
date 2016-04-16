@@ -97,15 +97,10 @@ public class Main {
 		shaders.add(defaultShader);
 		shaders.add(instancedShader);
 
-		int dif = Util.loadTexture("earth.jpg");
-		int spec = Util.loadTexture("earth_spec.jpg");
-		int cloud = Util.loadTexture("cloudSphere.png");
 		int sunTex = Util.loadTexture("sun.jpg");
 		int rock = Util.loadTexture("container2.png");
 		int rockSpec = Util.loadTexture("container2_specular.png");
 
-		Material earthMat = new Material(dif, spec);
-		Material cloudMat = new Material(cloud, 0);
 		Material sunMat = new Material(sunTex, 0);
 		Material rockMat = new Material(rock, rockSpec);
 
@@ -123,13 +118,6 @@ public class Main {
 		Mesh planetSphere = loadObjectEBO("earth.obj");
 		Mesh asteroid = loadObjectEBO("asteroid.obj");
 
-		MeshInstance earth = new MeshInstance(planetSphere, earthMat);
-		earth.setLocation(new Vector3f(0, 0, 0));
-
-		MeshInstance clouds = new MeshInstance(planetSphere, cloudMat);
-		clouds.setLocation(new Vector3f(0, 0, 0));
-		float cloudScale = 1.01f;
-		clouds.setScale(new Vector3f(cloudScale, cloudScale, cloudScale));
 
 		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
@@ -194,10 +182,13 @@ public class Main {
 		
 		//load animation object
 		
-		Animation test = ObjectLoader.loadAnimation("dummy.dae");
-		test.generateShader("NoLight.frag", null);
-		test.getShader().addUniformBlockIndex(1, "Matrices");
-		sunMat.apply(test.getShader());
+		Animation animation = ObjectLoader.loadAnimation("dummy.dae");
+		animation.generateShader("NoLight.frag", null);
+		animation.getShader().addUniformBlockIndex(1, "Matrices");
+		rockMat.apply(animation.getShader());
+		
+		Matrix4f animModel = new Matrix4f();
+		glUniformMatrix4(animation.getShader().getUniform("model"), false, animModel.getData());
 		
 		
 		
@@ -243,16 +234,8 @@ public class Main {
 			// update player position uniform
 			player.applyToShader(defaultShader, true);
 			
-			test.render();
-
-			// earth
-			float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
-			earth.setRotation(new Vector3f(0, angle, 0));
-			//earth.render(defaultShader);
-
-			// clouds
-			clouds.setRotation(new Vector3f(0, angle * 1f, 0));
-			//clouds.render(defaultShader);
+			animation.render();
+			animation.update(deltaTime);
 
 			// sun
 			sun.setLocation(sunPos);

@@ -5,6 +5,7 @@ layout (location = 2) in vec2 texCoord;
 out vec2 tex;
 out vec3 pos;
 out vec3 normal;
+out vec3 debug;
 
 layout (std140) uniform Matrices{	
 	uniform mat4 projection;
@@ -19,4 +20,6 @@ void main(){
 	gl_Position = projection * view * model * vec4(position, 1.0); 
 	tex = vec2(texCoord.x, texCoord.y);
 	normal = mat3(transpose(inverse(model))) * normalVec;  
+
+	debug = vec3(0);
 }

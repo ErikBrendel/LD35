@@ -9,6 +9,7 @@ package util;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import org.lwjgl.BufferUtils;
@@ -17,7 +18,6 @@ import static org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
@@ -48,6 +48,10 @@ public class Animation {
 	private boolean invalidVAO;
 	private int VAO;
 	private Shader shader;
+	
+	private float progress = 0f;
+	private float length = 1.2f;
+	private float speed = 0.7f;
 
 	Animation() {
 		keyframes = new SortedArrayList<>();
@@ -114,6 +118,7 @@ public class Animation {
 			//
 			//
 			//re-generate VAO
+			
 			int boneCount = getBoneCount();
 			int vertexFloatCount = 8 + boneCount;
 			int stride = vertexFloatCount * SIZEOF_FLOAT;
@@ -241,9 +246,19 @@ public class Animation {
 				boolean forThisBone = frame.getBones().get(b) != null;
 				glUniform1i(shader.getUniform("forThisBone" + arr), forThisBone ? 1 : 0);
 
-				glUniformMatrix4(shader.getUniform("bones" + arr), false, frame.getBones().get(b).getData());
+				glUniformMatrix4(shader.getUniform("bones" + arr), false, frame.getBones().get(b).invalidate().getData());
+			}
+		}/**/
+		glUniform1f(shader.getUniform("currentTime"), 0.2f);
+		
+		//DEBUG ANIM DATA
+		for (int k = 0; k < getKeyFrameCount(); k++) {
+			for (int b = 0; b < getBoneCount(); b++) {
+				System.err.println(Arrays.toString(keyframes.get(k).getBones().get(b).getDataArray()));
 			}
 		}
+		
+		
 	}
 
 	/**
@@ -253,8 +268,16 @@ public class Animation {
 		shader.use();
 
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indizes.size(), GL_UNSIGNED_INT, 0);
+		//glDrawArrays(GL_TRIANGLES, vertices.size(), 0);
 		glBindVertexArray(0);
+	}
+	
+	public void update(float deltaTime) {
+		progress += deltaTime * speed;
+		progress %= length;
+		glUniform1f(shader.getUniform("currentTime"), progress);
+		//System.err.println("progress = " + progress);
 	}
 
 	private int getKeyFrameCount() {

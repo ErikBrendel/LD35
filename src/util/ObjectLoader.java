@@ -7,6 +7,7 @@ package util;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -127,12 +128,12 @@ public class ObjectLoader {
 		}
 
 		/*
-		 * DEBUG STUFF System.err.println("Data: "); for (int i = 0; i <
-		 * data.length; i++) { System.err.println(data[i]); }
-		 * System.err.println("\nMap: "); indexMap.forEach((String str, Integer
-		 * i) -> System.err.println("Map: " + str + " -> " + i));
-		 * System.err.println("\nIndizes: ");
-		 * indizesList.forEach(System.err::println);/*
+		 System.err.println("Data: "); for (int i = 0; i <
+		 data.length; i++) { System.err.println(data[i]); }
+		 System.err.println("\nMap: "); indexMap.forEach((String str, Integer
+		 i) -> System.err.println("Map: " + str + " -> " + i));
+		 System.err.println("\nIndizes: ");
+		 indizesList.forEach(System.err::println);/*
 		 */
 		System.err.println("[loadingLog] Loaded Object with " + indexMap.size() + " vertices " + "and " + indizesList.size() / 3 + " faces");
 
@@ -244,7 +245,7 @@ public class ObjectLoader {
 			Element collada = doc.getRootElement();
 			Namespace ns = collada.getNamespace();
 			Animation animatedMesh = new Animation();
-			
+
 			//extract Mesh/per_Vertex data
 			Element mesh = collada.getChild("library_geometries", ns).getChild("geometry", ns).getChild("mesh", ns);
 			Element polylist = mesh.getChild("polylist", ns);
@@ -253,7 +254,7 @@ public class ObjectLoader {
 
 			String posElemName = mesh.getChild("vertices", ns).getChild("input", ns).getAttributeValue("source").substring(1);
 			Element posElem = mesh.getChildren("source", ns).stream().filter((Element e) -> e.getAttributeValue("id").equals(posElemName)).findFirst().get().getChild("float_array", ns);
-			String[] posData = posElem.getText().split(" ");
+			float[] posData = toFloat(posElem.getText().split(" "));
 
 			String normElemName = polylist.getChildren("input", ns).stream().filter((Element e) -> e.getAttributeValue("semantic").equals("NORMAL")).findFirst().get().getAttributeValue("source").substring(1);
 			Element normElem = mesh.getChildren("source", ns).stream().filter((Element e) -> e.getAttributeValue("id").equals(normElemName)).findFirst().get().getChild("float_array", ns);
@@ -292,18 +293,18 @@ public class ObjectLoader {
 					int uvPointer = Integer.valueOf(polyData[vp + 2]);
 
 					Vector3f pos = new Vector3f( //xyz of vertex
-							Float.valueOf(posData[posPointer]),
-							Float.valueOf(posData[posPointer + 1]),
-							Float.valueOf(posData[posPointer + 2]));
+							posData[posPointer * 3],
+							posData[posPointer * 3 + 1],
+							posData[posPointer * 3 + 2]);
 
 					Vector3f norm = new Vector3f( //xyz of normal
-							Float.valueOf(normData[normPointer]),
-							Float.valueOf(normData[normPointer + 1]),
-							Float.valueOf(normData[normPointer + 2]));
+							Float.valueOf(normData[normPointer * 3]),
+							Float.valueOf(normData[normPointer * 3 + 1]),
+							Float.valueOf(normData[normPointer * 3 + 2]));
 
 					Vector2f uv = new Vector2f( //uv data
-							Float.valueOf(uvData[uvPointer]),
-							Float.valueOf(uvData[uvPointer + 1]));
+							Float.valueOf(uvData[uvPointer * 2]),
+							Float.valueOf(uvData[uvPointer * 2 + 1]));
 
 					Vertex vert = new Vertex(pos, norm, uv);
 
@@ -318,8 +319,8 @@ public class ObjectLoader {
 					for (int weightpp = offset * 2; weightpp < (offset + dataCount) * 2; weightpp += 2) {
 						int boneid = bone_weight_pointers[weightpp];
 						int weightp = bone_weight_pointers[weightpp + 1];
-						weights[boneid] =
-								weightData[weightp];
+						weights[boneid]
+								= weightData[weightp];
 					}
 					for (int i = 0; i < weights.length; i++) {
 						vert.getBoneWeights().add(weights[i]);
@@ -332,7 +333,7 @@ public class ObjectLoader {
 				}
 
 			}
-			
+
 			//
 			//
 			//
@@ -340,6 +341,10 @@ public class ObjectLoader {
 			//
 			//
 			// Now the animations
+			Element nameArrayElem = armature.getChildren("source", ns).stream().filter((Element e) -> e.getAttributeValue("id").endsWith("skin-joints")).findFirst().get();
+			String[] boneNames = nameArrayElem.getChild("Name_array", ns).getText().split(" ");
+			
+			
 			List<Element> animations = collada.getChild("library_animations", ns).getChildren("animation", ns);
 			//just assuming that the first occuring animation object belongs to the first occuring bone
 			for (int bone = 0; bone < animations.size(); bone++) {
@@ -348,11 +353,20 @@ public class ObjectLoader {
 				String timestampsElemName = findAttribChild(pointerElem, "semantic", "INPUT", "input", ns).getAttributeValue("source").substring(1);
 				Element timestampsElem = findAttribChild(animation, "id", timestampsElemName, "source", ns).getChild("float_array", ns);
 				float[] timestampsData = toFloat(timestampsElem.getText().split(" "));
-				
+
 				String transformElemName = findAttribChild(pointerElem, "semantic", "OUTPUT", "input", ns).getAttributeValue("source").substring(1);
 				Element transformElem = findAttribChild(animation, "id", transformElemName, "source", ns).getChild("float_array", ns);
 				float[] transformData = toFloat(transformElem.getText().split(" "));
 				
+				//find out actual bone id
+				int actualBoneID = -1;
+				for (int bid = 0; bid < boneNames.length; bid++) {
+					if (animation.getAttributeValue("id").endsWith(boneNames[bid] + "_pose_matrix")) {
+						actualBoneID = bid;
+						break;
+					}
+				}
+
 				for (int key = 0; key < timestampsData.length; key++) {
 					//create all keyframes assoc. with this bone
 					Keyframe keyframe = new Keyframe(timestampsData[key]);
@@ -362,16 +376,13 @@ public class ObjectLoader {
 					}
 					Matrix4f transform = new Matrix4f();
 					transform.loadData(keyTransform);
-					keyframe.getBones().put(bone, transform);
+					keyframe.getBones().put(actualBoneID, transform);
 					animatedMesh.addKeyframe(keyframe);
 				}
 			}
-			
-			
-			
+
 			System.err.println("Loaded Object: " + animatedMesh);
-			
-			
+
 			return animatedMesh;
 			/**/
 		} catch (Exception ex) {

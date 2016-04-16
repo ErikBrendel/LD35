@@ -82,7 +82,7 @@ vec3 calcDirectionalLight(DirLight light, vec3 norm, vec3 viewDir);
 vec3 calcPointLight(PointLight pl, vec3 norm, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir);
 
-void main(){ 
+void main(){
 	vec3 norm = normalize(normal);		
 
 	vec3 viewDir = normalize(viewPos - pos);

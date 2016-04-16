@@ -60,7 +60,8 @@ public class Matrix4f extends org.lwjgl.util.vector.Matrix4f {
 		getDataArray();
 	}
 
-	public void invalidate() {
+	public Matrix4f invalidate() {
 		matrixBuffer = null;
+		return this;
 	}
 }
