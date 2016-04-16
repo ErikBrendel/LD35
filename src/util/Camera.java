@@ -38,7 +38,7 @@ public class Camera {
 	public void setWorldView(Vector3f origin, Vector3f playerPos, Vector3f enemyPos) {
 		Vector3f dif = new Vector3f();
 		dif = Vector3f.sub(enemyPos, playerPos, dif);
-		dif.scale(0.2f);
+		dif.scale(0.3f);
 		Vector3f midpoint = new Vector3f();
 		midpoint = Vector3f.add(playerPos, dif, midpoint);
 		Vector3f direction = new Vector3f();
@@ -50,7 +50,7 @@ public class Camera {
 		playerDir = Vector3f.sub(playerPos, enemyPos, playerDir);
 		up = Vector3f.cross(direction, playerDir, up);
 		up.normalise();
-		cameraDistance = playerDir.length() + 1.2f;
+		cameraDistance = playerDir.length() / 1.2f + 1.2f;
 	}
 
 	public Matrix4f getProjectionMatrix() {
