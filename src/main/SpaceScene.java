@@ -72,6 +72,9 @@ public class SpaceScene implements Scene {
 	private Matrix4f view;
 	private Skybox skybox;
 	private int matricesUBO;
+	private MeshInstance underwater;
+	private MeshInstance land;
+	private MeshInstance water;
 
 	public SpaceScene() {
 		Util.createWindow("Space explorer", true);
@@ -116,18 +119,6 @@ public class SpaceScene implements Scene {
 		shaders.add(defaultShader);
 		shaders.add(instancedShader);
 
-		int dif = Util.loadTexture("earth.jpg");
-		int spec = Util.loadTexture("earth_spec.jpg");
-		int cloud = Util.loadTexture("cloudSphere.png");
-		int sunTex = Util.loadTexture("sun.jpg");
-		int rock = Util.loadTexture("container2.png");
-		int rockSpec = Util.loadTexture("container2_specular.png");
-
-		Material earthMat = new Material(dif, spec);
-		Material cloudMat = new Material(cloud, 0);
-		Material sunMat = new Material(sunTex, 0);
-		rockMat = new Material(rock, rockSpec);
-
 		sunPos = new Vector3f(1, 1, 1);
 
 		// light
@@ -138,19 +129,41 @@ public class SpaceScene implements Scene {
 		lh.addLight(flashlight, shaders);
 		lh.addLight(sunLight, shaders);
 
+		int cloud = Util.loadTexture("cloudSphere.png");
+		int sunTex = Util.loadTexture("sun.jpg");
+		int rock = Util.loadTexture("container2.png");
+		int rockSpec = Util.loadTexture("container2_specular.png");
+		int sandTex = Util.loadTexture("sand_color.png", false);
+		int landTex = Util.loadTexture("green_color.png", false);
+		int waterTex = Util.loadTexture("blue_color_alpha.png", false);
+		int whiteTex = Util.loadTexture("white.png");
+		int blackTex = Util.loadTexture("black.png");
+
+		Material cloudMat = new Material(cloud, blackTex);
+		Material sunMat = new Material(sunTex, blackTex);
+		Material rockMat = new Material(rock, rockSpec);
+		Material sandMat = new Material(sandTex, blackTex);
+		Material landMat = new Material(landTex, blackTex);
+		Material waterMat = new Material(waterTex, whiteTex);
+		rockMat = new Material(rock, rockSpec);
+
 		// planets
 		Mesh planetSphere = loadObjectEBO("earth.obj");
-		asteroid = loadObjectEBO("asteroid.obj");
+		Mesh asteroid = loadObjectEBO("asteroid.obj");
+		Mesh underwaterMesh = loadObjectEBO("gamePlanetUnderwater.obj");
+		Mesh landMesh = loadObjectEBO("gamePlanetLand.obj");
+		Mesh waterMesh = loadObjectEBO("gamePlanetWater.obj");
 
-		earth = new MeshInstance(planetSphere, earthMat);
-		earth.setLocation(new Vector3f(0, 0, 0));
+		underwater = new MeshInstance(underwaterMesh, sandMat);
+		land = new MeshInstance(landMesh, landMat);
+		water = new MeshInstance(waterMesh, waterMat);
 
-		clouds = new MeshInstance(planetSphere, cloudMat);
+		MeshInstance clouds = new MeshInstance(planetSphere, cloudMat);
 		clouds.setLocation(new Vector3f(0, 0, 0));
 		float cloudScale = 1.01f;
 		clouds.setScale(new Vector3f(cloudScale, cloudScale, cloudScale));
 
-		sun = new MeshInstance(planetSphere, sunMat);
+		MeshInstance sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
 
 		amount = 100000;
@@ -275,8 +288,13 @@ public class SpaceScene implements Scene {
 
 		// earth
 		float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
-		earth.setRotation(new Vector3f(0, angle, 0));
-		earth.render(shaders[0]);
+		Vector3f rot = new Vector3f(0, angle, 0);
+		underwater.setRotation(rot);
+		underwater.render(defaultShader);
+		land.setRotation(rot);
+		land.render(defaultShader);
+		water.setRotation(rot);
+		water.render(defaultShader);
 
 		// clouds
 		clouds.setRotation(new Vector3f(0, angle * 1f, 0));
