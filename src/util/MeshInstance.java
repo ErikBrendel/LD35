@@ -60,6 +60,10 @@ public class MeshInstance {
 		this.scale = scale;
 	}
 
+	public void setScale(float scale) {
+		this.scale = new Vector3f(scale, scale, scale);
+	}
+
 	public Vector3f getLocation() {
 		return location;
 	}
