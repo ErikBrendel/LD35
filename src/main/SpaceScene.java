@@ -46,6 +46,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
+import sounds.SoundManager;
 import util.Camera;
 import util.GUI;
 import util.Material;
@@ -177,11 +178,10 @@ public class SpaceScene implements Scene {
 		Vector3f scaleVec = new Vector3f(worldScale, worldScale, worldScale);
 		water = new MeshInstance(waterMesh, waterMat);
 		water.setScale(scaleVec);
-		
+
 		WorldGenerator generator = new WorldGenerator();
 		generator.generate();
 		generated = generator.getData();
-		
 
 		sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
@@ -249,9 +249,10 @@ public class SpaceScene implements Scene {
 
 	public void start() {
 		lastFrame = System.nanoTime();
+		sounds.playSound("m_test");
 		while (!Display.isCloseRequested()) {
-			sounds.update();
-			// create window
+
+			// sounds.playSound("e_Powerup6");
 
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
@@ -362,7 +363,7 @@ public class SpaceScene implements Scene {
 		 * player.getCamera().processMouseScroll(-60 * deltaTime); } if
 		 * (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 		 * player.getCamera().processMouseScroll(60 * deltaTime); }
-		 *
+		 * 
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_Y)) { player.getCamera().roll(1 *
 		 * deltaTime); } if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
 		 * player.getCamera().roll(-1 * deltaTime); }
