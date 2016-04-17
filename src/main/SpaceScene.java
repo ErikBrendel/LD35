@@ -93,7 +93,7 @@ public class SpaceScene implements Scene {
 
 	private MeshInstance sun;
 	private MeshInstance water;
-	private MeshInstance generated;
+	private WorldGenerator generator;
 
 	private GUI gui;
 
@@ -155,7 +155,7 @@ public class SpaceScene implements Scene {
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		int cloud = Util.loadTexture("cloudSphere.png");
+		//int cloud = Util.loadTexture("cloudSphere.png");
 		int sunTex = Util.loadTexture("sun.jpg");
 		int rock = Util.loadTexture("container2.png");
 		int rockSpec = Util.loadTexture("container2_specular.png");
@@ -177,11 +177,9 @@ public class SpaceScene implements Scene {
 		Vector3f scaleVec = new Vector3f(worldScale, worldScale, worldScale);
 		water = new MeshInstance(waterMesh, waterMat);
 		water.setScale(scaleVec);
-		
-		WorldGenerator generator = new WorldGenerator();
+
+		generator = new WorldGenerator();
 		generator.generate();
-		generated = generator.getData();
-		
 
 		sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
@@ -198,8 +196,8 @@ public class SpaceScene implements Scene {
 			float x = (float) Math.sin(Math.toDegrees(angle)) * radius + displacement;
 			displacement = ran.nextInt() % (int) (2 * offset * 100) / 100.0f - offset;
 			float y = displacement * 0.4f; // Keep height of asteroid
-											// field smaller compared to
-											// width of x and z
+			// field smaller compared to
+			// width of x and z
 			displacement = ran.nextInt() % (int) (2 * offset * 100) / 100.0f - offset;
 			float z = (float) Math.cos(Math.toDegrees(angle)) * radius + displacement;
 			model.translate(new Vector3f(x, y, z));
@@ -272,7 +270,9 @@ public class SpaceScene implements Scene {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
-			player.setNearest(generated.getMesh());
+			if (generator.hasFinished()) {
+				player.setNearest(generator.getData().getMesh());
+			}
 			enemy.update(deltaTime);
 			gui.update();
 
@@ -316,7 +316,9 @@ public class SpaceScene implements Scene {
 		// float angle = (float) (System.currentTimeMillis() % (1000 * 360 *
 		// Math.PI)) / 5000f / 2f;
 		// Vector3f rot = new Vector3f(0, angle, 0);
-		generated.render(defaultShader);
+		if (generator.hasFinished()) {
+			generator.getData().render(defaultShader);
+		}
 
 		// player
 		player.render(defaultShader);

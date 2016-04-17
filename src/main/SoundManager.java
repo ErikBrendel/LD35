@@ -70,7 +70,7 @@ public class SoundManager {
 		 * fin = null; try { fin = new java.io.FileInputStream("Footsteps.wav");
 		 * } catch (java.io.FileNotFoundException ex) {
 		 * System.out.println("Datei nicht gefunden."); ex.printStackTrace();
-		 * return AL10.AL_FALSE; } System.out.println("Datei geöffnet.");
+		 * return AL10.AL_FALSE; } System.out.println("Datei geoeffnet.");
 		 * WaveData waveFile = WaveData.create(fin); try { fin.close(); } catch
 		 * (java.io.IOException ex) { }
 		 */

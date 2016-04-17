@@ -7,10 +7,10 @@
 package generating;
 
 import generating.Graph.GraphNode;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.BinaryOperator;
 import org.lwjgl.util.vector.Vector3f;
 import util.Material;
 import util.Mesh;
@@ -25,33 +25,61 @@ import util.Util;
  */
 public class WorldGenerator {
 
-	private static final int SMOOTH_LOOP_COUNT = 3;
-	private static final float waterThreshold = 0f;
+	private static final int SMOOTH_LOOP_COUNT = 2;
+	private static final float waterThreshold = -0.02f;
 	private static final float landHeight = 1f;
-	private static final float waterHeight = 1f/1.015f;
+	private static final float waterHeight = 1f / 1.015f;
 	private static final float underwaterHeight = 0.94f;
 
 	private Random r;
 	private MeshInstance planetObject;
+	private boolean finished;
+	private Graph sphereGraph;
 
 	/**
 	 * Create a new generator to get one random world
 	 */
 	public WorldGenerator() {
 		r = new Random();
+		finished = false;
+	}
+	
+	public void generateAsync() {
+		new Thread() {
+			{
+				setName("Planet generation thread.");
+			}
+			public void run() {
+				generate();
+			}
+		}.start();
 	}
 
 	/**
 	 * perform generation
 	 */
 	public void generate() {
+		long[] t = new long[8];
+		t[0] = System.nanoTime();
 		float[] sphere = loadSphereMesh();
-		Graph sphereGraph = convertToGraph(sphere);
+		t[1] = System.nanoTime();
+		sphereGraph = convertToGraph(sphere);
+		t[2] = System.nanoTime();
 		randomize(sphereGraph);
+		t[3] = System.nanoTime();
 		smooth(sphereGraph);
+		t[4] = System.nanoTime();
 		threshold(sphereGraph);
-		Mesh planet = convertBack(sphereGraph);
-		planetObject = instantiate(planet);
+		t[5] = System.nanoTime();
+		t[6] = System.nanoTime();
+		//planetObject = instantiate(planet);
+		t[7] = System.nanoTime();
+		r = null;
+		
+		for (int i = 1; i < 8; i++) {
+			System.out.println("Time: " + ((t[i] - t[i - 1]) / 1000000f) + "ms");
+		}
+		finished = true;
 	}
 
 	/**
@@ -60,7 +88,9 @@ public class WorldGenerator {
 	 * @return planet without water
 	 */
 	public MeshInstance getData() {
-
+		if(planetObject == null) {
+			planetObject = instantiate(convertBack(sphereGraph));
+		}
 		return planetObject;
 	}
 
@@ -90,6 +120,8 @@ public class WorldGenerator {
 			graph.connect(edges[2], edges[0]);
 
 		}
+		
+		//graph.merge();
 
 		return graph;
 	}
@@ -152,6 +184,55 @@ public class WorldGenerator {
 
 		}
 
+		//normal correction
+		for (int node = 0; node < graph.getNodeCount(); node++) {
+			GraphNode me = graph.getNodes().get(node);
+
+			List<GraphNode> area = graph.getConnected(me);
+			//area.add(me);
+
+			boolean allLand = area.stream().map((GraphNode n) -> n.isWater()).reduce(Boolean.TRUE, Boolean::logicalAnd);
+			boolean allWater = area.stream().map((GraphNode n) -> !n.isWater()).reduce(Boolean.TRUE, Boolean::logicalAnd);
+
+			if (allLand || allWater) {
+				continue;
+			}
+			
+			int dataPointer = node * DATA_STRIDE + 3;
+			Vector3f oldNormal = new Vector3f(points[dataPointer++], points[dataPointer++], points[dataPointer++]);
+			dataPointer -= 3;
+			
+
+			Vector3f waterDir = area.stream().filter((GraphNode n) -> n.isWater())
+					.map((GraphNode areaNode) -> {
+				return Vector3f.sub(areaNode.getPosition(), me.getPosition(), null); //get vectory to all water points
+			}).reduce((Vector3f t, Vector3f u) -> Vector3f.add(t, u, null)).get(); //sum together
+			
+			if(waterDir.length() == 0f) {
+				System.err.println("water vector length 0!");
+				continue;
+			}
+			
+			waterDir.normalise();
+			//waterDir.scale(0.3f);
+			oldNormal.normalise();
+			
+			Vector3f right = Vector3f.cross(waterDir, oldNormal, null);
+			
+			
+
+			Vector3f normal = Vector3f.cross(right, waterDir, null);
+			normal.normalise();
+			/*if(me.isWater()) {
+				normal.scale(-1f);
+			}/**/
+
+			points[dataPointer++] = normal.x; //normal data
+			points[dataPointer++] = normal.y;
+			points[dataPointer++] = normal.z;
+		}
+
+		//indizes list
 		int[] indizes = new int[graph.getConnectionCount() * 2];
 		int indizesPointer = 0;
 
@@ -160,38 +241,36 @@ public class WorldGenerator {
 		for (int node1i = 0; node1i < allNodes.size(); node1i++) {
 			GraphNode node1 = allNodes.get(node1i);
 			List<GraphNode> node1n = graph.getConnected(node1);
-			
-			for (GraphNode node2: node1n) {
+
+			for (GraphNode node2 : node1n) {
 				if (node2.getIndex() > node1.getIndex()) {
-					
+
 					List<GraphNode> node2n = graph.getConnected(node2);
-					
-					for (GraphNode node3: node2n) {
-						if(node1n.contains(node3)) {
-							if(node3.getIndex() > node2.getIndex()) {
-								
+
+					for (GraphNode node3 : node2n) {
+						if (node1n.contains(node3)) {
+							if (node3.getIndex() > node2.getIndex()) {
+
 								//we got a tri!
-								
 								indizes[indizesPointer++] = node1.getIndex();
 								indizes[indizesPointer++] = node2.getIndex();
 								indizes[indizesPointer++] = node3.getIndex();
-								
+
 							}
 						}
 					}
-					
+
 				}
 			}
 		}
-		
-		
+
 		int[] vertexDataSizes = {3, 3, 2};
 		Mesh planetMesh = new Mesh(points, indizes, vertexDataSizes);
 
 		return planetMesh;
 	}
 
-	private MeshInstance instantiate(Mesh planet) {
+	public MeshInstance instantiate(Mesh planet) {
 		return new MeshInstance(planet, new Material("generatedWorld.png", "black.png"));
 	}
 
@@ -248,6 +327,10 @@ public class WorldGenerator {
 				return landHeight;
 			}
 		}
+	}
+
+	public boolean hasFinished() {
+		return finished;
 	}
 
 }

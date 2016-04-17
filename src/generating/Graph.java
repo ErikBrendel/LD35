@@ -215,6 +215,40 @@ public class Graph {
 		}
 	}
 
+	/**
+	 * merges all vertices wich are at the same 3d-position
+	 * preserving all connections
+	 */
+	void merge() {
+		for (int node1 = 0; node1 < getNodeCount() - 1; node1++) {
+			for (int node2 = node1 + 1; node2 < getNodeCount(); node2++) {
+				
+				//check if both nodes are the same
+				if(nodes.get(node1).getPosition().equals(nodes.get(node2).getPosition())) {
+					//copy connections from node2 to node1
+					if(REDUNDANT_CONNECTION_MODE) {
+						nodes.get(node1).getConnected().addAll(nodes.get(node2).getConnected());
+						for (GraphNode conn: nodes.get(node2).getConnected()) {
+							conn.getConnected().remove(nodes.get(node2));
+							conn.getConnected().add(nodes.get(node1));
+						}
+					} else {
+						for (GraphConnection conn: connections) {
+							if(conn.contains(nodes.get(node2))) {
+								conn.update(nodes.get(node2), nodes.get(node1));
+							}
+						}
+					}
+					
+					//delete node2
+					nodes.remove(node2);
+					node2--;
+				}
+				
+			}
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "Graph(" + getNodeCount() + " nodes, " + getConnectionCount() + " connections, average of " + (getConnectionCount() / (float) getNodeCount()) + "conns/node)";
@@ -301,6 +335,14 @@ public class Graph {
 
 		public GraphNode getOther(GraphNode n) {
 			return n1 == n ? n2 : n1;
+		}
+		
+		public void update(GraphNode old, GraphNode _new) {
+			if(n1 == old) {
+				n1 = _new;
+			} else {
+				n2 = _new;
+			}
 		}
 	}
 }
