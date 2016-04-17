@@ -60,6 +60,7 @@ public class Player extends WorldObject {
 	private float[] scales;
 	private float[] speeds;
 	private MeshInstance transition;
+	private float leoLegAnimProgress = 0f;
 
 	public Player(Vector3f position) {
 		super(new MeshInstance(eagleMesh, eagleMat), new MeshInstance(sharkMesh, sharkMat, false), new MeshInstance(leopardMesh, leopardMat, false),
@@ -199,27 +200,7 @@ public class Player extends WorldObject {
 			}
 		}
 
-		//animate leopard legs
-		if (currentMesh == 2 || nextMesh == 2) {
-			float animProgress = ((System.currentTimeMillis() % 100000l) / 800f) % 1f;//linear from 0 to 1 over time
-
-			for (int leg = 0; leg < 4; leg++) {
-				float legRot = (float) Math.sin((animProgress - (leg * 0.2f)) * Math.PI*2) * 0.9f;
-				System.err.println("legRot = " + legRot);
-				float dX = (leg >= 2) ? 1f : -1f;
-				float dZ = (leg % 2 == 0) ? 0.25f : -0.25f;
-				float dY = 1.5f;
-				
-				
-				
-				Matrix4f legRotMatrix = new Matrix4f();
-				legRotMatrix.translate(new Vector3f(dX, dY, dZ));
-				legRotMatrix.rotate(legRot, new Vector3f(0, 0, 1));
-				modelMatrix[3 + leg] = legRotMatrix;
-			}
-
-		}
-
+		//walking
 		float viewDirAngleDelta = dy * deltaTime * 2f;
 
 		Vector3f prePos = getPosition();
@@ -232,9 +213,29 @@ public class Player extends WorldObject {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float s = dx * deltaTime * speed;
+		float walkSpeed = dx * deltaTime * speed;
 
-		walk(s, prePos);
+		walk(walkSpeed, prePos);
+
+		//animate leopard legs
+		if (currentMesh == 2 || nextMesh == 2) {
+			leoLegAnimProgress += deltaTime * 1.5f * (dx | dy);
+			leoLegAnimProgress %= 1f;
+
+			for (int leg = 0; leg < 4; leg++) {
+				float legRot = (float) Math.sin((leoLegAnimProgress - (leg * 0.2f)) * Math.PI * 2) * 0.9f;
+
+				float legdX = (leg >= 2) ? 1f : -1f;
+				float legdZ = (leg % 2 == 0) ? 0.25f : -0.25f;
+				float legdY = 1.5f;
+
+				Matrix4f legRotMatrix = new Matrix4f();
+				legRotMatrix.translate(new Vector3f(legdX, legdY, legdZ));
+				legRotMatrix.rotate(legRot, new Vector3f(0, 0, 1));
+				modelMatrix[3 + leg] = legRotMatrix;
+			}
+
+		}
 	}
 
 	@Override
