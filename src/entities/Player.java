@@ -40,7 +40,7 @@ public class Player extends WorldObject {
 		int shark = Util.loadTexture("shark.jpg");
 		int spec = Util.loadTexture("black.png");
 		int white = Util.loadTexture("white.png");
-		int leopard = Util.loadTexture("leoparg.jpg");
+		int leopard = Util.loadTexture("leopard.jpg");
 		eagleMat = new Material(eagle, spec);
 		sharkMat = new Material(shark, spec);
 		transitionkMat = new Material(white, white);
@@ -62,7 +62,9 @@ public class Player extends WorldObject {
 	private MeshInstance transition;
 
 	public Player(Vector3f position) {
-		super(new MeshInstance(eagleMesh, eagleMat), new MeshInstance(sharkMesh, sharkMat, false), new MeshInstance(leopardMesh, leopardMat, false));
+		super(new MeshInstance(eagleMesh, eagleMat), new MeshInstance(sharkMesh, sharkMat, false), new MeshInstance(leopardMesh, leopardMat, false),
+				new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false));
+
 		transition = new MeshInstance(transitionkMesh, transitionkMat);
 		transition.setVisible(false);
 		scales = new float[model.length];
@@ -74,7 +76,7 @@ public class Player extends WorldObject {
 		speeds[1] = 0.17f;
 		speeds[2] = 0.17f;
 		for (int i = 0; i < model.length; i++) {
-			model[i].setScale(scales[i]);
+			model[i].setScale(scales[Math.min(i, 2)]);
 		}
 		this.position = position;
 		this.position.normalise();
@@ -88,10 +90,8 @@ public class Player extends WorldObject {
 	 * fetches input events (like lookaround and walking) and updates the
 	 * uniform values to also show this progress
 	 *
-	 * @param deltaTime
-	 *            time passed since last frame
+	 * @param deltaTime time passed since last frame
 	 */
-
 	public void setNearest(Mesh m) {
 		speed = speeds[currentMesh];
 		if (currentMesh == nextMesh) {
@@ -177,6 +177,11 @@ public class Player extends WorldObject {
 				currentMesh = nextMesh;
 				speed = speeds[currentMesh];
 			}
+
+			for (int m = 3; m < 7; m++) {
+				model[m].setScale(model[2].getScale());
+				model[m].setVisible(model[2].isVisible());
+			}
 		} else {
 			timeAnimating = 0;
 			// movement
@@ -192,6 +197,27 @@ public class Player extends WorldObject {
 			if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
 				dy++;
 			}
+		}
+
+		//animate leopard legs
+		if (currentMesh == 2 || nextMesh == 2) {
+			float animProgress = ((System.currentTimeMillis() % 100000l) / 800f) % 1f;//linear from 0 to 1 over time
+
+			for (int leg = 0; leg < 4; leg++) {
+				float legRot = (float) Math.sin((animProgress - (leg * 0.2f)) * Math.PI*2) * 0.9f;
+				System.err.println("legRot = " + legRot);
+				float dX = (leg >= 2) ? 1f : -1f;
+				float dZ = (leg % 2 == 0) ? 0.25f : -0.25f;
+				float dY = 1.5f;
+				
+				
+				
+				Matrix4f legRotMatrix = new Matrix4f();
+				legRotMatrix.translate(new Vector3f(dX, dY, dZ));
+				legRotMatrix.rotate(legRot, new Vector3f(0, 0, 1));
+				modelMatrix[3 + leg] = legRotMatrix;
+			}
+
 		}
 
 		float viewDirAngleDelta = dy * deltaTime * 2f;

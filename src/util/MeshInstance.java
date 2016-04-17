@@ -73,7 +73,7 @@ public class MeshInstance {
 	}
 
 	public Vector3f getScale() {
-		return scale;
+		return new Vector3f(scale);
 	}
 
 	public void render(Shader shader) {
@@ -100,6 +100,10 @@ public class MeshInstance {
 
 	public Mesh getMesh() {
 		return mesh;
+	}
+
+	public boolean isVisible() {
+		return visible;
 	}
 
 }
