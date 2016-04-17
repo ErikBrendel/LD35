@@ -12,7 +12,7 @@ public class SoundManager implements Runnable {
 	private static boolean playMusic;
 
 	public enum Music {
-		;
+		title(0);
 
 		private final int id;
 
@@ -98,9 +98,13 @@ public class SoundManager implements Runnable {
 	@Override
 	public void run() {
 		sounds = new LinkedList<AudioClip>();
+		sounds.add(loadClip("miniaturestory"));
 		// sounds.add(loadClip("Test"));
 		music = new LinkedList<AudioClip>();
+		music.add(loadClip("miniaturestory"));
 		playMusic = true;
 		playSounds = true;
+		playMusic(Music.title);
+		playSound(Sounds.hurt);
 	}
 }

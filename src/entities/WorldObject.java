@@ -17,13 +17,16 @@ public abstract class WorldObject {
 
 	protected Vector3f position;
 	protected Vector3f viewDir;
+	protected Vector3f prePos;
 	protected MeshInstance[] model;
 	protected Matrix4f[] modelMatrix;
 
 	public WorldObject(MeshInstance... model) {
+		prePos = new Vector3f();
+		position = new Vector3f();
 		this.model = model;
 		modelMatrix = new Matrix4f[model.length];
-		for (int i = 0 ; i < modelMatrix.length; i++) {
+		for (int i = 0; i < modelMatrix.length; i++) {
 			modelMatrix[i] = new Matrix4f();
 		}
 	}
@@ -38,7 +41,16 @@ public abstract class WorldObject {
 		return new Vector3f(position);
 	}
 
+	public Vector3f getVelocity() {
+		return Vector3f.sub(position, prePos, null);
+	}
+
+	public Vector3f getViewDir() {
+		return viewDir;
+	}
+
 	public void render(Shader shader) {
+		prePos = new Vector3f(position);
 		for (int m = 0; m < model.length; m++) {
 			model[m].setLocation(position);
 			Vector3f rotationAxis = new Vector3f();
@@ -81,11 +93,11 @@ public abstract class WorldObject {
 			rot.rotate(viewDirAngle, normPos);
 			rot.rotate(angle, rotationAxis);
 			rot.rotate(baseRotationAngle, WORLD_NORTH);
-			
+
 			rot = Matrix4f.mul(rot, modelMatrix[m], rot);
 
 			model[m].setRotationMatrix(rot);
-			//model[m].setScale(new Vector3f(0.07f, 0.07f, 0.07f));
+			// model[m].setScale(new Vector3f(0.07f, 0.07f, 0.07f));
 			model[m].render(shader);
 		}
 	}

@@ -88,6 +88,7 @@ public class SpaceScene implements Scene {
 	private Matrix4f view;
 	private Skybox skybox;
 	private int matricesUBO;
+	private SoundManager sounds;
 
 	private MeshInstance sun;
 	private MeshInstance underwater;
@@ -97,6 +98,7 @@ public class SpaceScene implements Scene {
 	private GUI gui;
 
 	public SpaceScene() {
+
 		Util.createWindow("Space explorer", false);
 
 		shaders = new ArrayList<>();
@@ -105,7 +107,7 @@ public class SpaceScene implements Scene {
 		skybox = new Skybox("ownSky");
 
 		HashMap<String, Object> parameters = new HashMap<>();
-		parameters.put("SHININESS", 256);
+		parameters.put("SHININESS", 64);
 		parameters.put("NUM_DIR_LIGHTS", 0);
 		parameters.put("NUM_SPOT_LIGHTS", 0);
 		parameters.put("NUM_POINT_LIGHTS", 0);
@@ -129,12 +131,14 @@ public class SpaceScene implements Scene {
 
 		camera = new Camera(new Vector3f(0, 0, 0), player.getPosition(), enemy.getPosition(), 3f);
 
+		sounds = new SoundManager();
+
 		gui = new GUI(player);
 
 		sunPos = new Vector3f(1, 1, 1);
 
 		// light
-		sunLight = new DirectionalLight(new Color(255, 255, 220), sunPos);
+		sunLight = new DirectionalLight(new Color(255, 255, 150), sunPos);
 
 		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 10, 20, 15);
 
@@ -250,7 +254,9 @@ public class SpaceScene implements Scene {
 	}
 
 	public void start() {
+		lastFrame = System.nanoTime();
 		while (!Display.isCloseRequested()) {
+			sounds.update();
 			// create window
 
 			// get deltaTime and FPS
@@ -298,6 +304,7 @@ public class SpaceScene implements Scene {
 			Display.update();
 			Display.sync(600);
 		}
+		sounds.destroy();
 	}
 
 	@Override

@@ -1,8 +1,6 @@
 package entities;
 
 import java.util.ArrayList;
-import java.util.Random;
-
 import light.LightHandler;
 import light.SpotLight;
 
@@ -21,14 +19,12 @@ public class Enemy extends WorldObject {
 	private static final Mesh enemyMesh;
 	private static final Mesh enemyPropMesh;
 	private static final Material enemyMat;
-	private static Random ran;
 
 	static {
 		int dif = Util.loadTexture("EnemyTex.png");
 		enemyMat = new Material(dif, 0);
 		enemyMesh = ObjectLoader.loadObjectEBO("Enemy.obj");
 		enemyPropMesh = ObjectLoader.loadObjectEBO("Enemy_propeler.obj");
-		ran = new Random();
 	}
 
 	private float propellerRot = 0f;
@@ -88,12 +84,14 @@ public class Enemy extends WorldObject {
 		destinationDir.normalise();
 
 		Vector3f deltaDir = Vector3f.sub(destinationDir, viewDir, null);
-		deltaDir.scale(deltaTime * 2);
+		deltaDir.scale(deltaTime * 4);
 		viewDir = Vector3f.add(viewDir, deltaDir, null);
 
 		viewDir.normalise();
 
-		float speed = dx * deltaTime * 0.05f;
+		float currentSpeed = 0.08f + (float) Math.sqrt(timePassed) / 90;
+
+		float speed = dx * deltaTime * currentSpeed;
 		walk(speed, prePos);
 	}
 }

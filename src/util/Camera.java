@@ -16,7 +16,7 @@ public class Camera {
 		FORAWRD, BACKWARD, LEFT, RIGHT, UP, DOWN
 	}
 
-	private Vector3f position, up, lookAt;
+	private Vector3f position, up, lookAt, prePos;
 	private float zoom;
 	private float cameraDistance;
 	private Matrix4f projection;
@@ -37,6 +37,7 @@ public class Camera {
 	}
 
 	public void setWorldView(Vector3f origin, Vector3f playerPos, Vector3f enemyPos) {
+		prePos = new Vector3f(position);
 		Vector3f dif = new Vector3f();
 		dif = Vector3f.sub(enemyPos, playerPos, dif);
 		dif.scale(0.3f);
@@ -62,6 +63,14 @@ public class Camera {
 		} else {
 			lookAt = new Vector3f();
 		}
+	}
+
+	public Vector3f getUp() {
+		return up;
+	}
+
+	public Vector3f getLookAt() {
+		return lookAt;
 	}
 
 	public Matrix4f getProjectionMatrix() {
@@ -90,6 +99,10 @@ public class Camera {
 
 	public void apply(Shader shader) {
 		glUniform3f(shader.getUniform("viewPos"), position.getX(), position.getY(), position.getZ());
+	}
+
+	public Vector3f getVelocity() {
+		return Vector3f.sub(position, prePos, null);
 	}
 
 }
