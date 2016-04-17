@@ -31,7 +31,7 @@ public class GUI {
 		addIcon("icon_leo_active", true);
 		addIcon("icon_leo_disabled", false);
 		for (MeshInstance m : meshes) {
-			m.setScale(0.1f);
+			m.setScale(new Vector3f(0.1f, 0.1f * 16f / 9f, 0.1f));
 		}
 	}
 
@@ -48,30 +48,42 @@ public class GUI {
 			if (player.isOverland()) {
 				if (player.getCurrentMesh() == 0) {
 					setBirdPosition(position.disabled);
-					setLeoPosition(position.left);
+					setLeoPosition(position.right);
 					setLeo(true);
-					setSharkPosition(position.right);
+					setSharkPosition(position.left);
 					setShark(false);
 				} else if (player.getCurrentMesh() == 1) {
 					setSharkPosition(position.disabled);
-					setBirdPosition(position.left);
+					setBirdPosition(position.right);
 					setBird(true);
-					setLeoPosition(position.right);
+					setLeoPosition(position.left);
 					setLeo(true);
 				} else {
 					setLeoPosition(position.disabled);
-					setBirdPosition(position.right);
+					setBirdPosition(position.left);
 					setBird(true);
-					setSharkPosition(position.left);
+					setSharkPosition(position.right);
 					setShark(false);
 				}
 			} else {
 				if (player.getCurrentMesh() == 0) {
-
+					setBirdPosition(position.disabled);
+					setLeoPosition(position.right);
+					setLeo(false);
+					setSharkPosition(position.left);
+					setShark(true);
 				} else if (player.getCurrentMesh() == 1) {
-
+					setSharkPosition(position.disabled);
+					setBirdPosition(position.right);
+					setBird(true);
+					setLeoPosition(position.left);
+					setLeo(false);
 				} else {
-
+					setLeoPosition(position.disabled);
+					setBirdPosition(position.left);
+					setBird(true);
+					setSharkPosition(position.right);
+					setShark(true);
 				}
 			}
 		}
@@ -84,12 +96,12 @@ public class GUI {
 				meshes.get(1).setLocation(new Vector3f(-1.9f, -1.9f, 1));
 				break;
 			case left:
-				meshes.get(0).setLocation(new Vector3f(-0.1f, -0.1f, 1));
-				meshes.get(1).setLocation(new Vector3f(-0.1f, -0.1f, 1));
+				meshes.get(0).setLocation(new Vector3f(-0.8f, 0.8f, 1));
+				meshes.get(1).setLocation(new Vector3f(-0.8f, 0.8f, 1));
 				break;
 			case right:
-				meshes.get(0).setLocation(new Vector3f(0.1f, 0.1f, 1));
-				meshes.get(1).setLocation(new Vector3f(0.1f, 0.1f, 1));
+				meshes.get(0).setLocation(new Vector3f(0.8f, 0.8f, 1));
+				meshes.get(1).setLocation(new Vector3f(0.8f, 0.8f, 1));
 				break;
 			default:
 				break;
@@ -103,8 +115,8 @@ public class GUI {
 				meshes.get(3).setLocation(new Vector3f(-1.9f, -1.9f, 1));
 				break;
 			case left:
-				meshes.get(2).setLocation(new Vector3f(-0.9f, -0.9f, 1));
-				meshes.get(3).setLocation(new Vector3f(-0.9f, -0.9f, 1));
+				meshes.get(2).setLocation(new Vector3f(-0.8f, 0.8f, 1));
+				meshes.get(3).setLocation(new Vector3f(-0.8f, 0.8f, 1));
 				break;
 			case right:
 				meshes.get(2).setLocation(new Vector3f(0.8f, 0.8f, 1));
@@ -122,8 +134,8 @@ public class GUI {
 				meshes.get(5).setLocation(new Vector3f(-1.9f, -1.9f, 1));
 				break;
 			case left:
-				meshes.get(4).setLocation(new Vector3f(-0.9f, -0.9f, 1));
-				meshes.get(5).setLocation(new Vector3f(-0.9f, -0.9f, 1));
+				meshes.get(4).setLocation(new Vector3f(-0.8f, 0.8f, 1));
+				meshes.get(5).setLocation(new Vector3f(-0.8f, 0.8f, 1));
 				break;
 			case right:
 				meshes.get(4).setLocation(new Vector3f(0.8f, 0.8f, 1));

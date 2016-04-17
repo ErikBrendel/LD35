@@ -104,19 +104,19 @@ public class ObjectLoader {
 				}
 			}
 		}
-		
-		for (int bullshit = 0; bullshit < 10; bullshit++) {
-			
-						float[] data = new float[8];
-						data[0] = bullshit;
-						data[1] = bullshit;
-						data[2] = bullshit;
-						data[3] = bullshit;
-						data[4] = bullshit;
-						data[5] = bullshit;
-						data[6] = bullshit;
-						data[7] = 1 - bullshit;
-						dataList.add(data);
+
+		for (int bullshit = 0; bullshit < 1; bullshit++) {
+
+			float[] data = new float[8];
+			data[0] = bullshit;
+			data[1] = bullshit;
+			data[2] = bullshit;
+			data[3] = bullshit;
+			data[4] = bullshit;
+			data[5] = bullshit;
+			data[6] = bullshit;
+			data[7] = 1 - bullshit;
+			dataList.add(data);
 		}
 
 		// actual mesh data
@@ -135,8 +135,7 @@ public class ObjectLoader {
 
 		if (objectName.equals("icon.obj")) {
 			System.err.println("Data: ");
-			for (int i = 0; i
-					< data.length; i++) {
+			for (int i = 0; i < data.length; i++) {
 				System.err.println(data[i]);
 			}
 			System.err.println("\nMap: ");
@@ -148,7 +147,7 @@ public class ObjectLoader {
 
 		System.err.println("[loadingLog] Loaded Object " + objectName + " with " + indexMap.size() + " vertices " + "and " + indizesList.size() / 3 + " faces");
 
-		int[] vertexDataSizes = {3, 3, 2};
+		int[] vertexDataSizes = { 3, 3, 2 };
 		return new Mesh(data, indizes, vertexDataSizes);
 	}
 
