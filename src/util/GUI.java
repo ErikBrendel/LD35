@@ -30,13 +30,17 @@ public class GUI {
 		addIcon("icon_shark_disabled", false);
 		addIcon("icon_leo_active", true);
 		addIcon("icon_leo_disabled", false);
+		addIcon("icon_e", true);
+		addIcon("icon_q", true);
 		for (MeshInstance m : meshes) {
 			m.setScale(new Vector3f(0.1f, 0.1f * 16f / 9f, 0.1f));
 		}
+		meshes.get(6).setLocation(new Vector3f(0.8f, 0.8f, 1));
+		meshes.get(7).setLocation(new Vector3f(-0.8f, 0.8f, 1));
 	}
 
 	private void addIcon(String icon, boolean visible) {
-		meshes.add(new MeshInstance(mesh, new Material(icon + ".png", "black.png"), visible));
+		meshes.add(new MeshInstance(mesh, new Material(Util.loadTexture(icon + ".png"), 0), visible));
 	}
 
 	public void update() {

@@ -98,41 +98,49 @@ public class Player extends WorldObject {
 				if (currentMesh == 0) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 1;
+						return;
 					}
 				}
 				if (currentMesh == 1) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 0;
+						return;
 					}
 				}
 				if (currentMesh == 2) {
+					speed = 0.01f;
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 0;
+						return;
 					}
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 1;
+						return;
 					}
-					speed = 0.01f;
 				}
 			} else {
 				overLand = true;
 				if (currentMesh == 0) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 2;
+						return;
 					}
 				}
 				if (currentMesh == 1) {
+					speed = 0.01f;
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 0;
+						return;
 					}
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 2;
+						return;
 					}
-					speed = 0.01f;
 				}
 				if (currentMesh == 2) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 0;
+						return;
 					}
 				}
 			}
@@ -180,6 +188,7 @@ public class Player extends WorldObject {
 			} else if (timeAnimating > offsetSphereExpanding) {
 				transition.setVisible(false);
 				currentMesh = nextMesh;
+				timeAnimating = 0;
 				speed = speeds[currentMesh];
 			}
 
@@ -188,7 +197,6 @@ public class Player extends WorldObject {
 				model[m].setVisible(model[2].isVisible());
 			}
 		} else {
-			timeAnimating = 0;
 			// movement
 			if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
 				dx--;
@@ -217,7 +225,7 @@ public class Player extends WorldObject {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float walkSpeed = dx * deltaTime * speed;
+		float walkSpeed = dx * deltaTime * speed * 10;
 
 		walk(walkSpeed, prePos);
 
