@@ -63,6 +63,8 @@ public class Player extends WorldObject {
 	private MeshInstance transition;
 	private boolean overLand;
 	private float leoLegAnimProgress = 0f;
+	
+	private float powerup;
 
 	public Player(Vector3f position) {
 		super(new MeshInstance(eagleMesh, eagleMat), new MeshInstance(sharkMesh, sharkMat, false), new MeshInstance(leopardMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false));
@@ -86,6 +88,7 @@ public class Player extends WorldObject {
 		walk(0.01f, new Vector3f(0.1f, 0.1f, 0.1f));
 		update(0.001f);
 		speed = 0.15f;
+		powerup = 0;
 	}
 
 	public void setNearest(Mesh m) {
@@ -225,7 +228,8 @@ public class Player extends WorldObject {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float walkSpeed = dx * deltaTime * speed;
+		float walkSpeed = dx * deltaTime * speed * (1 + powerup);
+		powerup *= (1 - deltaTime);
 
 		walk(walkSpeed, prePos);
 
@@ -272,4 +276,10 @@ public class Player extends WorldObject {
 	private float interpolate(float value) {
 		return (float) (-2 * Math.pow(value, 3) + 3 * Math.pow(value, 2));
 	}
+
+	public void setPowerup(float powerup) {
+		this.powerup += powerup;
+	}
+	
+	
 }

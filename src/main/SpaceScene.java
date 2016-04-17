@@ -62,6 +62,7 @@ import com.sun.prism.impl.BufferUtil;
 
 import entities.Enemy;
 import entities.Player;
+import entities.Powerups;
 import generating.WorldGenerator;
 
 /**
@@ -95,6 +96,7 @@ public class SpaceScene implements Scene {
 	private MeshInstance sun;
 	private MeshInstance water;
 	private WorldGenerator generator;
+	private Powerups powerups;
 
 	private GUI gui;
 
@@ -168,6 +170,10 @@ public class SpaceScene implements Scene {
 		rockMat = new Material(rock, rockSpec);
 		Material waterMat = new Material(waterTex, whiteTex);
 		rockMat = new Material(rock, rockSpec);
+		
+		
+		powerups = new Powerups();
+		
 
 		// planets
 		Mesh planetSphere = loadObjectEBO("earth.obj");
@@ -277,6 +283,7 @@ public class SpaceScene implements Scene {
 			}
 			enemy.update(deltaTime);
 			gui.update();
+			powerups.update(deltaTime, player);
 
 			// Update Matrices Uniform Buffer Block
 			view = camera.getViewMatrix();
@@ -327,6 +334,8 @@ public class SpaceScene implements Scene {
 		enemy.render(defaultShader);
 
 		water.render(defaultShader);
+		
+		powerups.render(defaultShader);
 
 		// sun
 		sun.setLocation(sunPos);

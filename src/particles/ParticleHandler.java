@@ -73,7 +73,7 @@ public class ParticleHandler {
 	public void update(float deltaTime) {
 		int o = 0;
 		for (Particle p : particles) {
-			matrices[o] = p.generateModel(random);
+			//matrices[o] = p.generateModel(random);
 			o++;
 		}
 		data = BufferUtil.newFloatBuffer(amount * 16);
