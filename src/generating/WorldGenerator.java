@@ -28,8 +28,8 @@ public class WorldGenerator {
 	private static final int SMOOTH_LOOP_COUNT = 3;
 	private static final float waterThreshold = 0f;
 	private static final float landHeight = 1f;
-	private static final float waterHeight = 1f/1.06f;
-	private static final float underwaterHeight = 0.95f;
+	private static final float waterHeight = 1f/1.015f;
+	private static final float underwaterHeight = 0.94f;
 
 	private Random r;
 	private MeshInstance planetObject;
