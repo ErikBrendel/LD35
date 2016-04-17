@@ -47,16 +47,9 @@ public class WorldGenerator {
 	public void generate() {
 		float[] sphere = loadSphereMesh();
 		Graph sphereGraph = convertToGraph(sphere);
-
-		System.err.println(sphereGraph);
-
 		randomize(sphereGraph);
 		smooth(sphereGraph);
 		threshold(sphereGraph);
-
-		System.err.println("Smoothing complete");
-		debugCoast(sphereGraph);
-
 		Mesh planet = convertBack(sphereGraph);
 		planetObject = instantiate(planet);
 	}
