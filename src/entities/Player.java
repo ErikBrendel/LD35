@@ -74,8 +74,8 @@ public class Player extends WorldObject {
 		scales[0] = 0.07f;
 		scales[1] = 0.12f;
 		scales[2] = 0.02f;
-		speeds[0] = 0.1f;
-		speeds[1] = 0.17f;
+		speeds[0] = 0.14f;
+		speeds[1] = 0.20f;
 		speeds[2] = 0.17f;
 		for (int i = 0; i < model.length; i++) {
 			model[i].setScale(scales[Math.min(i, 2)]);
@@ -108,7 +108,7 @@ public class Player extends WorldObject {
 					}
 				}
 				if (currentMesh == 2) {
-					speed = 0.01f;
+					speed = 0.03f;
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 0;
 						return;
@@ -225,7 +225,7 @@ public class Player extends WorldObject {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float walkSpeed = dx * deltaTime * speed * 10;
+		float walkSpeed = dx * deltaTime * speed;
 
 		walk(walkSpeed, prePos);
 
