@@ -38,4 +38,9 @@ public class Material {
 	public void apply(Shader shader) {
 		apply(shader, "material");
 	}
+	
+	@Override
+	public String toString() {
+		return "Material(" + diffuseTex + ", " + specularTex + ")";
+	}
 }

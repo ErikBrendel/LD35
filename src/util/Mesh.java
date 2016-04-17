@@ -158,4 +158,9 @@ public class Mesh {
 
 		return result;
 	}
+	
+	@Override
+	public String toString() {
+		return "Mesh(EBO:" + EBOMode + ", " + indices.length + " indizes and " + data.length + " floats data)";
+	}
 }

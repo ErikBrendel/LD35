@@ -88,19 +88,12 @@ public class Player extends WorldObject {
 		speed = 0.15f;
 	}
 
-	/**
-	 * fetches input events (like lookaround and walking) and updates the
-	 * uniform values to also show this progress
-	 *
-	 * @param deltaTime
-	 *            time passed since last frame
-	 */
 	public void setNearest(Mesh m) {
 		speed = speeds[currentMesh];
 		if (currentMesh == nextMesh) {
 			neighbour = m.getNearestVertex(position);
 
-			if (neighbour.length() < 1.01f) {
+			if (neighbour.length() < 0.99f) {
 				overLand = false;
 				if (currentMesh == 0) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
@@ -154,6 +147,13 @@ public class Player extends WorldObject {
 		}
 	}
 
+	/**
+	 * fetches input events (like lookaround and walking) and updates the
+	 * uniform values to also show this progress
+	 *
+	 * @param deltaTime
+	 *            time passed since last frame
+	 */
 	public void update(float deltaTime) {
 		int dx = 0, dy = 0;
 

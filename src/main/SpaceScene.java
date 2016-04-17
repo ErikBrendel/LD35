@@ -61,6 +61,7 @@ import com.sun.prism.impl.BufferUtil;
 
 import entities.Enemy;
 import entities.Player;
+import generating.WorldGenerator;
 
 /**
  * Main class for LD project
@@ -91,9 +92,8 @@ public class SpaceScene implements Scene {
 	private SoundManager sounds;
 
 	private MeshInstance sun;
-	private MeshInstance underwater;
-	private MeshInstance land;
 	private MeshInstance water;
+	private MeshInstance generated;
 
 	private GUI gui;
 
@@ -159,35 +159,29 @@ public class SpaceScene implements Scene {
 		int sunTex = Util.loadTexture("sun.jpg");
 		int rock = Util.loadTexture("container2.png");
 		int rockSpec = Util.loadTexture("container2_specular.png");
-		int sandTex = Util.loadTexture("sand_color.png", false);
-		int landTex = Util.loadTexture("green_color.png", false);
 		int waterTex = Util.loadTexture("blue_color_alpha.png", false);
 		int whiteTex = Util.loadTexture("white.png");
 		int blackTex = Util.loadTexture("black.png");
 
-		Material cloudMat = new Material(cloud, blackTex);
 		Material sunMat = new Material(sunTex, 0);
 		rockMat = new Material(rock, rockSpec);
-		Material sandMat = new Material(sandTex, blackTex);
-		Material landMat = new Material(landTex, blackTex);
 		Material waterMat = new Material(waterTex, whiteTex);
 		rockMat = new Material(rock, rockSpec);
 
 		// planets
 		Mesh planetSphere = loadObjectEBO("earth.obj");
 		asteroid = loadObjectEBO("asteroid.obj");
-		Mesh underwaterMesh = loadObjectEBO("gamePlanetUnderwater.obj");
-		Mesh landMesh = loadObjectEBO("gamePlanetLand.obj");
 		Mesh waterMesh = loadObjectEBO("gamePlanetWater.obj");
 
-		underwater = new MeshInstance(underwaterMesh, sandMat);
 		float worldScale = 1f / 1.015f;
 		Vector3f scaleVec = new Vector3f(worldScale, worldScale, worldScale);
-		underwater.setScale(scaleVec);
-		land = new MeshInstance(landMesh, landMat);
-		land.setScale(scaleVec);
 		water = new MeshInstance(waterMesh, waterMat);
 		water.setScale(scaleVec);
+		
+		WorldGenerator generator = new WorldGenerator();
+		generator.generate();
+		generated = generator.getData();
+		
 
 		sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
@@ -278,7 +272,7 @@ public class SpaceScene implements Scene {
 			defaultShader.use();
 			handleInputs(deltaTime, defaultShader);
 			player.update(deltaTime);
-			player.setNearest(land.getMesh());
+			player.setNearest(generated.getMesh());
 			enemy.update(deltaTime);
 			gui.update();
 
@@ -322,8 +316,7 @@ public class SpaceScene implements Scene {
 		// float angle = (float) (System.currentTimeMillis() % (1000 * 360 *
 		// Math.PI)) / 5000f / 2f;
 		// Vector3f rot = new Vector3f(0, angle, 0);
-		underwater.render(defaultShader);
-		land.render(defaultShader);
+		generated.render(defaultShader);
 
 		// player
 		player.render(defaultShader);
