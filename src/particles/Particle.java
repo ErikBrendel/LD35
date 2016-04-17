@@ -8,13 +8,13 @@ import util.Matrix4f;
 
 public abstract class Particle {
 
-	private Matrix4f model;
+	protected Matrix4f model;
 
-	private Vector3f startPos;
-	private Vector3f startDir;
+	protected Vector3f startPos;
+	protected Vector3f startDir;
 
-	private float timePassed;
-	private boolean isDead;
+	protected float timePassed;
+	protected boolean dead;
 
 	public Particle() {
 		model = new Matrix4f();
@@ -25,5 +25,7 @@ public abstract class Particle {
 	abstract void generateStartValues(Random ran, Vector3f origin);
 
 	abstract Matrix4f generateModel(Random ran, float deltaTime);
+	
+	abstract boolean isDead();
 
 }
