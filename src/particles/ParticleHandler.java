@@ -62,6 +62,31 @@ public class ParticleHandler {
 		this.material = material;
 		this.shader = shader;
 		matrices = new Matrix4f[0];
+		VAO = mesh.getVAO();
+		FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
+		for (int i = 0; i < amount; i++) {
+			data.put(matrices[i].getDataArray());
+		}
+		data.flip();
+		glBindVertexArray(VAO);
+		int buffer = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, false, 64, 0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, false, 64, 16);
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, false, 64, 32);
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, false, 64, 48);
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
 	}
 
 	public void setOrigin(Vector3f origin) {
@@ -92,12 +117,11 @@ public class ParticleHandler {
 		amount = particles.size();
 
 		FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
-		for (int i = 0; i < o; i++) {
+		for (int i = 0; i < amount; i++) {
 			data.put(matrices[i].getDataArray());
 		}
-		data.flip();
 
-		VAO = mesh.getVAO();
+		data.flip();
 		glBindVertexArray(VAO);
 		int buffer = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);

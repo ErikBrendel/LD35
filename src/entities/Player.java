@@ -172,7 +172,7 @@ public class Player extends WorldObject {
 
 		if (nextMesh != currentMesh) {
 			particles.setOrigin(position);
-			particles.emit(10);
+			particles.emit(100);
 			timeAnimating += deltaTime;
 			if (timeAnimating < timeModelShrinking) {
 				model[currentMesh].setScale(scales[currentMesh] * interpolate((timeModelShrinking - timeAnimating) / timeModelShrinking));

@@ -39,11 +39,12 @@ public class ShapeShiftParticle extends Particle {
 	Matrix4f generateModel(Random ran, float deltaTime) {
 		timePassed += deltaTime;
 
-		Vector3f position = Vector3f.add(new Vector3f(timePassed * startDir.x, timePassed * startDir.y, timePassed * startDir.z), startPos, null);
+		Vector3f position = Vector3f.add(new Vector3f(timePassed * startDir.x * 0.5f, timePassed * startDir.y * 0.5f, timePassed * startDir.z * 0.5f), startPos, null);
 
 		Matrix4f model = new Matrix4f();
 		model.translate(position);
-		model.rotate(timePassed, new Vector3f(1, timePassed, timePassed));
+		model.rotate(timePassed, new Vector3f(1, 0, 0));
+		model.scale(new Vector3f(lifetime - timePassed, lifetime - timePassed, lifetime - timePassed));
 		return model;
 	}
 
