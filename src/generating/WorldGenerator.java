@@ -10,7 +10,12 @@ import generating.Graph.GraphNode;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import org.lwjgl.util.vector.Vector3f;
 import util.Material;
 import util.Mesh;
@@ -71,6 +76,7 @@ public class WorldGenerator {
 		t[4] = System.nanoTime();
 		threshold(sphereGraph);
 		t[5] = System.nanoTime();
+		coastSmooth(sphereGraph);
 		t[6] = System.nanoTime();
 		//planetObject = instantiate(planet);
 		t[7] = System.nanoTime();
@@ -154,6 +160,28 @@ public class WorldGenerator {
 		sphereGraph.getNodes().stream().parallel().forEach((GraphNode n) -> {
 			n.setWater(n.getNoiseValue() < waterThreshold);
 		});
+	}
+	
+	private void coastSmooth(Graph graph) {
+		boolean coastSoomthFinished = false;
+		
+		while (!coastSoomthFinished) {
+			coastSoomthFinished = true;
+			
+			List<GraphNode> nodes = graph.getNodes();
+			for (int n = 0; n < nodes.size(); n++) {
+				GraphNode node = nodes.get(n);
+				if(!node.isWater()) {
+					List<GraphNode> neighbours = graph.getConnected(node);
+					int landCount = neighbours.stream().map((GraphNode no) -> no.isWater() ? 0 : 1).reduce(0, Integer::sum);
+					if (landCount <= 1) {
+						node.setWater(true);
+						coastSoomthFinished = false;
+					}
+				}
+			}
+		}
+		
 	}
 
 	private Mesh convertBack(Graph graph) {
@@ -332,5 +360,6 @@ public class WorldGenerator {
 	public boolean hasFinished() {
 		return finished;
 	}
+
 
 }
