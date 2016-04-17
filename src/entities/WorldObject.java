@@ -12,8 +12,8 @@ import util.Shader;
  */
 public abstract class WorldObject {
 
-	private static final Vector3f WORLD_FRONT = new Vector3f(1, 0, 0);
-	private static final Vector3f WORLD_NORTH = new Vector3f(0, 1, 0);
+	protected static final Vector3f WORLD_FRONT = new Vector3f(1, 0, 0);
+	protected static final Vector3f WORLD_NORTH = new Vector3f(0, 1, 0);
 
 	protected Vector3f position;
 	protected Vector3f viewDir;
@@ -55,7 +55,9 @@ public abstract class WorldObject {
 			model[m].setLocation(position);
 			Vector3f rotationAxis = new Vector3f();
 			rotationAxis = Vector3f.cross(WORLD_NORTH, position, rotationAxis);
-			rotationAxis.normalise();
+			if (rotationAxis.length() > 0) {
+				rotationAxis.normalise();
+			}
 
 			Vector3f normPos = new Vector3f(position);
 			normPos.normalise();
@@ -91,7 +93,9 @@ public abstract class WorldObject {
 			}
 			org.lwjgl.util.vector.Matrix4f rot = new org.lwjgl.util.vector.Matrix4f();
 			rot.rotate(viewDirAngle, normPos);
-			rot.rotate(angle, rotationAxis);
+			if (rotationAxis.length() > 0) {
+				rot.rotate(angle, rotationAxis);
+			}
 			rot.rotate(baseRotationAngle, WORLD_NORTH);
 
 			rot = Matrix4f.mul(rot, modelMatrix[m], rot);

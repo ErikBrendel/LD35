@@ -108,7 +108,7 @@ public class SoundManager {
 				}
 			}
 		}
-		AL10.alSourcePlay(source[loadedSounds.get(name)].get(0));
+		//AL10.alSourcePlay(source[loadedSounds.get(name)].get(0));
 	}
 
 	void setListenerValues(FloatBuffer pos, FloatBuffer vel, FloatBuffer ori) {
