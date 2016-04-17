@@ -18,10 +18,26 @@ public class ShapeShiftParticle extends Particle {
 
 	private static final float lifetime = 0.5f;
 	private static final float startDisplacement = 0.1f;
+	
+	private Vector3f rotationAxis;
+	private float lifespan;
+
+	public ShapeShiftParticle() {
+	}
+
+	public ShapeShiftParticle(Vector3f axis, float lifespan) {
+		axis.normalise();
+		this.rotationAxis = axis;
+		this.lifespan = lifespan;
+	}
+	
+	
 
 	@Override
 	Particle getInstance() {
-		return new ShapeShiftParticle();
+		Random ran = new Random();
+		return new ShapeShiftParticle(new Vector3f(ran.nextFloat() - 0.5f, ran.nextFloat() - 0.5f, ran.nextFloat() - 0.5f),
+				0.5f + ran.nextFloat());
 	}
 
 	@Override
@@ -43,14 +59,17 @@ public class ShapeShiftParticle extends Particle {
 
 		Matrix4f model = new Matrix4f();
 		model.translate(position);
-		model.rotate(timePassed, new Vector3f(1, 0, 0));
+		/*model.rotate(timePassed * rotationSpeed.x, new Vector3f(1, 0, 0));
+		model.rotate(timePassed * rotationSpeed.y, new Vector3f(0, 1, 0));
+		model.rotate(timePassed * rotationSpeed.z, new Vector3f(0, 0, 1));/**/
+		model.rotate(timePassed * 3 + 2, rotationAxis);
 		model.scale(new Vector3f(lifetime - timePassed, lifetime - timePassed, lifetime - timePassed));
 		return model;
 	}
 
 	@Override
 	boolean isDead() {
-		return timePassed > lifetime;
+		return timePassed > lifetime * lifespan;
 	}
 
 }
