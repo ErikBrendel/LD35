@@ -61,6 +61,7 @@ import com.sun.prism.impl.BufferUtil;
 
 import entities.Enemy;
 import entities.Player;
+import generating.WorldGenerator;
 
 /**
  * Main class for LD project
@@ -93,6 +94,7 @@ public class SpaceScene implements Scene {
 	private MeshInstance underwater;
 	private MeshInstance land;
 	private MeshInstance water;
+	private MeshInstance generated;
 
 	private GUI gui;
 
@@ -184,6 +186,11 @@ public class SpaceScene implements Scene {
 		land.setScale(scaleVec);
 		water = new MeshInstance(waterMesh, waterMat);
 		water.setScale(scaleVec);
+		
+		WorldGenerator generator = new WorldGenerator();
+		generator.generate();
+		generated = generator.getData();
+		
 
 		sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
@@ -315,8 +322,9 @@ public class SpaceScene implements Scene {
 		// float angle = (float) (System.currentTimeMillis() % (1000 * 360 *
 		// Math.PI)) / 5000f / 2f;
 		// Vector3f rot = new Vector3f(0, angle, 0);
-		underwater.render(defaultShader);
-		land.render(defaultShader);
+		//underwater.render(defaultShader);
+		//land.render(defaultShader);
+		generated.render(defaultShader);
 
 		// player
 		player.render(defaultShader);

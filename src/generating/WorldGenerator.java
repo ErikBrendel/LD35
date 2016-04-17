@@ -25,10 +25,11 @@ import util.Util;
  */
 public class WorldGenerator {
 
-	private static final int SMOOTH_LOOP_COUNT = 10;
+	private static final int SMOOTH_LOOP_COUNT = 3;
 	private static final float waterThreshold = 0f;
-	private static final float landHeight = 1.06f;
-	private static final float underwaterHeight = 0.85f;
+	private static final float landHeight = 1f;
+	private static final float waterHeight = 1f/1.06f;
+	private static final float underwaterHeight = 0.95f;
 
 	private Random r;
 	private MeshInstance planetObject;
@@ -153,7 +154,7 @@ public class WorldGenerator {
 			points[dataPointer++] = actualPos.y;
 			points[dataPointer++] = actualPos.z;
 
-			points[dataPointer++] = 0.25f + ((pointScale < 1.001f) ? 0.5f : 0f);
+			points[dataPointer++] = 0.25f + ((pointScale < landHeight) ? 0.5f : 0f);
 			points[dataPointer++] = 0.5f;
 
 		}
@@ -161,47 +162,36 @@ public class WorldGenerator {
 		int[] indizes = new int[graph.getConnectionCount() * 2];
 		int indizesPointer = 0;
 
-		//slowly de-construct graph to fetch triangles
-		while (graph.getNodeCount() > 0) {
-			GraphNode triStart = graph.getNodes().get(0); //get a node (forst of the list)
-			List<GraphNode> triStartConnected = graph.getConnected(triStart);
-
-			GraphNode tri2 = triStartConnected.get(0); //get one node connected to our fist node
-			List<GraphNode> tri2connected = graph.getConnected(tri2);
-
-			List<GraphNode> sharedNodes = new ArrayList<>();
-			for (GraphNode triStartConn : triStartConnected) { //get a node connected to both of them
-				if (tri2connected.contains(triStartConn)) {
-					sharedNodes.add(triStartConn);
+		//fetch all triangles
+		List<GraphNode> allNodes = graph.getNodes();
+		for (int node1i = 0; node1i < allNodes.size(); node1i++) {
+			GraphNode node1 = allNodes.get(node1i);
+			List<GraphNode> node1n = graph.getConnected(node1);
+			
+			for (GraphNode node2: node1n) {
+				if (node2.getIndex() > node1.getIndex()) {
+					
+					List<GraphNode> node2n = graph.getConnected(node2);
+					
+					for (GraphNode node3: node2n) {
+						if(node1n.contains(node3)) {
+							if(node3.getIndex() > node2.getIndex()) {
+								
+								//we got a tri!
+								
+								indizes[indizesPointer++] = node1.getIndex();
+								indizes[indizesPointer++] = node2.getIndex();
+								indizes[indizesPointer++] = node3.getIndex();
+								
+							}
+						}
+					}
+					
 				}
 			}
-			if (sharedNodes.isEmpty()) { //there is no shared node?!?
-				System.err.println("No De-triangulation possible. TriNodes:");
-				System.err.println(triStart);
-				System.err.println(tri2);
-				System.exit(-1);
-			}
-			GraphNode tri3 = sharedNodes.get(0);
-			System.err.println("Triangulation success:");
-			System.err.println(triStart);
-			System.err.println(tri2);
-			System.err.println(tri3);
-
-			//we got one triangle!
-			//add triangle to vertex index list
-			indizes[indizesPointer++] = triStart.getIndex();
-			indizes[indizesPointer++] = tri2.getIndex();
-			indizes[indizesPointer++] = tri3.getIndex();
-
-			//remove tringle from graph (if needed)
-			if (sharedNodes.size() == 1) {
-				graph.removeConnection(triStart, tri2, true);
-				graph.removeConnection(tri2, tri3, true);
-				graph.removeConnection(tri3, triStart, true);
-			}
-
 		}
-
+		
+		
 		int[] vertexDataSizes = {3, 3, 2};
 		Mesh planetMesh = new Mesh(points, indizes, vertexDataSizes);
 
@@ -209,7 +199,7 @@ public class WorldGenerator {
 	}
 
 	private MeshInstance instantiate(Mesh planet) {
-		return new MeshInstance(planet, new Material("white", "black"));
+		return new MeshInstance(planet, new Material("generatedWorld.png", "black.png"));
 	}
 
 	private void debugGraph(Graph g) {
@@ -260,7 +250,7 @@ public class WorldGenerator {
 				}
 			}
 			if (coast) {
-				return 1.0f;
+				return waterHeight;
 			} else {
 				return landHeight;
 			}
