@@ -104,6 +104,20 @@ public class ObjectLoader {
 				}
 			}
 		}
+		
+		for (int bullshit = 0; bullshit < 10; bullshit++) {
+			
+						float[] data = new float[8];
+						data[0] = bullshit;
+						data[1] = bullshit;
+						data[2] = bullshit;
+						data[3] = bullshit;
+						data[4] = bullshit;
+						data[5] = bullshit;
+						data[6] = bullshit;
+						data[7] = 1 - bullshit;
+						dataList.add(data);
+		}
 
 		// actual mesh data
 		float[] data = new float[dataList.size() * 8];
