@@ -6,12 +6,29 @@
  */
 package main;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL31.*;
-import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindBufferBase;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
+import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
+import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
 import static util.ObjectLoader.loadObjectEBO;
 
 import java.awt.Color;
@@ -29,11 +46,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
-import com.sun.prism.impl.BufferUtil;
-
-import entities.Enemy;
-import entities.Player;
 import util.Camera;
+import util.GUI;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
@@ -42,6 +56,11 @@ import util.Scene;
 import util.Shader;
 import util.Skybox;
 import util.Util;
+
+import com.sun.prism.impl.BufferUtil;
+
+import entities.Enemy;
+import entities.Player;
 
 /**
  * Main class for LD project
@@ -75,6 +94,8 @@ public class SpaceScene implements Scene {
 	private MeshInstance land;
 	private MeshInstance water;
 
+	private GUI gui;
+
 	public SpaceScene() {
 		Util.createWindow("Space explorer", true);
 
@@ -107,6 +128,8 @@ public class SpaceScene implements Scene {
 		enemy = new Enemy(new Vector3f(0, 1, 0), player, lh, shaders);
 
 		camera = new Camera(new Vector3f(0, 0, 0), player.getPosition(), enemy.getPosition(), 3f);
+
+		gui = new GUI(player);
 
 		sunPos = new Vector3f(1, 1, 1);
 
@@ -314,6 +337,8 @@ public class SpaceScene implements Scene {
 
 		// skybox
 		skybox.render(camera);
+
+		gui.render();
 	}
 
 	public boolean down = false;
@@ -336,7 +361,7 @@ public class SpaceScene implements Scene {
 		 * player.getCamera().processMouseScroll(-60 * deltaTime); } if
 		 * (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 		 * player.getCamera().processMouseScroll(60 * deltaTime); }
-		 * 
+		 *
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_Y)) { player.getCamera().roll(1 *
 		 * deltaTime); } if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
 		 * player.getCamera().roll(-1 * deltaTime); }

@@ -10,6 +10,11 @@ public class Material {
 
 	int diffuseTex, specularTex;
 
+	public Material(String diffuseTex, String specularTex) {
+		this.diffuseTex = Util.loadTexture(diffuseTex);
+		this.specularTex = Util.loadTexture(specularTex);
+	}
+
 	public Material(int diffuseTex, int specularTex) {
 		this.diffuseTex = diffuseTex;
 		this.specularTex = specularTex;

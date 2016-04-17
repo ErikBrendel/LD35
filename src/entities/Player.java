@@ -12,6 +12,7 @@ import util.Material;
 import util.Matrix4f;
 import util.Mesh;
 import util.MeshInstance;
+import util.ObjectLoader;
 import util.Shader;
 import util.Util;
 
@@ -40,16 +41,16 @@ public class Player extends WorldObject {
 		int shark = Util.loadTexture("shark.jpg");
 		int spec = Util.loadTexture("black.png");
 		int white = Util.loadTexture("white.png");
-		int leopard = Util.loadTexture("leoparg.jpg");
+		int leopard = Util.loadTexture("leopard.jpg");
 		eagleMat = new Material(eagle, spec);
 		sharkMat = new Material(shark, spec);
 		transitionkMat = new Material(white, white);
 		leopardMat = new Material(leopard, white);
-		leopardMesh = new Mesh("leopard_body.obj");
-		leopardLegMesh = new Mesh("leopard_leg.obj");
-		eagleMesh = new Mesh("bird.obj");
-		sharkMesh = new Mesh("shark.obj");
-		transitionkMesh = new Mesh("shapeshiftoverlay.obj");
+		leopardMesh = ObjectLoader.loadObjectEBO("leopard_body.obj");
+		leopardLegMesh = ObjectLoader.loadObjectEBO("leopard_leg.obj");
+		eagleMesh = ObjectLoader.loadObjectEBO("bird.obj");
+		sharkMesh = ObjectLoader.loadObjectEBO("shark.obj");
+		transitionkMesh = ObjectLoader.loadObjectEBO("shapeshiftoverlay.obj");
 	}
 
 	private Vector3f neighbour;
@@ -60,6 +61,7 @@ public class Player extends WorldObject {
 	private float[] scales;
 	private float[] speeds;
 	private MeshInstance transition;
+	private boolean overLand;
 
 	public Player(Vector3f position) {
 		super(new MeshInstance(eagleMesh, eagleMat), new MeshInstance(sharkMesh, sharkMat, false), new MeshInstance(leopardMesh, leopardMat, false));
@@ -98,6 +100,7 @@ public class Player extends WorldObject {
 			neighbour = m.getNearestVertex(position);
 
 			if (neighbour.length() < 1.01f) {
+				overLand = false;
 				if (currentMesh == 0) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 1;
@@ -118,6 +121,7 @@ public class Player extends WorldObject {
 					speed = 0.01f;
 				}
 			} else {
+				overLand = true;
 				if (currentMesh == 0) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 2;
@@ -216,6 +220,18 @@ public class Player extends WorldObject {
 		super.render(shader);
 		transition.setLocation(position);
 		transition.render(shader);
+	}
+
+	public int getCurrentMesh() {
+		return currentMesh;
+	}
+
+	public int getNextMesh() {
+		return nextMesh;
+	}
+
+	public boolean isOverland() {
+		return overLand;
 	}
 
 	private float interpolate(float value) {

@@ -12,6 +12,7 @@ import util.Material;
 import util.Matrix4f;
 import util.Mesh;
 import util.MeshInstance;
+import util.ObjectLoader;
 import util.Shader;
 import util.Util;
 
@@ -25,8 +26,8 @@ public class Enemy extends WorldObject {
 	static {
 		int dif = Util.loadTexture("EnemyTex.png");
 		enemyMat = new Material(dif, 0);
-		enemyMesh = new Mesh("Enemy.obj");
-		enemyPropMesh = new Mesh("Enemy_propeler.obj");
+		enemyMesh = ObjectLoader.loadObjectEBO("Enemy.obj");
+		enemyPropMesh = ObjectLoader.loadObjectEBO("Enemy_propeler.obj");
 		ran = new Random();
 	}
 
