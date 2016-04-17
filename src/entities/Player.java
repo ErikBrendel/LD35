@@ -172,7 +172,7 @@ public class Player extends WorldObject {
 
 		if (nextMesh != currentMesh) {
 			particles.setOrigin(position);
-			particles.emit(100);
+			particles.emit(1000);
 			timeAnimating += deltaTime;
 			if (timeAnimating < timeModelShrinking) {
 				model[currentMesh].setScale(scales[currentMesh] * interpolate((timeModelShrinking - timeAnimating) / timeModelShrinking));
@@ -267,8 +267,8 @@ public class Player extends WorldObject {
 		particles.update(deltaTime);
 	}
 
-	public void renderParticles(Camera camera) {
-		particles.render(camera);
+	public void renderParticles() {
+		particles.render();
 	}
 
 	@Override
@@ -276,8 +276,6 @@ public class Player extends WorldObject {
 		super.render(shader);
 		transition.setLocation(position);
 		transition.render(shader);
-
-		shader.use();
 	}
 
 	public int getCurrentMesh() {

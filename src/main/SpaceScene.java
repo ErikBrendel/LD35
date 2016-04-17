@@ -172,7 +172,7 @@ public class SpaceScene implements Scene {
 		Material waterMat = new Material(waterTex, whiteTex);
 		rockMat = new Material(rock, rockSpec);
 
-		powerups = new Powerups();
+		powerups = new Powerups(lh);
 
 		// planets
 		Mesh planetSphere = loadObjectEBO("earth.obj");
@@ -219,7 +219,34 @@ public class SpaceScene implements Scene {
 			model.rotate((float) Math.toDegrees(rotAngle), new Vector3f(0.4f, 0.6f, 0.8f));
 
 			matrices[i] = model;
+
 		}
+		FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
+		for (int i = 0; i < amount; i++) {
+			data.put(matrices[i].getDataArray());
+		}
+		data.flip();
+
+		VAO = asteroid.getVAO();
+		glBindVertexArray(VAO);
+		int buffer = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, false, 64, 0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, false, 64, 16);
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, false, 64, 32);
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, false, 64, 48);
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// game loop
 	}
@@ -228,39 +255,12 @@ public class SpaceScene implements Scene {
 		lastFrame = System.nanoTime();
 		sounds.playSound("m_test");
 		while (!Display.isCloseRequested()) {
-
-			FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
-			for (int i = 0; i < amount; i++) {
-				data.put(matrices[i].getDataArray());
-			}
-			data.flip();
-
-			VAO = asteroid.getVAO();
-			glBindVertexArray(VAO);
-			int buffer = glGenBuffers();
-			glBindBuffer(GL_ARRAY_BUFFER, buffer);
-			glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(3);
-			glVertexAttribPointer(3, 4, GL_FLOAT, false, 64, 0);
-			glEnableVertexAttribArray(4);
-			glVertexAttribPointer(4, 4, GL_FLOAT, false, 64, 16);
-			glEnableVertexAttribArray(5);
-			glVertexAttribPointer(5, 4, GL_FLOAT, false, 64, 32);
-			glEnableVertexAttribArray(6);
-			glVertexAttribPointer(6, 4, GL_FLOAT, false, 64, 48);
-
-			glVertexAttribDivisor(3, 1);
-			glVertexAttribDivisor(4, 1);
-			glVertexAttribDivisor(5, 1);
-			glVertexAttribDivisor(6, 1);
-
-			glBindVertexArray(0);
 			// sounds.playSound("e_Powerup6");
 
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
-			// System.out.println("FPS = " + (double) 1 / deltaTime);
+			System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
 			// enemy.setPosition(new Vector3f((float)
@@ -281,7 +281,7 @@ public class SpaceScene implements Scene {
 			}
 			enemy.update(deltaTime);
 			gui.update();
-			powerups.update(deltaTime, player);
+			powerups.update(deltaTime, player, shaders);
 
 			// Update Matrices Uniform Buffer Block
 			view = camera.getViewMatrix();
@@ -328,8 +328,8 @@ public class SpaceScene implements Scene {
 		}
 
 		// player
-		player.render(defaultShader);
 		defaultShader.use();
+		player.render(defaultShader);
 		enemy.render(defaultShader);
 
 		water.render(defaultShader);
@@ -348,7 +348,7 @@ public class SpaceScene implements Scene {
 		glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(), GL_UNSIGNED_INT, 0, amount);
 		glBindVertexArray(0);
 
-		player.renderParticles(camera);
+		player.renderParticles();
 
 		// skybox
 		skybox.render(camera);

@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import util.Camera;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
@@ -143,9 +142,8 @@ public class ParticleHandler {
 		glBindVertexArray(0);
 	}
 
-	public void render(Camera cam) {
+	public void render() {
 		shader.use();
-		cam.apply(shader);
 		material.apply(shader);
 		glBindVertexArray(VAO);
 		glDrawElementsInstanced(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0, amount);
