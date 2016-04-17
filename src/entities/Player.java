@@ -8,6 +8,9 @@ package entities;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
+import particles.ParticleHandler;
+import particles.ShapeShiftParticle;
+import util.Camera;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
@@ -29,8 +32,10 @@ public class Player extends WorldObject {
 	private static final Mesh leopardMesh;
 	private static final Mesh leopardLegMesh;
 	private static final Material leopardMat;
-	private static final Mesh transitionkMesh;
+	private static final Mesh transitionMesh;
 	private static final Material transitionkMat;
+	private static final Mesh particleMesh;
+	private static final Material particleMat;
 	private static final float timeModelShrinking = 0.8f;
 	private static final float offsetSphereExpanding = 0.4f;
 	private static final float timeSphereExpanding = 0.5f;
@@ -46,11 +51,13 @@ public class Player extends WorldObject {
 		sharkMat = new Material(shark, spec);
 		transitionkMat = new Material(white, white);
 		leopardMat = new Material(leopard, white);
+		particleMat = new Material(white, white);
 		leopardMesh = ObjectLoader.loadObjectEBO("leopard_body.obj");
 		leopardLegMesh = ObjectLoader.loadObjectEBO("leopard_leg.obj");
 		eagleMesh = ObjectLoader.loadObjectEBO("bird.obj");
 		sharkMesh = ObjectLoader.loadObjectEBO("shark.obj");
-		transitionkMesh = ObjectLoader.loadObjectEBO("shapeshiftoverlay.obj");
+		transitionMesh = ObjectLoader.loadObjectEBO("shapeshiftoverlay.obj");
+		particleMesh = ObjectLoader.loadObjectEBO("particle.obj");
 	}
 
 	private Vector3f neighbour;
@@ -63,11 +70,14 @@ public class Player extends WorldObject {
 	private MeshInstance transition;
 	private boolean overLand;
 	private float leoLegAnimProgress = 0f;
+	private ParticleHandler particles;
 
-	public Player(Vector3f position) {
+	public Player(Vector3f position, Shader instanceShader) {
 		super(new MeshInstance(eagleMesh, eagleMat), new MeshInstance(sharkMesh, sharkMat, false), new MeshInstance(leopardMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false), new MeshInstance(leopardLegMesh, leopardMat, false));
 
-		transition = new MeshInstance(transitionkMesh, transitionkMat);
+		particles = new ParticleHandler(position, new ShapeShiftParticle(), particleMesh, particleMat, instanceShader);
+
+		transition = new MeshInstance(transitionMesh, transitionkMat);
 		transition.setVisible(false);
 		scales = new float[model.length];
 		speeds = new float[model.length];
@@ -155,9 +165,12 @@ public class Player extends WorldObject {
 	 *            time passed since last frame
 	 */
 	public void update(float deltaTime) {
+
 		int dx = 0, dy = 0;
 
 		if (nextMesh != currentMesh) {
+			particles.setOrigin(position);
+			particles.emit(10);
 			timeAnimating += deltaTime;
 			if (timeAnimating < timeModelShrinking) {
 				model[currentMesh].setScale(scales[currentMesh] * interpolate((timeModelShrinking - timeAnimating) / timeModelShrinking));
@@ -248,6 +261,11 @@ public class Player extends WorldObject {
 			}
 
 		}
+		particles.update(deltaTime);
+	}
+
+	public void renderParticles(Camera camera) {
+		particles.render(camera);
 	}
 
 	@Override
@@ -255,6 +273,8 @@ public class Player extends WorldObject {
 		super.render(shader);
 		transition.setLocation(position);
 		transition.render(shader);
+
+		shader.use();
 	}
 
 	public int getCurrentMesh() {

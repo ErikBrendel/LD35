@@ -1,6 +1,8 @@
 package particles;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
@@ -9,36 +11,91 @@ import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
 import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
-
 import java.nio.FloatBuffer;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import util.Camera;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
+import util.Shader;
 
 import com.sun.prism.impl.BufferUtil;
 
 public class ParticleHandler {
+	private int vertexCount;
 	private int amount;
 	private Vector3f origin;
 	private Random random;
 	private Particle parent;
 
-	private int VAO;
+	private Material material;
 
 	private HashSet<Particle> particles;
 
 	private Matrix4f[] matrices;
-	private FloatBuffer data;
+	private Shader shader;
 
-	public ParticleHandler(Vector3f origin, Particle parent, Mesh mesh, Material material) {
+	private Mesh mesh;
+
+	private int VAO;
+
+	public ParticleHandler(Vector3f origin, Particle parent, Mesh mesh, Material material, Shader shader) {
 		random = new Random();
+
+		particles = new HashSet<>();
+
 		this.origin = origin;
+
+		this.mesh = mesh;
+
+		this.parent = parent;
+
+		this.vertexCount = mesh.getVertCount();
+
+		this.material = material;
+		this.shader = shader;
+		matrices = new Matrix4f[0];
+	}
+
+	public void setOrigin(Vector3f origin) {
+		this.origin = origin;
+	}
+
+	public void emit(int amount) {
+		this.amount += amount;
+		for (int i = 0; i < amount; i++) {
+			Particle p = parent.getInstance();
+			p.generateStartValues(random, origin);
+			particles.add(p);
+		}
+		matrices = new Matrix4f[this.amount];
+	}
+
+	public void update(float deltaTime) {
+		int o = 0;
+		for (Particle p : particles) {
+			matrices[o] = p.generateModel(random, deltaTime);
+			o++;
+			if (p.isDead()) {
+				o--;
+			}
+		}
+		particles = (HashSet<Particle>) particles.stream().filter((Particle part) -> !part.isDead()).collect(Collectors.toSet());
+
+		amount = particles.size();
+
+		FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
+		for (int i = 0; i < o; i++) {
+			data.put(matrices[i].getDataArray());
+		}
+		data.flip();
 
 		VAO = mesh.getVAO();
 		glBindVertexArray(VAO);
@@ -62,30 +119,12 @@ public class ParticleHandler {
 		glBindVertexArray(0);
 	}
 
-	public void emit(int amount) {
-		this.amount += amount;
-		for (int i = 0; i < amount; i++) {
-			particles.add(parent.getInstance());
-		}
-		matrices = new Matrix4f[this.amount];
-	}
-
-	public void update(float deltaTime) {
-		int o = 0;
-		for (Particle p : particles) {
-			matrices[o] = p.generateModel(random);
-			o++;
-		}
-		data = BufferUtil.newFloatBuffer(amount * 16);
-
-		for (int i = 0; i < amount; i++) {
-			data.put(matrices[i].getDataArray());
-		}
-
-		data.flip();
-	}
-
-	public void render() {
-
+	public void render(Camera cam) {
+		shader.use();
+		cam.apply(shader);
+		material.apply(shader);
+		glBindVertexArray(VAO);
+		glDrawElementsInstanced(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0, amount);
+		glBindVertexArray(0);
 	}
 }

@@ -95,6 +95,7 @@ public class SpaceScene implements Scene {
 	private MeshInstance sun;
 	private MeshInstance water;
 	private WorldGenerator generator;
+	private Matrix4f[] matrices;
 
 	private GUI gui;
 
@@ -126,7 +127,7 @@ public class SpaceScene implements Scene {
 		shaders.add(defaultShader);
 		shaders.add(instancedShader);
 
-		player = new Player(new Vector3f((float) Math.sqrt(2), (float) Math.sqrt(2), 0));
+		player = new Player(new Vector3f((float) Math.sqrt(2), (float) Math.sqrt(2), 0), instancedShader);
 
 		enemy = new Enemy(new Vector3f(0, 1, 0), player, lh, shaders);
 
@@ -156,7 +157,7 @@ public class SpaceScene implements Scene {
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		//int cloud = Util.loadTexture("cloudSphere.png");
+		// int cloud = Util.loadTexture("cloudSphere.png");
 		int sunTex = Util.loadTexture("sun.jpg");
 		int rock = Util.loadTexture("container2.png");
 		int rockSpec = Util.loadTexture("container2_specular.png");
@@ -186,7 +187,7 @@ public class SpaceScene implements Scene {
 		sun.setScale(new Vector3f(5, 5, 5));
 
 		amount = 1000;
-		Matrix4f[] matrices = new Matrix4f[amount];
+		matrices = new Matrix4f[amount];
 		Random ran = new Random(System.currentTimeMillis());
 		float radius = 8;
 		float offset = 0.5f;
@@ -207,41 +208,14 @@ public class SpaceScene implements Scene {
 			float scale = ran.nextInt() % 50 / 100.0f + 0.25f;
 			model.scale(new Vector3f(scale, scale, scale));
 
-			// 3. Rotation: add random rotation around a (semi)randomly picked
+			// 3. Rotation: add random rotation around a (semi)randomly
+			// picked
 			// rotation axis vector
 			float rotAngle = ran.nextInt() % 360;
 			model.rotate((float) Math.toDegrees(rotAngle), new Vector3f(0.4f, 0.6f, 0.8f));
 
 			matrices[i] = model;
 		}
-
-		FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
-		for (int i = 0; i < amount; i++) {
-			data.put(matrices[i].getDataArray());
-		}
-		data.flip();
-
-		VAO = asteroid.getVAO();
-		glBindVertexArray(VAO);
-		int buffer = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 4, GL_FLOAT, false, 64, 0);
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 4, GL_FLOAT, false, 64, 16);
-		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, false, 64, 32);
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, false, 64, 48);
-
-		glVertexAttribDivisor(3, 1);
-		glVertexAttribDivisor(4, 1);
-		glVertexAttribDivisor(5, 1);
-		glVertexAttribDivisor(6, 1);
-
-		glBindVertexArray(0);
-
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// game loop
 	}
@@ -251,6 +225,32 @@ public class SpaceScene implements Scene {
 		sounds.playSound("m_test");
 		while (!Display.isCloseRequested()) {
 
+			FloatBuffer data = BufferUtil.newFloatBuffer(amount * 16);
+			for (int i = 0; i < amount; i++) {
+				data.put(matrices[i].getDataArray());
+			}
+			data.flip();
+
+			VAO = asteroid.getVAO();
+			glBindVertexArray(VAO);
+			int buffer = glGenBuffers();
+			glBindBuffer(GL_ARRAY_BUFFER, buffer);
+			glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(3);
+			glVertexAttribPointer(3, 4, GL_FLOAT, false, 64, 0);
+			glEnableVertexAttribArray(4);
+			glVertexAttribPointer(4, 4, GL_FLOAT, false, 64, 16);
+			glEnableVertexAttribArray(5);
+			glVertexAttribPointer(5, 4, GL_FLOAT, false, 64, 32);
+			glEnableVertexAttribArray(6);
+			glVertexAttribPointer(6, 4, GL_FLOAT, false, 64, 48);
+
+			glVertexAttribDivisor(3, 1);
+			glVertexAttribDivisor(4, 1);
+			glVertexAttribDivisor(5, 1);
+			glVertexAttribDivisor(6, 1);
+
+			glBindVertexArray(0);
 			// sounds.playSound("e_Powerup6");
 
 			// get deltaTime and FPS
@@ -324,6 +324,7 @@ public class SpaceScene implements Scene {
 
 		// player
 		player.render(defaultShader);
+		defaultShader.use();
 		enemy.render(defaultShader);
 
 		water.render(defaultShader);
@@ -339,6 +340,8 @@ public class SpaceScene implements Scene {
 		glBindVertexArray(VAO);
 		glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(), GL_UNSIGNED_INT, 0, amount);
 		glBindVertexArray(0);
+
+		player.renderParticles(camera);
 
 		// skybox
 		skybox.render(camera);
