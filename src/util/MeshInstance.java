@@ -105,5 +105,10 @@ public class MeshInstance {
 	public boolean isVisible() {
 		return visible;
 	}
+	
+	@Override
+	public String toString() {
+		return "MeshInstance(" + mesh + ", " + material + ")";
+	}
 
 }
