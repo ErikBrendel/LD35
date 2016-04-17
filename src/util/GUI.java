@@ -1,7 +1,7 @@
 package util;
 
 import static org.lwjgl.opengl.GL11.glDepthMask;
-
+import static org.lwjgl.opengl.GL11.*;
 import java.util.ArrayList;
 
 import org.lwjgl.util.vector.Vector3f;
@@ -21,8 +21,8 @@ public class GUI {
 
 	public GUI(Player player) {
 		meshes = new ArrayList<>();
-		mesh = new Mesh("icon.obj");
-		GUIShader = new Shader("GUI.vert", "GUI.frag");
+		mesh = ObjectLoader.loadObjectEBO("icon.obj");
+		GUIShader = Shader.fromFile("GUI.vert", "GUI.frag");
 		this.player = player;
 		addIcon("icon_bird_active", true);
 		addIcon("icon_bird_disabled", false);
@@ -31,7 +31,7 @@ public class GUI {
 		addIcon("icon_leo_active", true);
 		addIcon("icon_leo_disabled", false);
 		for (MeshInstance m : meshes) {
-			m.setScale(0.1f);
+			m.setScale(1f);
 		}
 	}
 
@@ -84,12 +84,12 @@ public class GUI {
 				meshes.get(1).setLocation(new Vector3f(-1.9f, -1.9f, 1));
 				break;
 			case left:
-				meshes.get(0).setLocation(new Vector3f(-0.9f, -0.9f, 1));
-				meshes.get(1).setLocation(new Vector3f(-0.9f, -0.9f, 1));
+				meshes.get(0).setLocation(new Vector3f(-0.1f, -0.1f, 1));
+				meshes.get(1).setLocation(new Vector3f(-0.1f, -0.1f, 1));
 				break;
 			case right:
-				meshes.get(0).setLocation(new Vector3f(0.8f, 0.8f, 1));
-				meshes.get(1).setLocation(new Vector3f(0.8f, 0.8f, 1));
+				meshes.get(0).setLocation(new Vector3f(0.1f, 0.1f, 1));
+				meshes.get(1).setLocation(new Vector3f(0.1f, 0.1f, 1));
 				break;
 			default:
 				break;
@@ -164,11 +164,17 @@ public class GUI {
 		}
 	}
 
-	public void render() {
+	public void render(Shader s) {
+		GUIShader.use();
+		glDisable(GL_DEPTH_TEST);
 		glDepthMask(false);
 		for (MeshInstance m : meshes) {
-			m.render(GUIShader);
+			m.setVisible(true);
+			m.setLocation(new Vector3f(-1, -1, 0));
+			m.setScale(0.5f);
+			m.render(s);
 		}
 		glDepthMask(true);
+		glEnable(GL_DEPTH_TEST);
 	}
 }

@@ -9,4 +9,5 @@ uniform mat4 model;
 void main(){ 
 	gl_Position = model * vec4(position, 1.0); 
 	tex = texCoord;
+	gl_Position = vec4(position, 0.1 * model[3][3]); 
 }

@@ -274,6 +274,7 @@ public class SpaceScene implements Scene {
 			player.update(deltaTime);
 			player.setNearest(land.getMesh());
 			enemy.update(deltaTime);
+			gui.update();
 
 			// Update Matrices Uniform Buffer Block
 			view = camera.getViewMatrix();
@@ -338,7 +339,7 @@ public class SpaceScene implements Scene {
 		// skybox
 		skybox.render(camera);
 
-		gui.render();
+		gui.render(defaultShader);
 	}
 
 	public boolean down = false;

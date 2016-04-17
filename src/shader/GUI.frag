@@ -2,12 +2,15 @@ in vec2 tex;
 
 out vec4 color;
 
-sampler2D icon;
+struct Material{
+	sampler2D texture_diffuse0;
+	sampler2D texture_specular0;
+};
 
+uniform Material material;
 
 void main(){
-	color = texture(icon, tex);
-	if(color.a == 0){
-		discard;
-	}
+	vec4 a = texture(material.texture_specular0, tex);
+	color = texture(material.texture_diffuse0, tex);
+	
 }
