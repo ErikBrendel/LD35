@@ -97,7 +97,7 @@ public class SpaceScene implements Scene {
 	private GUI gui;
 
 	public SpaceScene() {
-		Util.createWindow("Space explorer", true);
+		Util.createWindow("Space explorer", false);
 
 		shaders = new ArrayList<>();
 		lh = new LightHandler();
@@ -295,7 +295,7 @@ public class SpaceScene implements Scene {
 
 			// finish frame
 			Display.update();
-			Display.sync(60);
+			Display.sync(600);
 		}
 	}
 
