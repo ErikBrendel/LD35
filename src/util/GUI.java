@@ -1,12 +1,12 @@
 package util;
 
-import static org.lwjgl.opengl.GL11.glDepthMask;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.ArrayList;
 
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.Player;
+import static util.ObjectLoader.loadObjectEBO;
 
 public class GUI {
 
@@ -21,7 +21,7 @@ public class GUI {
 
 	public GUI(Player player) {
 		meshes = new ArrayList<>();
-		mesh = new Mesh("icon.obj");
+		mesh = loadObjectEBO("icon.obj");
 		GUIShader = Shader.fromFile("GUI.vert", "GUI.frag");
 		this.player = player;
 		addIcon("icon_bird_active", true);
