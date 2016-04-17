@@ -21,7 +21,7 @@ public class GUI {
 
 	public GUI(Player player) {
 		meshes = new ArrayList<>();
-		mesh = ObjectLoader.loadObjectEBO("icon.obj");
+		mesh = new Mesh("icon.obj");
 		GUIShader = Shader.fromFile("GUI.vert", "GUI.frag");
 		this.player = player;
 		addIcon("icon_bird_active", true);
@@ -31,7 +31,7 @@ public class GUI {
 		addIcon("icon_leo_active", true);
 		addIcon("icon_leo_disabled", false);
 		for (MeshInstance m : meshes) {
-			m.setScale(1f);
+			m.setScale(0.1f);
 		}
 	}
 
@@ -169,10 +169,7 @@ public class GUI {
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(false);
 		for (MeshInstance m : meshes) {
-			m.setVisible(true);
-			m.setLocation(new Vector3f(-1, -1, 0));
-			m.setScale(0.5f);
-			m.render(s);
+			m.render(GUIShader);
 		}
 		glDepthMask(true);
 		glEnable(GL_DEPTH_TEST);

@@ -10,7 +10,6 @@ struct Material{
 uniform Material material;
 
 void main(){
-	vec4 a = texture(material.texture_specular0, tex);
 	color = texture(material.texture_diffuse0, tex);
 	
 }
