@@ -362,6 +362,9 @@ public class SpaceScene implements Scene {
 
 					gui = new GUI(player);
 					mainMenu.setCursorPos(2);
+					
+					
+					Balancing.init();
 
 					break;
 				case 0:

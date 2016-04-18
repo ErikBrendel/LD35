@@ -27,7 +27,7 @@ public class Settings {
 			+ "# Markus Brand and Erik Brendel\n"
 			+ "skybox_mipmap = true\n"
 			+ "light_shader_optimization = true\n"
-			+ "sound_enabled = true\n"
+			+ "sounds_enabled = true\n"
 			+ "music_enabled = true";
 
 	private static HashMap<String, String> settings;

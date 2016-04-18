@@ -12,6 +12,7 @@ import java.util.Random;
 
 import light.LightHandler;
 import light.PointLight;
+import main.Balancing;
 import main.SpaceScene;
 
 import org.lwjgl.util.vector.Vector3f;
@@ -69,7 +70,7 @@ public class Powerups {
 					lights.remLight(inst.getLight(), shaders);
 					instances.remove(inst);
 					i--;
-					player.setPowerup(2);
+					player.setPowerup(Balancing.getPowerupStrength());
 					SpaceScene.playSound("e_powerup");
 				}
 			}

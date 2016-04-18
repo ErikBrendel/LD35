@@ -5,6 +5,7 @@
  */
 package entities;
 
+import main.Balancing;
 import main.SpaceScene;
 
 import org.lwjgl.input.Keyboard;
@@ -35,8 +36,6 @@ public class Player extends WorldObject {
 	private static final Material leopardMat;
 	private static final Mesh particleMesh;
 	private static final Material particleMat;
-	private static final float timeModelShrinking = 0.4f;
-	private static final float timeModelExpanding = 0.4f;
 
 	static {
 		int eagle = Util.loadTexture("bird.png");
@@ -174,13 +173,13 @@ public class Player extends WorldObject {
 			particles.setOrigin(position);
 			particles.emit(100);
 			timeAnimating += deltaTime;
-			if (timeAnimating < timeModelShrinking) {
-				model[currentMesh].setScale(scales[currentMesh] * interpolate((timeModelShrinking - timeAnimating) / timeModelShrinking));
-			} else if (timeAnimating < timeModelExpanding + timeModelShrinking) {
+			if (timeAnimating < Balancing.getTimeModelShrinking()) {
+				model[currentMesh].setScale(scales[currentMesh] * interpolate((Balancing.getTimeModelShrinking() - timeAnimating) / Balancing.getTimeModelShrinking()));
+			} else if (timeAnimating < Balancing.getTimeModelExpanding() + Balancing.getTimeModelShrinking()) {
 				model[currentMesh].setVisible(false);
 				model[currentMesh].setScale(scales[currentMesh]);
 				model[nextMesh].setVisible(true);
-				model[nextMesh].setScale(scales[nextMesh] * interpolate((timeAnimating - timeModelShrinking) / timeModelExpanding));
+				model[nextMesh].setScale(scales[nextMesh] * interpolate((timeAnimating - Balancing.getTimeModelShrinking()) / Balancing.getTimeModelExpanding()));
 			} else {
 				model[nextMesh].setScale(scales[nextMesh]);
 				currentMesh = nextMesh;
@@ -221,7 +220,7 @@ public class Player extends WorldObject {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float walkSpeed = dx * deltaTime * speed * (1 + powerup);
+		float walkSpeed = dx * deltaTime * speed * (1 + powerup) * Balancing.getPlayerSpeed(currentMesh);
 		powerup *= 1 - deltaTime;
 
 		walk(walkSpeed, prePos);

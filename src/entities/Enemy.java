@@ -3,6 +3,7 @@ package entities;
 import java.util.ArrayList;
 import light.LightHandler;
 import light.SpotLight;
+import main.Balancing;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -92,7 +93,7 @@ public class Enemy extends WorldObject {
 
 		viewDir.normalise();
 
-		float currentSpeed = 0.08f + (float) Math.sqrt(timePassed) / 90;
+		float currentSpeed = Balancing.getEnemySpeed();
 
 		float speed = dx * deltaTime * currentSpeed;
 		walk(speed, prePos);
