@@ -93,9 +93,7 @@ public class Enemy extends WorldObject {
 
 		viewDir.normalise();
 
-		float currentSpeed = Balancing.getEnemySpeed();
-
-		float speed = dx * deltaTime * currentSpeed;
+		float speed = dx * deltaTime * Balancing.getEnemySpeed();
 		walk(speed, prePos);
 	}
 

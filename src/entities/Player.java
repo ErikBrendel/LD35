@@ -55,12 +55,11 @@ public class Player extends WorldObject {
 	}
 
 	private Vector3f neighbour;
-	private float speed;
+	private float relativeSpeed;
 	private int currentMesh;
 	private int nextMesh;
 	private float timeAnimating;
 	private float[] scales;
-	private float[] speeds;
 	private boolean overLand;
 	private float leoLegAnimProgress = 0f;
 	private ParticleHandler particles;
@@ -72,13 +71,9 @@ public class Player extends WorldObject {
 		particles = new ParticleHandler(position, new ShapeShiftParticle(), particleMesh, particleMat, instanceShader);
 
 		scales = new float[model.length];
-		speeds = new float[model.length];
 		scales[0] = 0.07f;
 		scales[1] = 0.12f;
 		scales[2] = 0.02f;
-		speeds[0] = 0.14f;
-		speeds[1] = 0.20f;
-		speeds[2] = 0.17f;
 		for (int i = 0; i < model.length; i++) {
 			model[i].setScale(scales[Math.min(i, 2)]);
 		}
@@ -87,12 +82,12 @@ public class Player extends WorldObject {
 		viewDir = new Vector3f(1.1f, 0.1f, 0.1f);
 		walk(0.01f, new Vector3f(0.1f, 0.1f, 0.1f));
 		update(0.001f);
-		speed = 0.15f;
+		relativeSpeed = 1f;
 		powerup = 0;
 	}
 
 	public void setNearest(Mesh m) {
-		speed = speeds[currentMesh];
+		relativeSpeed = 1;
 		if (currentMesh == nextMesh) {
 			neighbour = m.getNearestVertex(position);
 
@@ -113,7 +108,7 @@ public class Player extends WorldObject {
 					}
 				}
 				if (currentMesh == 2) {
-					speed = 0.03f;
+					relativeSpeed = 0.07f;
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 0;
 						SpaceScene.playSound("e_shapeshift");
@@ -135,7 +130,7 @@ public class Player extends WorldObject {
 					}
 				}
 				if (currentMesh == 1) {
-					speed = 0.01f;
+					relativeSpeed = 0.02f;
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 0;
 						SpaceScene.playSound("e_shapeshift");
@@ -166,7 +161,6 @@ public class Player extends WorldObject {
 	 *            time passed since last frame
 	 */
 	public void update(float deltaTime) {
-
 		int dx = 0, dy = 0;
 
 		if (nextMesh != currentMesh) {
@@ -184,7 +178,7 @@ public class Player extends WorldObject {
 				model[nextMesh].setScale(scales[nextMesh]);
 				currentMesh = nextMesh;
 				timeAnimating = 0;
-				speed = speeds[currentMesh];
+				relativeSpeed = 1;
 			}
 
 			for (int m = 3; m < 7; m++) {
@@ -220,7 +214,8 @@ public class Player extends WorldObject {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		float walkSpeed = dx * deltaTime * speed * (1 + powerup) * Balancing.getPlayerSpeed(currentMesh);
+		//walkSpeed = [-1,1]:keyPress * frame * stayStuck * powerup * balanced base speed
+		float walkSpeed = dx * deltaTime * relativeSpeed * (1 + powerup) * Balancing.getPlayerSpeed(currentMesh);
 		powerup *= 1 - deltaTime;
 
 		walk(walkSpeed, prePos);
