@@ -36,13 +36,13 @@ public abstract class Light {
 		glUniform3f(shader.getUniform(uniform + ".color"), color.x, color.y, color.z);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Light) {
-			return id == ((Light) obj).id;
-		}
-		return false;
-	}
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (obj instanceof Light) {
+	// return id == ((Light) obj).id;
+	// }
+	// return false;
+	// }
 
 	public abstract float[] getData();
 }
