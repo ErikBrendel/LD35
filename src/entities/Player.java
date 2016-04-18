@@ -5,6 +5,8 @@
  */
 package entities;
 
+import main.SpaceScene;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -100,12 +102,14 @@ public class Player extends WorldObject {
 				if (currentMesh == 0) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 1;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 				}
 				if (currentMesh == 1) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 0;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 				}
@@ -113,10 +117,12 @@ public class Player extends WorldObject {
 					speed = 0.03f;
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 0;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 1;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 				}
@@ -125,6 +131,7 @@ public class Player extends WorldObject {
 				if (currentMesh == 0) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 2;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 				}
@@ -132,16 +139,19 @@ public class Player extends WorldObject {
 					speed = 0.01f;
 					if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 						nextMesh = 0;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 2;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 				}
 				if (currentMesh == 2) {
 					if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
 						nextMesh = 0;
+						SpaceScene.playSound("e_shapeshift");
 						return;
 					}
 				}

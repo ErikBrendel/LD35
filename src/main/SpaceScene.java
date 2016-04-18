@@ -92,7 +92,7 @@ public class SpaceScene implements Scene {
 	private Matrix4f view;
 	private Skybox skybox;
 	private int matricesUBO;
-	private SoundManager sounds;
+	private static SoundManager sounds;
 
 	private MeshInstance sun;
 	private MeshInstance water;
@@ -257,9 +257,13 @@ public class SpaceScene implements Scene {
 		// game loop
 	}
 
+	public static void playSound(String sound) {
+		sounds.playSound(sound);
+	}
+
 	public void start() {
 		lastFrame = System.nanoTime();
-		sounds.playSound("m_test");
+		sounds.playSound("m_title");
 		while (!Display.isCloseRequested()) {
 			// sounds.playSound("e_Powerup6");
 			// get deltaTime and FPS

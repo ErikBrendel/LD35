@@ -62,7 +62,6 @@ public class SoundManager {
 
 	public void playSound(String name) {
 		if (!loadedSounds.containsKey(name)) {
-			System.out.println(name);
 			loadedSounds.put(name, count);
 			WaveData waveFile = WaveData.create("audio/" + name + ".wav");
 			waves.add(waveFile);
@@ -108,7 +107,7 @@ public class SoundManager {
 				}
 			}
 		}
-		//AL10.alSourcePlay(source[loadedSounds.get(name)].get(0));
+		AL10.alSourcePlay(source[loadedSounds.get(name)].get(0));
 	}
 
 	void setListenerValues(FloatBuffer pos, FloatBuffer vel, FloatBuffer ori) {

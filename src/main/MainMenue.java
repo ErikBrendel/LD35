@@ -52,10 +52,10 @@ public class MainMenue {
 		open = true;
 		allowContinue = false;
 	}
-	
+
 	public void setAllowContinue(boolean allowContinue) {
 		this.allowContinue = allowContinue;
-		if(allowContinue){
+		if (allowContinue) {
 			setCursorPos(1);
 		}
 	}
@@ -89,6 +89,7 @@ public class MainMenue {
 		}
 		cursor.setScale(new Vector3f(0.05f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 16f / 9f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 1f / (float) (Math.sin(timePassed * 2) / 8 + 0.8)));
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_NUMPADENTER) || Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
+			SpaceScene.playSound("e_apply");
 			open = false;
 			return cursorPos;
 		}
@@ -118,6 +119,7 @@ public class MainMenue {
 		}
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
 		cursor.setLocation(cursorLocation);
+		SpaceScene.playSound("e_select");
 	}
 
 	private void down() {
@@ -130,5 +132,6 @@ public class MainMenue {
 		}
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
 		cursor.setLocation(cursorLocation);
+		SpaceScene.playSound("e_select");
 	}
 }
