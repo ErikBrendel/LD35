@@ -54,7 +54,7 @@ public class Powerups {
 		}
 
 		// spawning new ones
-		if (r.nextFloat() < deltaTime * 2 && instances.size() < 20) {
+		if (r.nextFloat() < deltaTime * 2 && instances.size() < 10) {
 			spawnNew(r, shaders);
 		}
 
