@@ -93,7 +93,7 @@ public class MainMenu {
 				return cursorPos;
 			}
 		}
-		cursor.setScale(new Vector3f(0.05f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 16f / 9f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 1f / (float) (Math.sin(timePassed * 2) / 8 + 0.8)));
+		cursor.setScale(new Vector3f(0.05f * (float) (Math.sin(timePassed * 6) / 8 + 0.8), 0.05f * 16f / 9f * (float) (Math.sin(timePassed * 6) / 8 + 0.8), 0.05f * 1f / (float) (Math.sin(timePassed * 6) / 8 + 0.8)));
 
 		return -1;
 	}

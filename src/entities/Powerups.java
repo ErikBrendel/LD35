@@ -117,9 +117,11 @@ public class Powerups {
 			age += deltaTime;
 
 			float sin = ((float) Math.sin(age * 5f) + 1f) * 0.3f;
+			float rot = age;
 
 			Matrix4f local = new Matrix4f();
 			local.translate(new Vector3f(0, sin, 0));
+			local.rotate(rot, new Vector3f(0, 1, 0));
 
 			modelMatrix[0] = local;
 		}
