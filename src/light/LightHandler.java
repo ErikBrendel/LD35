@@ -24,7 +24,7 @@ public class LightHandler {
 	public LightHandler() {
 		freeSpots = new LinkedList<>();
 		numDirLights = 0;
-		numPointLights = 300;
+		numPointLights = 10;
 		for (int i = 0; i < numPointLights; i++) {
 			freeSpots.add(i);
 		}
