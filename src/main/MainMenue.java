@@ -1,4 +1,4 @@
-package util;
+package main;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glDepthMask;
@@ -8,8 +8,14 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
+import util.Material;
+import util.Mesh;
+import util.MeshInstance;
+import util.ObjectLoader;
+import util.Shader;
+import util.Util;
 
-public class Menu {
+public class MainMenue {
 	private int cursorPos;
 	private Vector3f cursorLocation;
 	private MeshInstance background;
@@ -32,7 +38,7 @@ public class Menu {
 		cursorMaterial = new Material(Util.loadTexture("cursor.png"), 0);
 	}
 
-	public Menu() {
+	public MainMenue() {
 		shader = Shader.fromFile("GUI.vert", "GUI.frag");
 		cursorPos = 2;
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
@@ -72,7 +78,7 @@ public class Menu {
 			}
 		}
 		cursor.setScale(new Vector3f(0.05f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 16f / 9f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 1f / (float) (Math.sin(timePassed * 2) / 8 + 0.8)));
-		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_NUMPADENTER) || Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
 			open = false;
 			return cursorPos;
 		}

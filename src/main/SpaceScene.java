@@ -51,7 +51,6 @@ import util.Camera;
 import util.GUI;
 import util.Material;
 import util.Matrix4f;
-import util.Menu;
 import util.Mesh;
 import util.MeshInstance;
 import util.Scene;
@@ -103,13 +102,13 @@ public class SpaceScene implements Scene {
 
 	private GUI gui;
 
-	private Menu menu;
+	private MainMenue menu;
 
 	public SpaceScene() {
 
 		Util.createWindow("Space explorer", false);
 
-		menu = new Menu();
+		menu = new MainMenue();
 		menu.render();
 		Display.update();
 
