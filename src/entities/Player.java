@@ -32,8 +32,6 @@ public class Player extends WorldObject {
 	private static final Mesh leopardMesh;
 	private static final Mesh leopardLegMesh;
 	private static final Material leopardMat;
-	private static final Mesh transitionMesh;
-	private static final Material transitionkMat;
 	private static final Mesh particleMesh;
 	private static final Material particleMat;
 	private static final float timeModelShrinking = 0.8f;
@@ -49,14 +47,12 @@ public class Player extends WorldObject {
 		int leopard = Util.loadTexture("leopard.jpg");
 		eagleMat = new Material(eagle, spec);
 		sharkMat = new Material(shark, spec);
-		transitionkMat = new Material(white, white);
 		leopardMat = new Material(leopard, white);
 		particleMat = new Material(white, white);
 		leopardMesh = ObjectLoader.loadObjectEBO("leopard_body.obj");
 		leopardLegMesh = ObjectLoader.loadObjectEBO("leopard_leg.obj");
 		eagleMesh = ObjectLoader.loadObjectEBO("bird.obj");
 		sharkMesh = ObjectLoader.loadObjectEBO("shark.obj");
-		transitionMesh = ObjectLoader.loadObjectEBO("shapeshiftoverlay.obj");
 		particleMesh = ObjectLoader.loadObjectEBO("particle.obj");
 	}
 
@@ -67,7 +63,6 @@ public class Player extends WorldObject {
 	private float timeAnimating;
 	private float[] scales;
 	private float[] speeds;
-	private MeshInstance transition;
 	private boolean overLand;
 	private float leoLegAnimProgress = 0f;
 	private ParticleHandler particles;
@@ -78,8 +73,6 @@ public class Player extends WorldObject {
 
 		particles = new ParticleHandler(position, new ShapeShiftParticle(), particleMesh, particleMat, instanceShader);
 
-		transition = new MeshInstance(transitionMesh, transitionkMat);
-		transition.setVisible(false);
 		scales = new float[model.length];
 		speeds = new float[model.length];
 		scales[0] = 0.07f;
@@ -172,36 +165,28 @@ public class Player extends WorldObject {
 
 		if (nextMesh != currentMesh) {
 			particles.setOrigin(position);
-			particles.emit(1000);
+			particles.emit(100);
 			timeAnimating += deltaTime;
 			if (timeAnimating < timeModelShrinking) {
 				model[currentMesh].setScale(scales[currentMesh] * interpolate((timeModelShrinking - timeAnimating) / timeModelShrinking));
 			}
 			if (timeAnimating > offsetSphereExpanding && timeAnimating < offsetSphereExpanding + timeSphereExpanding) {
 				float timeExpanding = timeAnimating - offsetSphereExpanding;
-				transition.setVisible(true);
-				transition.setScale(interpolate(1 - (timeSphereExpanding - timeExpanding) / timeSphereExpanding) * 0.2f);
 				Matrix4f rot = new Matrix4f();
 				Vector3f axis = new Vector3f(0.7f, 0.7f, timeExpanding * 3f);
 				axis.normalise();
 				rot.rotate(timeExpanding * 4, axis);
-				transition.setRotationMatrix(rot);
 			} else if (timeAnimating > offsetSphereExpanding && timeAnimating < offsetSphereExpanding + timeSphereExpanding + timeSphereShrinking) {
 				float timeExpanding = timeAnimating - offsetSphereExpanding;
-				float timeRetreating = timeAnimating - offsetSphereExpanding - timeSphereExpanding;
-				transition.setVisible(true);
-				transition.setScale(interpolate((timeSphereExpanding - timeRetreating) / timeSphereExpanding) * 0.2f);
 				Matrix4f rot = new Matrix4f();
 				Vector3f axis = new Vector3f(0.7f, 0.7f, timeExpanding * 3f);
 				axis.normalise();
 				rot.rotate(timeExpanding * 4, axis);
-				transition.setRotationMatrix(rot);
 
 				model[currentMesh].setVisible(false);
 				model[currentMesh].setScale(scales[currentMesh]);
 				model[nextMesh].setVisible(true);
 			} else if (timeAnimating > offsetSphereExpanding) {
-				transition.setVisible(false);
 				currentMesh = nextMesh;
 				timeAnimating = 0;
 				speed = speeds[currentMesh];
@@ -269,13 +254,6 @@ public class Player extends WorldObject {
 
 	public void renderParticles() {
 		particles.render();
-	}
-
-	@Override
-	public void render(Shader shader) {
-		super.render(shader);
-		transition.setLocation(position);
-		transition.render(shader);
 	}
 
 	public int getCurrentMesh() {
