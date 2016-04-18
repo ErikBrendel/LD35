@@ -214,18 +214,32 @@ public class Util {
 	public static DisplayMode getBestDisplayMode() {
 		try {
 			DisplayMode[] modes = Display.getAvailableDisplayModes();
+			System.out.println("Displaymodes available: " + modes.length);
 			DisplayMode full = null;
 			// finding best quality display mode
 			for (DisplayMode current : modes) {
-				System.err.println("displayMode:   " + current);
-				if (full == null || current.getWidth() > full.getWidth() || current.getHeight() > full.getHeight() || current.getFrequency() > full.getFrequency() || current.getBitsPerPixel() > full.getBitsPerPixel()) {
-					if (current.getWidth() <= 1920 && current.getHeight() <= 1080) {
+				if (full == null) {
+					full = current;
+				} else {
+					if (current.getWidth() > full.getWidth()) {
 						full = current;
+					} else if (current.getWidth() == full.getWidth()) {
+						if (current.getHeight() > full.getHeight()) {
+							full = current;
+						} else if (current.getHeight() == full.getHeight()) {
+							if (current.getFrequency() > full.getFrequency()) {
+								full = current;
+							} else if (current.getFrequency() == full.getFrequency()) {
+								if (current.getBitsPerPixel() > full.getBitsPerPixel()) {
+									full = current;
+								}
+							}
+						}
 					}
 				}
 
 			}
-			System.err.println("fullMode = " + full);
+			System.out.println("fullMode = " + full);
 			return full;
 		} catch (Exception ex) {
 			return null;

@@ -66,25 +66,17 @@ public class WorldGenerator {
 	 * perform generation
 	 */
 	public void generate() {
-		long[] t = new long[8];
-		t[1] = System.nanoTime();
+		long before = System.nanoTime();
 		sphereGraph = convertToGraph(sphere);
-		t[2] = System.nanoTime();
 		randomize(sphereGraph);
-		t[3] = System.nanoTime();
 		smooth(sphereGraph);
-		t[4] = System.nanoTime();
 		threshold(sphereGraph);
-		t[5] = System.nanoTime();
 		coastSmooth(sphereGraph);
-		t[6] = System.nanoTime();
 		// planetObject = instantiate(planet);
-		t[7] = System.nanoTime();
 		r = null;
+		long after = System.nanoTime();
+		System.out.println("World generation time: " + ((after - before) / 1000000f) + "ms");
 
-		for (int i = 1; i < 8; i++) {
-			System.out.println("Time: " + (t[i] - t[i - 1]) / 1000000f + "ms");
-		}
 		finished = true;
 	}
 
@@ -122,7 +114,6 @@ public class WorldGenerator {
 		}
 
 		// graph.merge();
-
 		return graph;
 	}
 
@@ -226,13 +217,13 @@ public class WorldGenerator {
 
 			Vector3f waterDir = area.stream().filter((GraphNode n) -> n.isWater()).map((GraphNode areaNode) -> {
 				return Vector3f.sub(areaNode.getPosition(), me.getPosition(), null); // get
-																						// vectory
-																						// to
-																						// all
-																						// water
-																						// points
-				}).reduce((Vector3f t, Vector3f u) -> Vector3f.add(t, u, null)).get(); // sum
-																						// together
+				// vectory
+				// to
+				// all
+				// water
+				// points
+			}).reduce((Vector3f t, Vector3f u) -> Vector3f.add(t, u, null)).get(); // sum
+			// together
 
 			if (waterDir.length() == 0f) {
 				System.err.println("water vector length 0!");
@@ -288,7 +279,7 @@ public class WorldGenerator {
 			}
 		}
 
-		int[] vertexDataSizes = { 3, 3, 2 };
+		int[] vertexDataSizes = {3, 3, 2};
 		Mesh planetMesh = new Mesh(points, indizes, vertexDataSizes);
 
 		return planetMesh;
@@ -332,8 +323,7 @@ public class WorldGenerator {
 	/**
 	 * calculate scale factor based on land/underwater/coast etc
 	 *
-	 * @param node
-	 *            a vertex point (GraphNode)
+	 * @param node a vertex point (GraphNode)
 	 * @return its scale factor (distance from planet middle)
 	 */
 	private float getNodeHeight(Graph g, GraphNode node) {

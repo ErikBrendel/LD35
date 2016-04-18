@@ -7,10 +7,12 @@
 package sounds;
 
 import java.util.HashMap;
+import java.util.Set;
 import org.lwjgl.openal.AL;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
+import util.Settings;
 
 /**
  *
@@ -42,9 +44,13 @@ public class SlickOgg {
 		}
 
 		if (isMusic.get(name)) {
-			audio.get(name).playAsSoundEffect(1, 1, true);
+			if (Settings.getBoolean("music_enabled")) {
+				audio.get(name).playAsSoundEffect(1, 1, true);
+			}
 		} else {
-			audio.get(name).playAsSoundEffect(1, 1, false);
+			if (Settings.getBoolean("sounds_enabled")) {
+				audio.get(name).playAsSoundEffect(1, 1, false);
+			}
 		}
 	}
 

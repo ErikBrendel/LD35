@@ -107,7 +107,7 @@ public class SpaceScene implements Scene {
 
 	public SpaceScene() {
 
-		Util.createWindow("Space explorer", false);
+		Util.createWindow("Space explorer", true);
 
 		mainMenu = new MainMenu();
 		mainMenu.render();
@@ -372,7 +372,7 @@ public class SpaceScene implements Scene {
 			}
 			// finish frame
 			Display.update();
-			Display.sync(600);
+			Display.sync(60);
 		}
 		SlickOgg.destroy();
 	}

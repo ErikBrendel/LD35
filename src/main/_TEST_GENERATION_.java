@@ -6,8 +6,6 @@
  */
 package main;
 
-import generating.WorldGenerator;
-import java.util.Arrays;
 import sounds.SlickOgg;
 
 /**

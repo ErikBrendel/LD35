@@ -133,7 +133,7 @@ public class ObjectLoader {
 			indizes[i] = indizesList.get(i);
 		}
 
-		System.err.println("[loadingLog] Loaded Object " + objectName + " with " + indexMap.size() + " vertices " + "and " + indizesList.size() / 3 + " faces");
+		System.out.println("[loadingLog] Loaded Object " + objectName + " with " + indexMap.size() + " vertices " + "and " + indizesList.size() / 3 + " faces");
 
 		int[] vertexDataSizes = { 3, 3, 2 };
 		return new Mesh(data, indizes, vertexDataSizes);
@@ -219,7 +219,7 @@ public class ObjectLoader {
 		for (int i = 0; i < dataArray.length; i++) {
 			dataArray[i] = data.get(i);
 		}
-		System.err.println("[loadingLog] Loaded Object " + objectName + " with " + vertices.size() + " vertices and " + data.size() / 8 / 3 + " faces");
+		System.out.println("[loadingLog] Loaded Object " + objectName + " with " + vertices.size() + " vertices and " + data.size() / 8 / 3 + " faces");
 		return dataArray;
 	}
 }
