@@ -55,7 +55,10 @@ public class Enemy extends WorldObject {
 		timePassed += deltaTime;
 
 		Vector3f lightPos = new Vector3f(position);
-		lightPos.scale(1.2f);
+		Vector3f trans = new Vector3f(viewDir);
+		trans.scale(-0.08f);
+		lightPos = Vector3f.add(lightPos, trans, null);
+		lightPos.scale(1.11f);
 		light.setPosition(lightPos);
 		Vector3f lightDir = new Vector3f(-viewDir.x, -viewDir.y, -viewDir.z);
 		Vector3f right = Vector3f.cross(lightDir, position, null);
