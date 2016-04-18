@@ -101,7 +101,6 @@ public abstract class WorldObject {
 			rot = Matrix4f.mul(rot, modelMatrix[m], rot);
 
 			model[m].setRotationMatrix(rot);
-			model[m].setScale(new Vector3f(0.07f, 0.07f, 0.07f));
 			model[m].render(shader);
 		}
 	}
