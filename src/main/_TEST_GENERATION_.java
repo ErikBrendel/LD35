@@ -8,6 +8,7 @@ package main;
 
 import generating.WorldGenerator;
 import java.util.Arrays;
+import sounds.SlickOgg;
 
 /**
  *
@@ -15,8 +16,16 @@ import java.util.Arrays;
  */
 public class _TEST_GENERATION_ {
 	public static void main(String[] args) {
-		WorldGenerator gen = new WorldGenerator();
-		gen.generate();
-		System.err.println(gen.getData());
+		SlickOgg.load();
+		SlickOgg.play("music");
+		new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(5000);
+				} catch (Exception e) {
+					
+				}
+			}
+		}.start();
 	}
 }

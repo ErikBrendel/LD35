@@ -25,7 +25,7 @@ public class Enemy extends WorldObject {
 		int dif = Util.loadTexture("EnemyTex.png");
 		enemyMat = new Material(dif, 0);
 		enemyMesh = ObjectLoader.loadObjectEBO("Enemy.obj");
-		enemyPropMesh = ObjectLoader.loadObjectEBO("Enemy_propeler.obj");
+		enemyPropMesh = ObjectLoader.loadObjectEBO("Enemy_Propeler.obj");
 	}
 
 	private float propellerRot = 0f;
