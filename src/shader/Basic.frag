@@ -153,6 +153,7 @@ vec3 calcDirectionalLight(DirLight light, vec3 norm, vec3 viewDir){
 }
 
 vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir){	
+	if(light.color.r + light.color.g + light.color.b == 0) return vec3(0);
 	vec3 direction = light.position - pos;
 
 	float distance = length(direction);

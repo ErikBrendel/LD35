@@ -180,7 +180,7 @@ public class GUI {
 		}
 	}
 
-	public void render(Shader s) {
+	public void render() {
 		GUIShader.use();
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(false);
