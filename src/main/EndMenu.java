@@ -1,7 +1,5 @@
 package main;
 
-import java.awt.Font;
-
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glDepthMask;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -9,8 +7,6 @@ import static org.lwjgl.opengl.GL11.glEnable;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
-import org.newdawn.slick.TrueTypeFont;
-
 import util.Material;
 import util.Mesh;
 import util.MeshInstance;
@@ -22,7 +18,6 @@ public class EndMenu {
 
 	private static Mesh icon;
 	private static Material backgroundMaterial;
-	private static TrueTypeFont font;
 	private static final boolean text_AntiAlias = true;
 
 	private MeshInstance background;
@@ -31,8 +26,6 @@ public class EndMenu {
 	static {
 		icon = ObjectLoader.loadObjectEBO("icon.obj");
 		backgroundMaterial = new Material(Util.loadTexture("deathscreen.png"), 0);
-		Font awtFont = new Font("Times New Roman", Font.BOLD, 40);
-		// font = new TrueTypeFont(awtFont, text_AntiAlias);
 	}
 
 	public EndMenu() {

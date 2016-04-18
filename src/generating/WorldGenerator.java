@@ -45,7 +45,7 @@ public class WorldGenerator {
 	 * Create a new generator to get one random world
 	 */
 	public WorldGenerator() {
-		r = new Random();
+		r = new Random(System.currentTimeMillis());
 		finished = false;
 	}
 
