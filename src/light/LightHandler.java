@@ -2,6 +2,7 @@ package light;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import util.Shader;
 
@@ -13,17 +14,22 @@ import static org.lwjgl.opengl.GL15.*;
 
 public class LightHandler {
 	private int numPointLights, numDirLights, numSpotLights;
-	private ArrayList<PointLight> pointLights;
+	private PointLight[] pointLights;
 	private ArrayList<DirectionalLight> dirLights;
 	private ArrayList<SpotLight> spotLights;
+	private LinkedList<Integer> freeSpots;
 
 	private int UBO;
 
 	public LightHandler() {
+		freeSpots = new LinkedList<>();
 		numDirLights = 0;
-		numPointLights = 0;
+		numPointLights = 300;
+		for (int i = 0; i < numPointLights; i++) {
+			freeSpots.add(i);
+		}
 		numSpotLights = 0;
-		pointLights = new ArrayList<>();
+		pointLights = new PointLight[numPointLights];
 		dirLights = new ArrayList<>();
 		spotLights = new ArrayList<>();
 		UBO = glGenBuffers();
@@ -57,9 +63,21 @@ public class LightHandler {
 		}
 
 		int pointLightOffset = 0;
+		int i = 0;
 		for (PointLight pl : pointLights) {
+			if (pl != null) {
+				i++;
+				FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
+				float[] data = pl.getData();
+				pointLightsBuffer.put(data);
+				pointLightsBuffer.flip();
+				glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + pointLightOffset) * 4, pointLightsBuffer);
+				pointLightOffset += 12;
+			}
+		}
+		for (; i < numPointLights; i++) {
 			FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
-			float[] data = pl.getData();
+			float[] data = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
 			pointLightsBuffer.put(data);
 			pointLightsBuffer.flip();
 			glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + pointLightOffset) * 4, pointLightsBuffer);
@@ -69,10 +87,7 @@ public class LightHandler {
 	}
 
 	public void addLight(Light light, ArrayList<Shader> shaders) {
-		if (light instanceof PointLight) {
-			pointLights.add((PointLight) light);
-			numPointLights++;
-		}
+		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
 		if (light instanceof DirectionalLight) {
 			dirLights.add((DirectionalLight) light);
 			numDirLights++;
@@ -81,25 +96,29 @@ public class LightHandler {
 			spotLights.add((SpotLight) light);
 			numSpotLights++;
 		}
-		for (Shader s : shaders) {
-			s.updateParameter("NUM_DIR_LIGHTS", numDirLights, false);
-			s.updateParameter("NUM_SPOT_LIGHTS", numSpotLights, false);
-			s.updateParameter("NUM_POINT_LIGHTS", numPointLights, false);
-			s.recompile();
+
+		if (light instanceof PointLight) {
+			FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
+			float[] data = light.getData();
+			pointLightsBuffer.put(data);
+			pointLightsBuffer.flip();
+			glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + freeSpots.getFirst() * 12) * 4, pointLightsBuffer);
+			pointLights[freeSpots.getFirst()] = (PointLight) light;
+			freeSpots.removeFirst();
+		} else {
+			for (Shader s : shaders) {
+				s.updateParameter("NUM_DIR_LIGHTS", numDirLights, false);
+				s.updateParameter("NUM_SPOT_LIGHTS", numSpotLights, false);
+				s.updateParameter("NUM_POINT_LIGHTS", numPointLights, false);
+				s.recompile();
+			}
+			generateUBO();
 		}
-		generateUBO();
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	public void remLight(Light light, ArrayList<Shader> shaders) {
-		if (light instanceof PointLight) {
-			for (int i = 0; i < pointLights.size(); i++) {
-				if (light.equals(pointLights.get(i))) {
-					pointLights.remove(i);
-					i--;
-					numPointLights--;
-				}
-			}
-		}
+		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
 		if (light instanceof DirectionalLight) {
 			for (int i = 0; i < dirLights.size(); i++) {
 				if (light.equals(dirLights.get(i))) {
@@ -118,27 +137,45 @@ public class LightHandler {
 				}
 			}
 		}
-		for (Shader s : shaders) {
-			s.updateParameter("NUM_DIR_LIGHTS", numDirLights, false);
-			s.updateParameter("NUM_SPOT_LIGHTS", numSpotLights, false);
-			s.updateParameter("NUM_POINT_LIGHTS", numPointLights, false);
-			s.recompile();
+
+		if (light instanceof PointLight) {
+			for (int i = 0; i < pointLights.length; i++) {
+				if (light.equals(pointLights[i])) {
+					FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
+					float[] data = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
+					pointLightsBuffer.put(data);
+					pointLightsBuffer.flip();
+					glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + i * 12) * 4, pointLightsBuffer);
+					freeSpots.add(i);
+					pointLights[i] = null;
+				}
+			}
+		} else {
+			for (Shader s : shaders) {
+				s.updateParameter("NUM_DIR_LIGHTS", numDirLights, false);
+				s.updateParameter("NUM_SPOT_LIGHTS", numSpotLights, false);
+				s.updateParameter("NUM_POINT_LIGHTS", numPointLights, false);
+				s.recompile();
+			}
+			generateUBO();
 		}
-		generateUBO();
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	public void updateLight(Light light) {
 		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
 		if (light instanceof PointLight) {
 			int pointLightOffset = 0;
-			for (int i = 0; i < pointLights.size(); i++) {
-				if (light.equals(pointLights.get(i))) {
-					pointLights.set(i, (PointLight) light);
-					FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
-					float[] data = light.getData();
-					pointLightsBuffer.put(data);
-					pointLightsBuffer.flip();
-					glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + pointLightOffset) * 4, pointLightsBuffer);
+			for (int i = 0; i < pointLights.length; i++) {
+				if (pointLights[i] != null) {
+					if (light.equals(pointLights[i])) {
+						pointLights[i] = (PointLight) light;
+						FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
+						float[] data = light.getData();
+						pointLightsBuffer.put(data);
+						pointLightsBuffer.flip();
+						glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + pointLightOffset) * 4, pointLightsBuffer);
+					}
 				}
 				pointLightOffset += 12;
 			}
