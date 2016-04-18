@@ -109,6 +109,8 @@ public class SpaceScene implements Scene {
 		Util.createWindow("Space explorer", false);
 
 		menu = new Menu();
+		menu.render();
+		Display.update();
 
 		shaders = new ArrayList<>();
 		lh = new LightHandler();
