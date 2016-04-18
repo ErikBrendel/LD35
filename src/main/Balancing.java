@@ -18,7 +18,7 @@ public class Balancing {
 
 	private static long startTime;
 
-	private static int getMS() {
+	public static int getMS() {
 		return (int) (System.currentTimeMillis() - startTime);
 	}
 

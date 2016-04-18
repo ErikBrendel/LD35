@@ -285,6 +285,7 @@ public class SpaceScene implements Scene {
 							if (endMenu.update() == 0) {
 								mainMenu.setAllowContinue(false);
 								mainMenu.setOpen(true);
+								endMenu.close();
 							}
 							endMenu.render();
 

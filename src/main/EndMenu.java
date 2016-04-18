@@ -22,6 +22,7 @@ public class EndMenu {
 
 	private MeshInstance background;
 	private Shader shader;
+	private boolean active = false;
 
 	static {
 		icon = ObjectLoader.loadObjectEBO("icon.obj");
@@ -35,6 +36,10 @@ public class EndMenu {
 	}
 
 	public int update() {
+		if(active == false) {
+			active = true;
+			System.err.println("\n\n\nYour Time: " + (Balancing.getMS() / 1000f) + " seconds!\n\n\n");
+		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_RETURN) || Keyboard.isKeyDown(Keyboard.KEY_NUMPADENTER)) {
 			SpaceScene.playSound("e_apply");
 			return 0;
@@ -52,5 +57,9 @@ public class EndMenu {
 		// Color.white.bind();
 		// font.drawString(100, 50, "THE LIGHTWEIGHT JAVA GAMES LIBRARY",
 		// Color.white);
+	}
+
+	void close() {
+		active = false;
 	}
 }
