@@ -114,8 +114,6 @@ public class SpaceScene implements Scene {
 		Display.update();
 
 		shaders = new ArrayList<>();
-		lh = new LightHandler();
-
 		skybox = new Skybox("ownSky");
 
 		HashMap<String, Object> parameters = new HashMap<>();
@@ -138,18 +136,21 @@ public class SpaceScene implements Scene {
 		shaders.add(defaultShader);
 		shaders.add(instancedShader);
 
+		lh = new LightHandler();
+
 		player = new Player(new Vector3f((float) Math.sqrt(2), (float) Math.sqrt(2), 0), instancedShader);
 
 		enemy = new Enemy(new Vector3f(0, 1, 0), player, lh, shaders);
 
 		camera = new Camera(new Vector3f(0, 0, 0), player.getPosition(), enemy.getPosition(), 3f);
 
-		sounds = new SoundManager();
-
 		gui = new GUI(player);
+
+		sounds = new SoundManager();
 
 		sunPos = new Vector3f(1, 1, 1);
 
+		powerups = new Powerups(lh);
 		// light
 		sunLight = new DirectionalLight(new Color(255, 255, 150), sunPos);
 
@@ -181,8 +182,6 @@ public class SpaceScene implements Scene {
 		Material waterMat = new Material(waterTex, whiteTex);
 		rockMat = new Material(rock, rockSpec);
 
-		powerups = new Powerups(lh);
-
 		// planets
 		Mesh planetSphere = loadObjectEBO("earth.obj");
 		asteroid = loadObjectEBO("asteroid.obj");
@@ -194,7 +193,6 @@ public class SpaceScene implements Scene {
 		water.setScale(scaleVec);
 
 		generator = new WorldGenerator();
-		generator.generate();
 
 		sun = new MeshInstance(planetSphere, sunMat);
 		sun.setScale(new Vector3f(5, 5, 5));
@@ -271,48 +269,84 @@ public class SpaceScene implements Scene {
 			System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
-			if (menu.update(deltaTime) != -1) {
+			switch (menu.update(deltaTime)) {
+				case -1:
+					menu.render();
+					break;
+				case 2:
+					// enemy.setPosition(new Vector3f((float)
+					// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f *
+					// Math.PI) / 3000f), 0.1f, (float)
+					// Math.cos(System.currentTimeMillis() % (int) (3000f * 2f *
+					// Math.PI) / 3000f)));
+					camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
+					// handle all inputs
+					sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
+					Vector3f sunDir = new Vector3f(-sunPos.x, -sunPos.y, -sunPos.z);
+					sunLight.setDirection(sunDir);
+					defaultShader.use();
+					handleInputs(deltaTime, defaultShader);
+					player.update(deltaTime);
+					if (generator.hasFinished()) {
+						player.setNearest(generator.getData().getMesh());
+					}
+					enemy.update(deltaTime);
+					gui.update();
+					powerups.update(deltaTime, player, shaders);
 
-				// enemy.setPosition(new Vector3f((float)
-				// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f *
-				// Math.PI) / 3000f), 0.1f, (float)
-				// Math.cos(System.currentTimeMillis() % (int) (3000f * 2f *
-				// Math.PI) / 3000f)));
-				camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
-				// handle all inputs
-				sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
-				Vector3f sunDir = new Vector3f(-sunPos.x, -sunPos.y, -sunPos.z);
-				sunLight.setDirection(sunDir);
-				defaultShader.use();
-				handleInputs(deltaTime, defaultShader);
-				player.update(deltaTime);
-				if (generator.hasFinished()) {
-					player.setNearest(generator.getData().getMesh());
-				}
-				enemy.update(deltaTime);
-				gui.update();
-				powerups.update(deltaTime, player, shaders);
+					// Update Matrices Uniform Buffer Block
+					view = camera.getViewMatrix();
+					projection = camera.getProjectionMatrix();
 
-				// Update Matrices Uniform Buffer Block
-				view = camera.getViewMatrix();
-				projection = camera.getProjectionMatrix();
+					glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+					glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
+					glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
+					glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-				glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
-				glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
-				glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
-				glBindBuffer(GL_UNIFORM_BUFFER, 0);
+					Vector3f flashLightDirection = new Vector3f(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+					flashlight.setDirection(flashLightDirection);
+					flashlight.setPosition(camera.getPosition());
 
-				Vector3f flashLightDirection = new Vector3f(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
-				flashlight.setDirection(flashLightDirection);
-				flashlight.setPosition(camera.getPosition());
+					lh.updateLight(flashlight);
+					lh.updateLight(sunLight);
 
-				lh.updateLight(flashlight);
-				lh.updateLight(sunLight);
+					render();
+					if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+						menu.setOpen(true);
+					}
+					break;
+				case 1:
+					generator = new WorldGenerator();
+					generator.generate();
 
-				render();
+					lh = new LightHandler();
 
-			} else {
-				menu.render();
+					player = new Player(new Vector3f((float) Math.sqrt(2), (float) Math.sqrt(2), 0), instancedShader);
+
+					enemy = new Enemy(new Vector3f(0, 1, 0), player, lh, shaders);
+
+					camera = new Camera(new Vector3f(0, 0, 0), player.getPosition(), enemy.getPosition(), 3f);
+
+					sunPos = new Vector3f(1, 1, 1);
+
+					// light
+					sunLight = new DirectionalLight(new Color(255, 255, 150), sunPos);
+
+					flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 10, 20, 15);
+
+					lh.addLight(flashlight, shaders);
+					lh.addLight(sunLight, shaders);
+
+					powerups = new Powerups(lh);
+
+					gui = new GUI(player);
+					menu.setCursorPos(2);
+					break;
+				case 0:
+					Display.destroy();
+					sounds.destroy();
+					System.exit(0);
+					break;
 			}
 			// finish frame
 			Display.update();
@@ -389,7 +423,7 @@ public class SpaceScene implements Scene {
 		 * player.getCamera().processMouseScroll(-60 * deltaTime); } if
 		 * (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 		 * player.getCamera().processMouseScroll(60 * deltaTime); }
-		 *
+		 * 
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_Y)) { player.getCamera().roll(1 *
 		 * deltaTime); } if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
 		 * player.getCamera().roll(-1 * deltaTime); }
@@ -405,10 +439,6 @@ public class SpaceScene implements Scene {
 		}
 
 		// moving
-		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-			Display.destroy();
-			System.exit(0);
-		}
 	}
 
 }

@@ -33,10 +33,8 @@ public class Player extends WorldObject {
 	private static final Material leopardMat;
 	private static final Mesh particleMesh;
 	private static final Material particleMat;
-	private static final float timeModelShrinking = 0.8f;
-	private static final float offsetSphereExpanding = 0.4f;
-	private static final float timeSphereExpanding = 0.5f;
-	private static final float timeSphereShrinking = 0.5f;
+	private static final float timeModelShrinking = 0.4f;
+	private static final float timeModelExpanding = 0.4f;
 
 	static {
 		int eagle = Util.loadTexture("bird.png");
@@ -168,24 +166,13 @@ public class Player extends WorldObject {
 			timeAnimating += deltaTime;
 			if (timeAnimating < timeModelShrinking) {
 				model[currentMesh].setScale(scales[currentMesh] * interpolate((timeModelShrinking - timeAnimating) / timeModelShrinking));
-			}
-			if (timeAnimating > offsetSphereExpanding && timeAnimating < offsetSphereExpanding + timeSphereExpanding) {
-				float timeExpanding = timeAnimating - offsetSphereExpanding;
-				Matrix4f rot = new Matrix4f();
-				Vector3f axis = new Vector3f(0.7f, 0.7f, timeExpanding * 3f);
-				axis.normalise();
-				rot.rotate(timeExpanding * 4, axis);
-			} else if (timeAnimating > offsetSphereExpanding && timeAnimating < offsetSphereExpanding + timeSphereExpanding + timeSphereShrinking) {
-				float timeExpanding = timeAnimating - offsetSphereExpanding;
-				Matrix4f rot = new Matrix4f();
-				Vector3f axis = new Vector3f(0.7f, 0.7f, timeExpanding * 3f);
-				axis.normalise();
-				rot.rotate(timeExpanding * 4, axis);
-
+			} else if (timeAnimating < timeModelExpanding + timeModelShrinking) {
 				model[currentMesh].setVisible(false);
 				model[currentMesh].setScale(scales[currentMesh]);
 				model[nextMesh].setVisible(true);
-			} else if (timeAnimating > offsetSphereExpanding) {
+				model[nextMesh].setScale(scales[nextMesh] * interpolate((timeAnimating - timeModelShrinking) / timeModelExpanding));
+			} else {
+				model[nextMesh].setScale(scales[nextMesh]);
 				currentMesh = nextMesh;
 				timeAnimating = 0;
 				speed = speeds[currentMesh];
