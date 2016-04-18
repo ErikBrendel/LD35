@@ -30,6 +30,8 @@ public class MainMenue {
 	private float timeSinceLastButtonPress;
 	private float timePassed;
 
+	private boolean allowContinue;
+
 	private boolean open;
 
 	static {
@@ -40,7 +42,7 @@ public class MainMenue {
 
 	public MainMenue() {
 		shader = Shader.fromFile("GUI.vert", "GUI.frag");
-		cursorPos = 2;
+		cursorPos = 1;
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
 		cursor = new MeshInstance(icon, cursorMaterial);
 		cursor.setLocation(cursorLocation);
@@ -48,6 +50,14 @@ public class MainMenue {
 		background.setScale(new Vector3f(1f, 1f, 1f));
 		cursor.setScale(new Vector3f(0.05f * 1f, 0.05f * 16f / 9f, 0.05f * 1f));
 		open = true;
+		allowContinue = false;
+	}
+	
+	public void setAllowContinue(boolean allowContinue) {
+		this.allowContinue = allowContinue;
+		if(allowContinue){
+			setCursorPos(1);
+		}
 	}
 
 	public void setCursorPos(int cursorPos) {
@@ -103,6 +113,9 @@ public class MainMenue {
 	private void up() {
 		cursorPos++;
 		cursorPos %= 3;
+		if (!allowContinue) {
+			cursorPos %= 2;
+		}
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
 		cursor.setLocation(cursorLocation);
 	}
@@ -111,6 +124,9 @@ public class MainMenue {
 		cursorPos--;
 		if (cursorPos < 0) {
 			cursorPos = 2;
+			if (!allowContinue) {
+				cursorPos = 1;
+			}
 		}
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
 		cursor.setLocation(cursorLocation);
