@@ -281,13 +281,11 @@ public class SpaceScene implements Scene {
 					break;
 				case 2:
 					if (enemy.hasCapturedPlayer(player)) {
-						while (endMenu.update() != 0) {
-							Display.update();
-							endMenu.render();
-							lastFrame = System.nanoTime();
+						if (endMenu.update() == 0) {
+							mainMenu.setAllowContinue(false);
+							mainMenu.setOpen(true);
 						}
-						mainMenu.setAllowContinue(false);
-						mainMenu.setOpen(true);
+						endMenu.render();
 
 					} else {
 						// enemy.setPosition(new Vector3f((float)
@@ -309,6 +307,9 @@ public class SpaceScene implements Scene {
 							player.setNearest(generator.getData().getMesh());
 						}
 						enemy.update(deltaTime);
+						if (enemy.hasCapturedPlayer(player)) {
+							sounds.playSound("e_dead");
+						}
 						gui.update();
 						powerups.update(deltaTime, player, shaders);
 
@@ -330,6 +331,7 @@ public class SpaceScene implements Scene {
 
 						render();
 						if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+							playSound("e_apply");
 							mainMenu.setAllowContinue(true);
 							mainMenu.setOpen(true);
 						}
