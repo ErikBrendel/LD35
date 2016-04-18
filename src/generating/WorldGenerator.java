@@ -104,9 +104,7 @@ public class WorldGenerator {
 		Graph graph = new Graph();
 
 		int vCount = sphereData.length / 8;
-		System.err.println("vCount = " + vCount);
 		int triCount = vCount / 3;
-		System.err.println("triCount = " + triCount);
 
 		for (int tri = 0; tri < triCount; tri++) {
 

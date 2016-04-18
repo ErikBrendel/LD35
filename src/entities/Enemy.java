@@ -22,10 +22,10 @@ public class Enemy extends WorldObject {
 	private static final Material enemyMat;
 
 	static {
-		int dif = Util.loadTexture("enemyTex.png");
+		int dif = Util.loadTexture("enemy.png");
 		enemyMat = new Material(dif, 0);
 		enemyMesh = ObjectLoader.loadObjectEBO("enemy.obj");
-		enemyPropMesh = ObjectLoader.loadObjectEBO("enemy_propeler.obj");
+		enemyPropMesh = ObjectLoader.loadObjectEBO("enemy_propeller.obj");
 	}
 
 	private float propellerRot = 0f;

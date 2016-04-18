@@ -217,6 +217,7 @@ public class Util {
 			DisplayMode full = null;
 			// finding best quality display mode
 			for (DisplayMode current : modes) {
+				System.err.println("displayMode:   " + current);
 				if (full == null || current.getWidth() > full.getWidth() || current.getHeight() > full.getHeight() || current.getFrequency() > full.getFrequency() || current.getBitsPerPixel() > full.getBitsPerPixel()) {
 					if (current.getWidth() <= 1920 && current.getHeight() <= 1080) {
 						full = current;
@@ -224,6 +225,7 @@ public class Util {
 				}
 
 			}
+			System.err.println("fullMode = " + full);
 			return full;
 		} catch (Exception ex) {
 			return null;

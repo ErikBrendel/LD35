@@ -6,10 +6,8 @@
  */
 package sounds;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.lwjgl.openal.AL;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
@@ -19,31 +17,38 @@ import org.newdawn.slick.util.ResourceLoader;
  * @author Erik
  */
 public class SlickOgg {
-	
+
 	private static HashMap<String, Audio> audio;
 	private static HashMap<String, Boolean> isMusic;
-	
+
 	static {
 		audio = new HashMap<>();
 		isMusic = new HashMap<>();
 	}
-	
-	public static void load() {
+
+	public static void loadSound(String name) {
 		try {
-			audio.put("music", AudioLoader.getStreamingAudio("OGG", ResourceLoader.getResource("audio/m_title.ogg").toURI().toURL()));
-			isMusic.put("music", false);
+			audio.put(name, AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("audio/" + name + ".ogg")));
+			isMusic.put(name, name.startsWith("m"));
 		} catch (Exception ex) {
-			System.err.println("Cannot load audio data:");
+			System.err.println("Error loading Sound " + name + ".ogg:");
 			ex.printStackTrace();
 		}
 	}
 
-	public static void play(String name) {
-		if(isMusic.get(name)) {
-			audio.get(name).playAsMusic(1f, 10f, true);
-			System.err.println("name = " + name);
+	public static void playSound(String name) {
+		if (!audio.containsKey(name)) {
+			loadSound(name);
+		}
+
+		if (isMusic.get(name)) {
+			audio.get(name).playAsSoundEffect(1, 1, true);
 		} else {
 			audio.get(name).playAsSoundEffect(1, 1, false);
 		}
+	}
+
+	public static void destroy() {
+		AL.destroy();
 	}
 }

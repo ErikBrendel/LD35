@@ -16,12 +16,12 @@ import sounds.SlickOgg;
  */
 public class _TEST_GENERATION_ {
 	public static void main(String[] args) {
-		SlickOgg.load();
-		SlickOgg.play("music");
+		//SlickOgg.playSound("m_title");
+		SlickOgg.playSound("e_select");
 		new Thread() {
 			public void run() {
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(320000);
 				} catch (Exception e) {
 					
 				}

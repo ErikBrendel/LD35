@@ -46,7 +46,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
-import sounds.SoundManager;
 import util.Camera;
 import util.GUI;
 import util.Material;
@@ -64,6 +63,7 @@ import entities.Enemy;
 import entities.Player;
 import entities.Powerups;
 import generating.WorldGenerator;
+import sounds.SlickOgg;
 import util.Settings;
 
 /**
@@ -92,7 +92,6 @@ public class SpaceScene implements Scene {
 	private Matrix4f view;
 	private Skybox skybox;
 	private int matricesUBO;
-	private static SoundManager sounds;
 
 	private MeshInstance sun;
 	private MeshInstance water;
@@ -148,9 +147,6 @@ public class SpaceScene implements Scene {
 		camera = new Camera(new Vector3f(0, 0, 0), player.getPosition(), enemy.getPosition(), 3f);
 
 		gui = new GUI(player);
-
-		sounds = new SoundManager();
-
 		sunPos = new Vector3f(1, 1, 1);
 
 		powerups = new Powerups(lh);
@@ -174,8 +170,8 @@ public class SpaceScene implements Scene {
 
 		// int cloud = Util.loadTexture("cloudSphere.png");
 		int sunTex = Util.loadTexture("sun.jpg");
-		int rock = Util.loadTexture("container2.png");
-		int rockSpec = Util.loadTexture("container2_specular.png");
+		int rock = Util.loadTexture("rock.png");
+		int rockSpec = Util.loadTexture("black.png");
 		int waterTex = Util.loadTexture("blue_color_alpha.png", false);
 		int whiteTex = Util.loadTexture("white.png");
 		int blackTex = Util.loadTexture("black.png");
@@ -262,18 +258,18 @@ public class SpaceScene implements Scene {
 	}
 
 	public static void playSound(String sound) {
-		sounds.playSound(sound);
+		SlickOgg.playSound(sound);
 	}
 
 	public void start() {
 		lastFrame = System.nanoTime();
-		sounds.playSound("m_title");
+		playSound("m_title");
 		while (!Display.isCloseRequested()) {
 			// sounds.playSound("e_Powerup6");
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
-			System.out.println("FPS = " + (double) 1 / deltaTime);
+			//System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
 			int state = mainMenu.update(deltaTime);
@@ -293,16 +289,7 @@ public class SpaceScene implements Scene {
 							endMenu.render();
 
 						} else {
-
-							// enemy.setPosition(new Vector3f((float)
-							// Math.sin(System.currentTimeMillis() % (int)
-							// (3000f *
-							// 2f *
-							// Math.PI) / 3000f), 0.1f, (float)
-							// Math.cos(System.currentTimeMillis() % (int)
-							// (3000f *
-							// 2f *
-							// Math.PI) / 3000f)));
+							
 							camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
 							// handle all inputs
 							sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
@@ -316,7 +303,7 @@ public class SpaceScene implements Scene {
 							}
 							enemy.update(deltaTime);
 							if (enemy.hasCapturedPlayer(player)) {
-								sounds.playSound("e_dead");
+								playSound("e_dead");
 							}
 							gui.update();
 							powerups.update(deltaTime, player, shaders);
@@ -379,7 +366,7 @@ public class SpaceScene implements Scene {
 					break;
 				case 0:
 					Display.destroy();
-					sounds.destroy();
+					SlickOgg.destroy();
 					System.exit(0);
 					break;
 			}
@@ -387,7 +374,7 @@ public class SpaceScene implements Scene {
 			Display.update();
 			Display.sync(600);
 		}
-		sounds.destroy();
+		SlickOgg.destroy();
 	}
 
 	@Override
