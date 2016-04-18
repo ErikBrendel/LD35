@@ -104,6 +104,7 @@ public class SpaceScene implements Scene {
 
 	private MainMenu mainMenu;
 	private EndMenu endMenu;
+	private StoryMenu storyMenu;
 
 	public SpaceScene() {
 
@@ -113,6 +114,7 @@ public class SpaceScene implements Scene {
 		mainMenu.render();
 		Display.update();
 		endMenu = new EndMenu();
+		storyMenu = new StoryMenu();
 
 		shaders = new ArrayList<>();
 		skybox = new Skybox("ownSky");
@@ -201,8 +203,8 @@ public class SpaceScene implements Scene {
 		amount = 1000;
 		matrices = new Matrix4f[amount];
 		Random ran = new Random(System.currentTimeMillis());
-		float radius = 8;
-		float offset = 0.5f;
+		float radius = 12;
+		float offset = 2f;
 		for (int i = 0; i < amount; i++) {
 			Matrix4f model = new Matrix4f();
 			float angle = (float) i / amount * 360f;
@@ -217,7 +219,7 @@ public class SpaceScene implements Scene {
 			model.translate(new Vector3f(x, y, z));
 
 			// 2. Scale: Scale between 0.05 and 0.25f
-			float scale = ran.nextInt() % 50 / 100.0f + 0.25f;
+			float scale = ran.nextInt() % 50 / 100.0f + 0.4f;
 			model.scale(new Vector3f(scale, scale, scale));
 
 			// 3. Rotation: add random rotation around a (semi)randomly
@@ -280,60 +282,67 @@ public class SpaceScene implements Scene {
 					mainMenu.render();
 					break;
 				case 2:
-					if (enemy.hasCapturedPlayer(player)) {
-						if (endMenu.update() == 0) {
-							mainMenu.setAllowContinue(false);
-							mainMenu.setOpen(true);
-						}
-						endMenu.render();
-
+					if (storyMenu.update() == -1) {
+						storyMenu.render();
 					} else {
-						// enemy.setPosition(new Vector3f((float)
-						// Math.sin(System.currentTimeMillis() % (int) (3000f *
-						// 2f *
-						// Math.PI) / 3000f), 0.1f, (float)
-						// Math.cos(System.currentTimeMillis() % (int) (3000f *
-						// 2f *
-						// Math.PI) / 3000f)));
-						camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
-						// handle all inputs
-						sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
-						Vector3f sunDir = new Vector3f(-sunPos.x, -sunPos.y, -sunPos.z);
-						sunLight.setDirection(sunDir);
-						defaultShader.use();
-						handleInputs(deltaTime, defaultShader);
-						player.update(deltaTime);
-						if (generator.hasFinished()) {
-							player.setNearest(generator.getData().getMesh());
-						}
-						enemy.update(deltaTime);
 						if (enemy.hasCapturedPlayer(player)) {
-							sounds.playSound("e_dead");
-						}
-						gui.update();
-						powerups.update(deltaTime, player, shaders);
+							if (endMenu.update() == 0) {
+								mainMenu.setAllowContinue(false);
+								mainMenu.setOpen(true);
+							}
+							endMenu.render();
 
-						// Update Matrices Uniform Buffer Block
-						view = camera.getViewMatrix();
-						projection = camera.getProjectionMatrix();
+						} else {
 
-						glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
-						glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
-						glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
-						glBindBuffer(GL_UNIFORM_BUFFER, 0);
+							// enemy.setPosition(new Vector3f((float)
+							// Math.sin(System.currentTimeMillis() % (int)
+							// (3000f *
+							// 2f *
+							// Math.PI) / 3000f), 0.1f, (float)
+							// Math.cos(System.currentTimeMillis() % (int)
+							// (3000f *
+							// 2f *
+							// Math.PI) / 3000f)));
+							camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
+							// handle all inputs
+							sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
+							Vector3f sunDir = new Vector3f(-sunPos.x, -sunPos.y, -sunPos.z);
+							sunLight.setDirection(sunDir);
+							defaultShader.use();
+							handleInputs(deltaTime, defaultShader);
+							player.update(deltaTime);
+							if (generator.hasFinished()) {
+								player.setNearest(generator.getData().getMesh());
+							}
+							enemy.update(deltaTime);
+							if (enemy.hasCapturedPlayer(player)) {
+								sounds.playSound("e_dead");
+							}
+							gui.update();
+							powerups.update(deltaTime, player, shaders);
 
-						Vector3f flashLightDirection = new Vector3f(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
-						flashlight.setDirection(flashLightDirection);
-						flashlight.setPosition(camera.getPosition());
+							// Update Matrices Uniform Buffer Block
+							view = camera.getViewMatrix();
+							projection = camera.getProjectionMatrix();
 
-						lh.updateLight(flashlight);
-						lh.updateLight(sunLight);
+							glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+							glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
+							glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
+							glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-						render();
-						if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-							playSound("e_apply");
-							mainMenu.setAllowContinue(true);
-							mainMenu.setOpen(true);
+							Vector3f flashLightDirection = new Vector3f(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+							flashlight.setDirection(flashLightDirection);
+							flashlight.setPosition(camera.getPosition());
+
+							lh.updateLight(flashlight);
+							lh.updateLight(sunLight);
+
+							render();
+							if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+								playSound("e_apply");
+								mainMenu.setAllowContinue(true);
+								mainMenu.setOpen(true);
+							}
 						}
 					}
 					break;
@@ -364,8 +373,7 @@ public class SpaceScene implements Scene {
 
 					gui = new GUI(player);
 					mainMenu.setCursorPos(2);
-					
-					
+
 					Balancing.init();
 
 					break;
