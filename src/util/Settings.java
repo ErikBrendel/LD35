@@ -26,7 +26,9 @@ public class Settings {
 			+ "# Ludum Dare Game by\n"
 			+ "# Markus Brand and Erik Brendel\n"
 			+ "skybox_mipmap = true\n"
-			+ "light_shader_optimization = true";
+			+ "light_shader_optimization = true\n"
+			+ "sound_enabled = true\n"
+			+ "music_enabled = true";
 
 	private static HashMap<String, String> settings;
 
@@ -74,6 +76,10 @@ public class Settings {
 	}
 
 	public static boolean getBoolean(String key) {
-		return Boolean.valueOf(get(key));
+		String s = get(key);
+		if(s == null) {
+			return false;
+		}
+		return Boolean.valueOf(s);
 	}
 }
