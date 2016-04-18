@@ -102,15 +102,17 @@ public class SpaceScene implements Scene {
 
 	private GUI gui;
 
-	private MainMenue menu;
+	private MainMenu mainMenu;
+	private EndMenu endMenu;
 
 	public SpaceScene() {
 
 		Util.createWindow("Space explorer", false);
 
-		menu = new MainMenue();
-		menu.render();
+		mainMenu = new MainMenu();
+		mainMenu.render();
 		Display.update();
+		endMenu = new EndMenu();
 
 		shaders = new ArrayList<>();
 		skybox = new Skybox("ownSky");
@@ -268,53 +270,65 @@ public class SpaceScene implements Scene {
 			System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
 
-			switch (menu.update(deltaTime)) {
+			switch (mainMenu.update(deltaTime)) {
 				case -1:
-					menu.render();
+					mainMenu.render();
 					break;
 				case 2:
-					// enemy.setPosition(new Vector3f((float)
-					// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f *
-					// Math.PI) / 3000f), 0.1f, (float)
-					// Math.cos(System.currentTimeMillis() % (int) (3000f * 2f *
-					// Math.PI) / 3000f)));
-					camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
-					// handle all inputs
-					sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
-					Vector3f sunDir = new Vector3f(-sunPos.x, -sunPos.y, -sunPos.z);
-					sunLight.setDirection(sunDir);
-					defaultShader.use();
-					handleInputs(deltaTime, defaultShader);
-					player.update(deltaTime);
-					if (generator.hasFinished()) {
-						player.setNearest(generator.getData().getMesh());
-					}
-					enemy.update(deltaTime);
-					gui.update();
-					powerups.update(deltaTime, player, shaders);
+					if (enemy.hasCapturedPlayer(player)) {
+						endMenu.render();
+						if (endMenu.update(deltaTime) == 0) {
+							mainMenu.setOpen(true);
+							mainMenu.setAllowContinue(false);
+							mainMenu.setCursorPos(1);
+							return;
+						}
+					} else {
+						// enemy.setPosition(new Vector3f((float)
+						// Math.sin(System.currentTimeMillis() % (int) (3000f * 2f *
+						// Math.PI) / 3000f), 0.1f, (float)
+						// Math.cos(System.currentTimeMillis() % (int) (3000f * 2f *
+						// Math.PI) / 3000f)));
+						camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
+						// handle all inputs
+						sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
+						Vector3f sunDir = new Vector3f(-sunPos.x, -sunPos.y, -sunPos.z);
+						sunLight.setDirection(sunDir);
+						defaultShader.use();
+						handleInputs(deltaTime, defaultShader);
+						player.update(deltaTime);
+						if (generator.hasFinished()) {
+							player.setNearest(generator.getData().getMesh());
+						}
+						enemy.update(deltaTime);
+						gui.update();
+						powerups.update(deltaTime, player, shaders);
 
-					// Update Matrices Uniform Buffer Block
-					view = camera.getViewMatrix();
-					projection = camera.getProjectionMatrix();
+						// Update Matrices Uniform Buffer Block
+						view = camera.getViewMatrix();
+						projection = camera.getProjectionMatrix();
 
-					glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
-					glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
-					glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
-					glBindBuffer(GL_UNIFORM_BUFFER, 0);
+						glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+						glBufferSubData(GL_UNIFORM_BUFFER, 0, projection.getData());
+						glBufferSubData(GL_UNIFORM_BUFFER, 64, view.getData());
+						glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-					Vector3f flashLightDirection = new Vector3f(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
-					flashlight.setDirection(flashLightDirection);
-					flashlight.setPosition(camera.getPosition());
+						Vector3f flashLightDirection = new Vector3f(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+						flashlight.setDirection(flashLightDirection);
+						flashlight.setPosition(camera.getPosition());
 
-					lh.updateLight(flashlight);
-					lh.updateLight(sunLight);
+						lh.updateLight(flashlight);
+						lh.updateLight(sunLight);
 
-					render();
-					if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-						menu.setOpen(true);
+						render();
+						if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+							mainMenu.setAllowContinue(true);
+							mainMenu.setOpen(true);
+						}
 					}
 					break;
 				case 1:
+					//world generating state
 					generator = new WorldGenerator();
 					generator.generate();
 
@@ -339,7 +353,8 @@ public class SpaceScene implements Scene {
 					powerups = new Powerups(lh);
 
 					gui = new GUI(player);
-					menu.setCursorPos(2);
+					mainMenu.setCursorPos(2);
+
 					break;
 				case 0:
 					Display.destroy();

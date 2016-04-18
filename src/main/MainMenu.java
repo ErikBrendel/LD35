@@ -15,7 +15,8 @@ import util.ObjectLoader;
 import util.Shader;
 import util.Util;
 
-public class MainMenue {
+public class MainMenu {
+
 	private int cursorPos;
 	private Vector3f cursorLocation;
 	private MeshInstance background;
@@ -40,7 +41,7 @@ public class MainMenue {
 		cursorMaterial = new Material(Util.loadTexture("cursor.png"), 0);
 	}
 
-	public MainMenue() {
+	public MainMenu() {
 		shader = Shader.fromFile("GUI.vert", "GUI.frag");
 		cursorPos = 1;
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
@@ -52,11 +53,13 @@ public class MainMenue {
 		open = true;
 		allowContinue = false;
 	}
-	
+
 	public void setAllowContinue(boolean allowContinue) {
 		this.allowContinue = allowContinue;
-		if(allowContinue){
-			setCursorPos(1);
+		if (!allowContinue) {
+			if (cursorPos == 0) {
+				setCursorPos(1);
+			}
 		}
 	}
 
