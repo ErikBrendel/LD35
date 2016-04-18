@@ -13,6 +13,9 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL15.*;
 
 public class LightHandler {
+	
+	private static final float[] emptyData = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
+	
 	private int numPointLights, numDirLights, numSpotLights;
 	private PointLight[] pointLights;
 	private ArrayList<DirectionalLight> dirLights;
@@ -77,8 +80,7 @@ public class LightHandler {
 		}
 		for (; i < numPointLights; i++) {
 			FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
-			float[] data = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
-			pointLightsBuffer.put(data);
+			pointLightsBuffer.put(emptyData);
 			pointLightsBuffer.flip();
 			glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + pointLightOffset) * 4, pointLightsBuffer);
 			pointLightOffset += 12;
@@ -142,8 +144,7 @@ public class LightHandler {
 			for (int i = 0; i < pointLights.length; i++) {
 				if (light.equals(pointLights[i])) {
 					FloatBuffer pointLightsBuffer = BufferUtil.newFloatBuffer(12);
-					float[] data = { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 };
-					pointLightsBuffer.put(data);
+					pointLightsBuffer.put(emptyData);
 					pointLightsBuffer.flip();
 					glBufferSubData(GL_UNIFORM_BUFFER, (Math.max(1, numDirLights) * 8 + Math.max(1, numSpotLights) * 16 + i * 12) * 4, pointLightsBuffer);
 					freeSpots.add(i);

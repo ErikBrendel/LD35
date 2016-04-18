@@ -65,6 +65,7 @@ import entities.Enemy;
 import entities.Player;
 import entities.Powerups;
 import generating.WorldGenerator;
+import util.Settings;
 
 /**
  * Main class for LD project
@@ -122,6 +123,7 @@ public class SpaceScene implements Scene {
 		parameters.put("NUM_DIR_LIGHTS", 0);
 		parameters.put("NUM_SPOT_LIGHTS", 0);
 		parameters.put("NUM_POINT_LIGHTS", 0);
+		parameters.put("OPTIMIZED_LIGHT_ENABLED", Settings.getBoolean("light_shader_optimization") ? "1" : "0");
 		defaultShader = Shader.fromFile("Basic.vert", "Basic.frag", parameters);
 		noLightShader = Shader.fromFile("Basic.vert", "NoLight.frag");
 		instancedShader = Shader.fromFile("Instanced.vert", "Basic.frag", parameters);

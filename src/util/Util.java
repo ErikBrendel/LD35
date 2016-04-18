@@ -68,7 +68,7 @@ public class Util {
 				buffer.put((byte) (pixel >> 8 & 0xFF)); // Green component
 				buffer.put((byte) (pixel & 0xFF)); // Blue component
 				buffer.put((byte) (pixel >> 24 & 0xFF)); // Alpha component.
-															// Only for RGBA
+				// Only for RGBA
 			}
 		}
 		buffer.flip();
@@ -132,7 +132,7 @@ public class Util {
 					buffer.put((byte) (pixel >> 8 & 0xFF)); // Green component
 					buffer.put((byte) (pixel & 0xFF)); // Blue component
 					buffer.put((byte) (pixel >> 24 & 0xFF)); // Alpha component.
-																// Only for RGBA
+					// Only for RGBA
 				}
 			}
 			buffer.flip();
@@ -145,7 +145,9 @@ public class Util {
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, images[i].getWidth(), images[i].getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+			if (Settings.getBoolean("skybox_mipmap")) {
+				glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+			}
 		}
 
 		// glBindTexture(GL_TEXTURE_2D, 0);

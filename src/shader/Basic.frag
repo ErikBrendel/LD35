@@ -152,8 +152,12 @@ vec3 calcDirectionalLight(DirLight light, vec3 norm, vec3 viewDir){
 	return vec3(texture(material.texture_diffuse0, tex)) * diffuse + vec3(texture(material.texture_specular0, tex)) * specular;
 }
 
-vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir){	
+vec3 calcPointLight(PointLight light, vec3 norm, vec3 viewDir){
+
+	#if OPTIMIZED_LIGHT_ENABLED == 1
 	if(light.color.r + light.color.g + light.color.b == 0) return vec3(0);
+	#endif
+
 	vec3 direction = light.position - pos;
 
 	float distance = length(direction);
