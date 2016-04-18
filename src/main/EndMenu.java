@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Font;
+
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glDepthMask;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -9,6 +10,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.TrueTypeFont;
+
 import util.Material;
 import util.Mesh;
 import util.MeshInstance;
@@ -41,6 +43,7 @@ public class EndMenu {
 
 	public int update() {
 		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_RETURN) || Keyboard.isKeyDown(Keyboard.KEY_NUMPADENTER)) {
+			SpaceScene.playSound("e_apply");
 			return 0;
 		}
 		return -1;

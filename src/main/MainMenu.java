@@ -21,12 +21,16 @@ public class MainMenu {
 	private Vector3f cursorLocation;
 	private MeshInstance background;
 	private MeshInstance cursor;
+	private MeshInstance loading;
+	private MeshInstance generating;
 
 	private Shader shader;
 
 	private static Mesh icon;
 	private static Material backgroundMaterial;
 	private static Material cursorMaterial;
+	private static Material loadingMaterial;
+	private static Material generatingMaterial;
 
 	private float timeSinceLastButtonPress;
 	private float timePassed;
@@ -35,23 +39,37 @@ public class MainMenu {
 
 	private boolean open;
 
+	private boolean init;
+
 	static {
 		icon = ObjectLoader.loadObjectEBO("icon.obj");
 		backgroundMaterial = new Material(Util.loadTexture("menu.png"), 0);
 		cursorMaterial = new Material(Util.loadTexture("cursor.png"), 0);
+		loadingMaterial = new Material(Util.loadTexture("loading.png"), 0);
+		generatingMaterial = new Material(Util.loadTexture("generating.png"), 0);
 	}
 
 	public MainMenu() {
 		shader = Shader.fromFile("GUI.vert", "GUI.frag");
 		cursorPos = 1;
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
+
 		cursor = new MeshInstance(icon, cursorMaterial);
 		cursor.setLocation(cursorLocation);
-		background = new MeshInstance(icon, backgroundMaterial);
-		background.setScale(new Vector3f(1f, 1f, 1f));
 		cursor.setScale(new Vector3f(0.05f * 1f, 0.05f * 16f / 9f, 0.05f * 1f));
+
+		background = new MeshInstance(icon, backgroundMaterial);
+
+		loading = new MeshInstance(icon, loadingMaterial);
+		loading.setScale(new Vector3f(0.3f * 1f, 0.3f * 16f / 9f, 1f));
+		loading.setLocation(new Vector3f(0.0f, -0.3f, 1));
+		generating = new MeshInstance(icon, generatingMaterial);
+		generating.setScale(new Vector3f(0.3f * 1f, 0.3f * 16f / 9f, 1f));
+		generating.setLocation(new Vector3f(0.0f, -0.3f, 1));
+
 		open = true;
 		allowContinue = false;
+		init = true;
 	}
 
 	public void setAllowContinue(boolean allowContinue) {
@@ -90,7 +108,6 @@ public class MainMenu {
 			if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_NUMPADENTER) || Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
 				SpaceScene.playSound("e_apply");
 				open = false;
-				return cursorPos;
 			}
 		}
 		cursor.setScale(new Vector3f(0.05f * (float) (Math.sin(timePassed * 6) / 8 + 0.8), 0.05f * 16f / 9f * (float) (Math.sin(timePassed * 6) / 8 + 0.8), 0.05f * 1f / (float) (Math.sin(timePassed * 6) / 8 + 0.8)));
@@ -107,7 +124,18 @@ public class MainMenu {
 		shader.use();
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(false);
+
 		background.render(shader);
+
+		if (init) {
+			init = false;
+			loading.render(shader);
+		}
+
+		if (cursorPos == 1 && !open) {
+			generating.render(shader);
+		}
+
 		cursor.render(shader);
 		glDepthMask(true);
 		glEnable(GL_DEPTH_TEST);

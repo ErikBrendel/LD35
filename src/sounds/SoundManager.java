@@ -4,11 +4,14 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.util.WaveData;
+
+import util.Settings;
 
 public class SoundManager {
 	/** Buffers hold sound data. */
@@ -93,14 +96,14 @@ public class SoundManager {
 				if (firstLetter == 'e') {
 					AL10.alSourcei(source[i].get(0), AL10.AL_BUFFER, buffer[i].get(0));
 					AL10.alSourcef(source[i].get(0), AL10.AL_PITCH, 1.0f);
-					AL10.alSourcef(source[i].get(0), AL10.AL_GAIN, 1.0f);
+					AL10.alSourcef(source[i].get(0), AL10.AL_GAIN, Settings.getBoolean("sound_enabled") ? 1.0f : 0.0f);
 					AL10.alSource(source[i].get(0), AL10.AL_POSITION, sourcePos);
 					AL10.alSource(source[i].get(0), AL10.AL_VELOCITY, sourceVel);
 					AL10.alSourcei(source[i].get(0), AL10.AL_LOOPING, AL10.AL_FALSE);
 				} else if (firstLetter == 'm') {
 					AL10.alSourcei(source[i].get(0), AL10.AL_BUFFER, buffer[i].get(0));
 					AL10.alSourcef(source[i].get(0), AL10.AL_PITCH, 1.0f);
-					AL10.alSourcef(source[i].get(0), AL10.AL_GAIN, 1.0f);
+					AL10.alSourcef(source[i].get(0), AL10.AL_GAIN, Settings.getBoolean("music_enabled") ? 1.0f : 0.0f);
 					AL10.alSource(source[i].get(0), AL10.AL_POSITION, sourcePos);
 					AL10.alSource(source[i].get(0), AL10.AL_VELOCITY, sourceVel);
 					AL10.alSourcei(source[i].get(0), AL10.AL_LOOPING, AL10.AL_TRUE);
