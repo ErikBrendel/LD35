@@ -10,7 +10,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import particles.ParticleHandler;
 import particles.ShapeShiftParticle;
-import util.Camera;
 import util.Material;
 import util.Matrix4f;
 import util.Mesh;
