@@ -66,7 +66,7 @@ public class Powerups {
 			for (int i = 0; i < instances.size(); i++) {
 				PowerupInstance inst = instances.get(i);
 				float dist = (float) Math.hypot(Math.hypot(inst.position.x - playerPos.x, inst.position.y - playerPos.y), inst.position.z - playerPos.z);
-				if (dist < 0.04) {
+				if (dist < Balancing.getPowerupPickupDistance()) {
 					lights.remLight(inst.getLight(), shaders);
 					instances.remove(inst);
 					i--;

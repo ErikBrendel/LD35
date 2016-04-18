@@ -99,6 +99,6 @@ public class Enemy extends WorldObject {
 
 	public boolean hasCapturedPlayer(Player player) {
 		Vector3f dist = Vector3f.sub(player.getPosition(), position, null);
-		return dist.length() < 0.05f;
+		return dist.length() < Balancing.getKillDistance();
 	}
 }

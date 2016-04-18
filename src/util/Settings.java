@@ -6,11 +6,11 @@
  */
 package util;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -60,11 +60,15 @@ public class Settings {
 				return Files.readAllLines(me.toPath());
 			} else {
 				//write default 
-				PrintWriter wr;
-				wr = new PrintWriter(me);
-				wr.print(defaultFile);
+				BufferedWriter wr;
+				wr = new BufferedWriter(new PrintWriter(me));
+				String[] lines = defaultFile.split("\n");
+				for (String l: lines) {
+					wr.write(l);
+					wr.newLine();
+				}
 				wr.close();
-				return Arrays.asList(defaultFile.split("\n"));
+				return Arrays.asList(lines);
 			}
 		} catch (Exception ex) {
 			return Arrays.asList(defaultFile.split("\n"));

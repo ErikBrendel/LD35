@@ -16,12 +16,21 @@ public class Balancing {
 		startTime = System.currentTimeMillis();
 	}
 
+	private static long startTime;
+
 	private static int getMS() {
 		return (int) (System.currentTimeMillis() - startTime);
 	}
 
-	private static long startTime;
 
+	public static float getPowerupPickupDistance() {
+		return 0.06f;
+	}
+
+	public static float getKillDistance() {
+		return 0.05f;
+	}
+	
 	public static float getTimeModelShrinking() {
 		return getTimeModelExpanding();
 	}
