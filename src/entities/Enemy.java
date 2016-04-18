@@ -97,4 +97,9 @@ public class Enemy extends WorldObject {
 		float speed = dx * deltaTime * currentSpeed;
 		walk(speed, prePos);
 	}
+
+	public boolean hasCapturedPlayer(Player player) {
+		Vector3f dist = Vector3f.sub(player.getPosition(), position, null);
+		return dist.length() < 0.05f;
+	}
 }

@@ -15,7 +15,8 @@ import util.ObjectLoader;
 import util.Shader;
 import util.Util;
 
-public class MainMenue {
+public class MainMenu {
+
 	private int cursorPos;
 	private Vector3f cursorLocation;
 	private MeshInstance background;
@@ -40,7 +41,7 @@ public class MainMenue {
 		cursorMaterial = new Material(Util.loadTexture("cursor.png"), 0);
 	}
 
-	public MainMenue() {
+	public MainMenu() {
 		shader = Shader.fromFile("GUI.vert", "GUI.frag");
 		cursorPos = 1;
 		cursorLocation = new Vector3f(-0.4f, 0.26f * (cursorPos + 1) - 0.064f, 1);
@@ -55,7 +56,7 @@ public class MainMenue {
 
 	public void setAllowContinue(boolean allowContinue) {
 		this.allowContinue = allowContinue;
-		if (allowContinue) {
+		if (!allowContinue) {
 			setCursorPos(1);
 		}
 	}
@@ -86,19 +87,20 @@ public class MainMenue {
 				down();
 				timeSinceLastButtonPress = 0;
 			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_NUMPADENTER) || Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
+				SpaceScene.playSound("e_apply");
+				open = false;
+				return cursorPos;
+			}
 		}
 		cursor.setScale(new Vector3f(0.05f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 16f / 9f * (float) (Math.sin(timePassed * 2) / 8 + 0.8), 0.05f * 1f / (float) (Math.sin(timePassed * 2) / 8 + 0.8)));
-		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) || Keyboard.isKeyDown(Keyboard.KEY_NUMPADENTER) || Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
-			SpaceScene.playSound("e_apply");
-			open = false;
-			return cursorPos;
-		}
+
 		return -1;
 	}
 
 	public void setOpen(boolean open) {
 		this.open = open;
-		timeSinceLastButtonPress = 0f;
+		timeSinceLastButtonPress = -0.2f;
 	}
 
 	public void render() {
