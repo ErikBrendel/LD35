@@ -218,7 +218,9 @@ public class Util {
 			// finding best quality display mode
 			for (DisplayMode current : modes) {
 				if (full == null || current.getWidth() > full.getWidth() || current.getHeight() > full.getHeight() || current.getFrequency() > full.getFrequency() || current.getBitsPerPixel() > full.getBitsPerPixel()) {
-					full = current;
+					if (current.getWidth() <= 1920 && current.getHeight() <= 1080) {
+						full = current;
+					}
 				}
 
 			}
@@ -233,12 +235,12 @@ public class Util {
 		try {
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 			windowSize = new Point((int) screen.getWidth(), (int) screen.getHeight());
-			DisplayMode full = Util.getBestDisplayMode();
-			Display.setDisplayMode(full);
+			Display.setDisplayMode(getBestDisplayMode());
 			Display.setFullscreen(true);
 			Display.setVSyncEnabled(vSync);
 			Display.setTitle(title);
 			Display.create();
+			Display.setFullscreen(true);
 
 			Mouse.create();
 			Mouse.setGrabbed(true);
