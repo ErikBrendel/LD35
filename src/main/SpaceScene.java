@@ -244,6 +244,7 @@ public class SpaceScene implements Scene {
 			shaders[2] = instancedShader;
 
 			render(shaders);
+			lh.renderLightShadows(this);
 
 			// skybox
 			glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
@@ -261,28 +262,28 @@ public class SpaceScene implements Scene {
 		glClearColor(0.05f, 0.075f, 0.075f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		glUniform1i(defaultShader.getUniform("alpha"), 1);
+		glUniform1i(shaders[0].getUniform("alpha"), 1);
 		// update player position uniform
-		player.applyToShader(defaultShader, true);
+		player.applyToShader(shaders[0], true);
 
 		// earth
 		float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
 		earth.setRotation(new Vector3f(0, angle, 0));
-		earth.render(defaultShader);
+		earth.render(shaders[0]);
 
 		// clouds
 		clouds.setRotation(new Vector3f(0, angle * 1f, 0));
-		clouds.render(defaultShader);
+		clouds.render(shaders[0]);
 
 		// sun
 		sun.setLocation(sunPos);
 		shaders[1].use();
-		player.applyToShader(noLightShader, false);
-		sun.render(noLightShader);
+		player.applyToShader(shaders[1], false);
+		sun.render(shaders[1]);
 		shaders[0].use();
 
 		shaders[2].use();
-		rockMat.apply(instancedShader);
+		rockMat.apply(shaders[2]);
 		glBindVertexArray(VAO);
 		glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(), GL_UNSIGNED_INT, 0, amount);
 		glBindVertexArray(0);

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -85,7 +84,6 @@ public class DirectionalLight extends Light {
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 
-		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		this.direction = direction;
@@ -136,10 +134,9 @@ public class DirectionalLight extends Light {
 
 		Shader s = Shader.fromFile("Test.vert", "Test.frag");
 		s.use();
-		glUniform1f(s.getUniform("near"), 1f);
-		glUniform1f(s.getUniform("far"), 10.0f);
+		// glUniform1f(s.getUniform("near"), 1f);
+		// glUniform1f(s.getUniform("far"), 10.0f);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
-		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
