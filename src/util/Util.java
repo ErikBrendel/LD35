@@ -215,15 +215,16 @@ public class Util {
 		try {
 			DisplayMode[] modes = Display.getAvailableDisplayModes();
 			System.out.println("Displaymodes available: " + modes.length);
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			DisplayMode full = null;
 			// finding best quality display mode
 			for (DisplayMode current : modes) {
 				if (full == null) {
 					full = current;
 				} else {
-					if (current.getWidth() > full.getWidth()) {
+					if (current.getWidth() > full.getWidth() && current.getHeight()<= screenSize.height) {
 						full = current;
-					} else if (current.getWidth() == full.getWidth()) {
+					} else if (current.getWidth() == full.getWidth() && current.getWidth() <= screenSize.getWidth()) {
 						if (current.getHeight() > full.getHeight()) {
 							full = current;
 						} else if (current.getHeight() == full.getHeight()) {
