@@ -87,7 +87,7 @@ vec3 calcPointLight(PointLight pl, vec3 norm, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 viewDir);
 
 vec3 calcNormal(vec3 normalIn, vec3 fragPos){
-	return normalize(normalIn) + vec3(0.03 * sin(fragPos.x * 120f +  6f * time), 0.03 *  sin(fragPos.y * 130f + 7f * time), 0.03 *  sin(fragPos.z * 140f + 8f * time));
+	return normalize(normalIn) + vec3(0.03 * cos(fragPos.x * 120f +  8f * time), 0.03 *  sin(fragPos.y * 130f + 7f * time), 0.03 *  sin(fragPos.z * 140f + 5f * time));
 }
 
 void main(){ 

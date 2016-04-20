@@ -53,6 +53,7 @@ public class Powerups {
 		// update each one
 		for (PowerupInstance o : instances) {
 			o.update(deltaTime);
+			lights.updateLight(o.pl);
 		}
 
 		// spawning new ones
@@ -107,7 +108,7 @@ public class Powerups {
 			age = 0;
 			Vector3f lightpos = new Vector3f(position);
 			lightpos.scale(1.03f);
-			pl = new PointLight(new Color(1, 0.5f, 0.0f), lightpos, 1f);
+			pl = new PointLight(new Color(1, 0.5f, 0.0f), lightpos, 2f);
 		}
 
 		public PointLight getLight() {
@@ -117,7 +118,7 @@ public class Powerups {
 		public void update(float deltaTime) {
 			age += deltaTime;
 
-			float sin = ((float) Math.sin(age * 5f) + 1f) * 0.3f;
+			float sin = ((float) Math.sin(age * 3f) + 1f) * 0.3f;
 			float rot = age;
 
 			Matrix4f local = new Matrix4f();
@@ -125,6 +126,9 @@ public class Powerups {
 			local.rotate(rot, new Vector3f(0, 1, 0));
 
 			modelMatrix[0] = local;
+			Vector3f lightPos = new Vector3f(position);
+			lightPos.scale(1.01f + sin / 4f);
+			pl.setPosition(lightPos);
 		}
 
 	}

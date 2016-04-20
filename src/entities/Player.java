@@ -45,7 +45,7 @@ public class Player extends WorldObject {
 		int leopard = Util.loadTexture("leopard.jpg");
 		eagleMat = new Material(eagle, spec);
 		sharkMat = new Material(shark, spec);
-		leopardMat = new Material(leopard, white);
+		leopardMat = new Material(leopard, spec);
 		particleMat = new Material(white, white);
 		leopardMesh = ObjectLoader.loadObjectEBO("leopard_body.obj");
 		leopardLegMesh = ObjectLoader.loadObjectEBO("leopard_leg.obj");
@@ -214,7 +214,8 @@ public class Player extends WorldObject {
 		viewDir = Util.vmMult(viewDir, rot);
 		viewDir.normalise();
 
-		//walkSpeed = [-1,1]:keyPress * frame * stayStuck * powerup * balanced base speed
+		// walkSpeed = [-1,1]:keyPress * frame * stayStuck * powerup * balanced
+		// base speed
 		float walkSpeed = dx * deltaTime * relativeSpeed * (1 + powerup) * Balancing.getPlayerSpeed(currentMesh);
 		powerup *= 1 - deltaTime;
 
