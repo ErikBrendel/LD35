@@ -58,7 +58,7 @@ public class MeshInstance {
 
 	public void render(Shader shader) {
 		shader.use();
-		// material.apply(shader);
+		material.apply(shader);
 
 		Matrix4f model = new Matrix4f();
 		model.translate(location);

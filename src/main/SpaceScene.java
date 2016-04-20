@@ -147,7 +147,7 @@ public class SpaceScene implements Scene {
 		amount = 100000;
 		Matrix4f[] matrices = new Matrix4f[amount];
 		Random ran = new Random(System.currentTimeMillis());
-		float radius = 0;
+		float radius = 10;
 		float offset = 10.5f;
 		for (int i = 0; i < amount; i++) {
 			Matrix4f model = new Matrix4f();
@@ -284,10 +284,11 @@ public class SpaceScene implements Scene {
 		earth.render(shaders[0]);
 		clouds.render(shaders[0]);
 		sun.render(shaders[1]);
-		shaders[2].use();
-		glBindVertexArray(VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(), GL_UNSIGNED_INT, 0, amount);
-		glBindVertexArray(0);
+		// shaders[2].use();
+		// glBindVertexArray(VAO);
+		// glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(),
+		// GL_UNSIGNED_INT, 0, amount);
+		// glBindVertexArray(0);
 	}
 
 	public boolean down = false;

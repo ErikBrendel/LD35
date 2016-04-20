@@ -172,7 +172,7 @@ public class Util {
 	public static Matrix4f orthographic(float l, float r, float b, float t, float n, float f) {
 		Matrix4f mat = new Matrix4f();
 
-		mat.m00 = 2 / (r + l);
+		mat.m00 = 2 / (r - l);
 		mat.m11 = 2 / (t - b);
 		mat.m22 = -2 / (f - n);
 		mat.m03 = -(r + l) / (r - l);
@@ -258,7 +258,7 @@ public class Util {
 			glEnable(GL_DEPTH_TEST);
 			// glDepthFunc(GL_LEQUAL);
 			// glEnable(GL_STENCIL_TEST);
-			// glEnable(GL_FRAMEBUFFER_SRGB);
+			glEnable(GL_FRAMEBUFFER);
 			// glEnable(GL_BLEND);
 			// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
