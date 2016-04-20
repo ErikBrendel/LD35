@@ -14,7 +14,6 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static util.ObjectLoader.loadObjectEBO;
 
-import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,7 +122,7 @@ public class SpaceScene implements Scene {
 		sunPos = new Vector3f(1, 1, 1);
 
 		// light
-		sunLight = new DirectionalLight(new Color(255, 255, 220), sunPos);
+		sunLight = new DirectionalLight(new Vector3f(1, 1, 1), sunPos);
 
 		flashlight = new SpotLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0f, 0.0f, -6.0f), new Vector3f(0, 0, 1), 10, 20, 15);
 
@@ -209,6 +208,8 @@ public class SpaceScene implements Scene {
 	public void start() {
 		while (!Display.isCloseRequested()) {
 			// create window
+			glClearColor(0.05f, 0.075f, 0.075f, 1);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
@@ -243,6 +244,27 @@ public class SpaceScene implements Scene {
 			shaders[1] = noLightShader;
 			shaders[2] = instancedShader;
 
+			shaders[0].use();
+			glUniform1i(shaders[0].getUniform("alpha"), 1);
+			// update player position uniform
+			player.applyToShader(shaders[0], true);
+
+			// earth
+			float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
+			earth.setRotation(new Vector3f(0, angle, 0));
+
+			// clouds
+			clouds.setRotation(new Vector3f(0, angle * 1f, 0));
+
+			// sun
+			sun.setLocation(sunPos);
+			shaders[1].use();
+			player.applyToShader(shaders[1], false);
+			shaders[0].use();
+
+			shaders[2].use();
+			rockMat.apply(shaders[2]);
+
 			render(shaders);
 			lh.renderLightShadows(this);
 
@@ -258,32 +280,11 @@ public class SpaceScene implements Scene {
 
 	@Override
 	public void render(Shader[] shaders) {
-		shaders[0].use();
-		glClearColor(0.05f, 0.075f, 0.075f, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		glUniform1i(shaders[0].getUniform("alpha"), 1);
-		// update player position uniform
-		player.applyToShader(shaders[0], true);
-
-		// earth
-		float angle = (float) (System.currentTimeMillis() % (1000 * 360 * Math.PI)) / 5000f / 2f;
-		earth.setRotation(new Vector3f(0, angle, 0));
 		earth.render(shaders[0]);
-
-		// clouds
-		clouds.setRotation(new Vector3f(0, angle * 1f, 0));
 		clouds.render(shaders[0]);
-
-		// sun
-		sun.setLocation(sunPos);
-		shaders[1].use();
-		player.applyToShader(shaders[1], false);
 		sun.render(shaders[1]);
-		shaders[0].use();
-
 		shaders[2].use();
-		rockMat.apply(shaders[2]);
 		glBindVertexArray(VAO);
 		glDrawElementsInstanced(GL_TRIANGLES, asteroid.getVertCount(), GL_UNSIGNED_INT, 0, amount);
 		glBindVertexArray(0);

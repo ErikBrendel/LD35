@@ -1,6 +1,5 @@
 package light;
 
-import java.awt.Color;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -32,38 +31,44 @@ public class DirectionalLight extends Light {
 
 	private Vector3f direction;
 
-	int quadVAO;
+	private static Shader testShader;
 
-	public DirectionalLight(Color color, Vector3f direction) {
-		super(color);
-		depthMapFBO = glGenFramebuffers();
-
-		depthMap = glGenTextures();
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-		// TODO LOOK IF THIS IS ACTUALLY CORRECT
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (FloatBuffer) null);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		this.direction = direction;
-
-		view = util.Util.lookAt(new Vector3f(0, 4.0f, 0.1f), new Vector3f(0, 0, 0), new Vector3f(0, 1, 0));
-		projection = util.Util.orthographic(-1000, 1000, -1000, 1000, 1f, 10.0f);
-		lightSpace = new Matrix4f(Matrix4f.mul(projection, view, lightSpace));
-
+	static {
+		testShader = Shader.fromFile("Test.vert", "Test.frag");
 	}
 
+	int quadVAO;
+
+	/*
+	 * public DirectionalLight(Color color, Vector3f direction) { super(color);
+	 * depthMapFBO = glGenFramebuffers();
+	 * 
+	 * depthMap = glGenTextures(); glBindTexture(GL_TEXTURE_2D, depthMap); //
+	 * TODO LOOK IF THIS IS ACTUALLY CORRECT glTexImage2D(GL_TEXTURE_2D, 0,
+	 * GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT,
+	 * GL_FLOAT, (FloatBuffer) null);
+	 * 
+	 * glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	 * glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	 * glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	 * glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	 * 
+	 * glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	 * glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+	 * GL_TEXTURE_2D, depthMap, 0); glDrawBuffer(GL_NONE);
+	 * glReadBuffer(GL_NONE);
+	 * 
+	 * glBindTexture(GL_TEXTURE_2D, 0); glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	 * 
+	 * this.direction = direction;
+	 * 
+	 * view = util.Util.lookAt(new Vector3f(-2f, 4.0f, -1.0f), new Vector3f(0,
+	 * 0, 0), new Vector3f(0, 1, 0)); projection = util.Util.orthographic(-10,
+	 * 10, -10, 10, 1f, 10f); lightSpace = new Matrix4f(Matrix4f.mul(projection,
+	 * view, lightSpace));
+	 * 
+	 * }
+	 */
 	public DirectionalLight(Vector3f color, Vector3f direction) {
 		super(color);
 		depthMapFBO = glGenFramebuffers();
@@ -109,7 +114,8 @@ public class DirectionalLight extends Light {
 		scene.render(shaders);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, Display.getWidth(), Display.getHeight());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+		// GL_STENCIL_BUFFER_BIT);
 		RenderQuad();
 	}
 
@@ -117,7 +123,7 @@ public class DirectionalLight extends Light {
 		if (quadVAO == 0) {
 			float quadVertices[] = {
 					// Positions // Texture Coords
-					-1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, };
+					-0.9f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, };
 			FloatBuffer buffer = BufferUtil.newFloatBuffer(quadVertices.length).put(quadVertices);
 			buffer.flip();
 			// Setup plane VAO
@@ -132,11 +138,11 @@ public class DirectionalLight extends Light {
 			glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * 4, 12);
 		}
 
-		Shader s = Shader.fromFile("Test.vert", "Test.frag");
-		s.use();
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+		testShader.use();
 		// glUniform1f(s.getUniform("near"), 1f);
 		// glUniform1f(s.getUniform("far"), 10.0f);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);

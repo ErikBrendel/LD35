@@ -138,8 +138,8 @@ public class Shader {
 		glShaderSource(vertexShader, paramString + vertexSource);
 		glCompileShader(vertexShader);
 		int vertCompileSuccess = glGetShader(vertexShader, GL_COMPILE_STATUS);
+		System.err.println("Vertex log: " + glGetShaderInfoLog(vertexShader, 512));
 		if (vertCompileSuccess != 1) {
-			System.err.println("Vertex log: " + glGetShaderInfoLog(vertexShader, 512));
 			System.err.println("Error compilng vertex shader: " + vertCompileSuccess);
 			Display.destroy();
 			System.exit(-1);
@@ -149,8 +149,8 @@ public class Shader {
 		glShaderSource(fragmentShader, paramString + fragmentSource);
 		glCompileShader(fragmentShader);
 		int fragCompileSuccess = glGetShader(fragmentShader, GL_COMPILE_STATUS);
+		System.err.println("Fragment log: " + glGetShaderInfoLog(fragmentShader, 512));
 		if (fragCompileSuccess != 1) {
-			System.err.println("Fragment log: " + glGetShaderInfoLog(fragmentShader, 512));
 			System.err.println("Error compiling fragment shader: " + fragCompileSuccess);
 			Display.destroy();
 			System.exit(-1);
@@ -161,8 +161,8 @@ public class Shader {
 		glAttachShader(shaderProgram, fragmentShader);
 		glLinkProgram(shaderProgram);
 		int progLinkSucccess = glGetProgram(shaderProgram, GL_LINK_STATUS);
+		System.err.println("Linking log: " + glGetProgramInfoLog(shaderProgram, 512));
 		if (progLinkSucccess != 1) {
-			System.err.println("Linking log: " + glGetProgramInfoLog(shaderProgram, 512));
 			System.err.println("Error linking shader program: " + progLinkSucccess);
 			Display.destroy();
 			System.exit(-1);

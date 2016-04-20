@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 
+ *  Copyright 2016
  *  Markus Brand and Erik Brendel, Potsdam.
  *  This File is part of a game created
  *  for LudumDare 35.
@@ -55,20 +55,20 @@ public class MeshInstance {
 	public Vector3f getScale() {
 		return scale;
 	}
-	
+
 	public void render(Shader shader) {
-		material.apply(shader);
-		
+		shader.use();
+		// material.apply(shader);
+
 		Matrix4f model = new Matrix4f();
 		model.translate(location);
 		model.rotate(rotation.x, new Vector3f(1, 0, 0));
 		model.rotate(rotation.y, new Vector3f(0, 1, 0));
 		model.rotate(rotation.z, new Vector3f(0, 0, 1));
 		model.scale(scale);
-		
-		
+
 		glUniformMatrix4(shader.getUniform("model"), false, model.getData());
-		
+
 		mesh.render();
 	}
 
