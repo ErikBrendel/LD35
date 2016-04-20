@@ -6,30 +6,23 @@
  */
 package main;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glBufferSubData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindBufferBase;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
-import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
-import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
-import static util.ObjectLoader.loadObjectEBO;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL33.*;
+import static util.ObjectLoader.*;
 
 import java.awt.Color;
 import java.nio.FloatBuffer;
@@ -104,6 +97,8 @@ public class SpaceScene implements Scene {
 	private MainMenu mainMenu;
 	private EndMenu endMenu;
 	private StoryMenu storyMenu;
+
+	private float timePassed;
 
 	public SpaceScene() {
 
@@ -269,8 +264,9 @@ public class SpaceScene implements Scene {
 			// get deltaTime and FPS
 			long currentFrame = System.nanoTime();
 			deltaTime = (float) ((currentFrame - lastFrame) / 1000000d / 1000d);
-			//System.out.println("FPS = " + (double) 1 / deltaTime);
+			// System.out.println("FPS = " + (double) 1 / deltaTime);
 			lastFrame = currentFrame;
+			timePassed += deltaTime;
 
 			int state = mainMenu.update(deltaTime);
 			switch (state) {
@@ -290,7 +286,7 @@ public class SpaceScene implements Scene {
 							endMenu.render();
 
 						} else {
-							
+
 							camera.setWorldView(new Vector3f(0.0f, 0.0f, 0.0f), player.getPosition(), enemy.getPosition());
 							// handle all inputs
 							sunPos = new Vector3f((float) -Math.sin(lastFrame / 10000000000d) * 50, 4, (float) Math.cos(lastFrame / 10000000000d) * 50);
@@ -386,6 +382,7 @@ public class SpaceScene implements Scene {
 
 		glUniform1i(defaultShader.getUniform("skybox"), skybox.getTexture());
 		glUniform1i(defaultShader.getUniform("alpha"), 1);
+		glUniform1f(defaultShader.getUniform("time"), timePassed);
 		// update player position uniform
 		camera.apply(defaultShader);
 
@@ -402,7 +399,9 @@ public class SpaceScene implements Scene {
 		player.render(defaultShader);
 		enemy.render(defaultShader);
 
+		glUniform1i(defaultShader.getUniform("water"), 0);
 		water.render(defaultShader);
+		glUniform1i(defaultShader.getUniform("water"), 1);
 
 		powerups.render(defaultShader);
 
@@ -446,7 +445,7 @@ public class SpaceScene implements Scene {
 		 * player.getCamera().processMouseScroll(-60 * deltaTime); } if
 		 * (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 		 * player.getCamera().processMouseScroll(60 * deltaTime); }
-		 *
+		 * 
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_Y)) { player.getCamera().roll(1 *
 		 * deltaTime); } if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
 		 * player.getCamera().roll(-1 * deltaTime); }
