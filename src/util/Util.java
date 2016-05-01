@@ -88,7 +88,7 @@ public class Util {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		}
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getWidth(), image.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		// glBindTexture(GL_TEXTURE_2D, 0);
@@ -144,7 +144,7 @@ public class Util {
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, images[i].getWidth(), images[i].getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, images[i].getWidth(), images[i].getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 			if (Settings.getBoolean("skybox_mipmap")) {
 				glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 			}
@@ -222,7 +222,7 @@ public class Util {
 				if (full == null) {
 					full = current;
 				} else {
-					if (current.getWidth() > full.getWidth() && current.getHeight()<= screenSize.height) {
+					if (current.getWidth() > full.getWidth() && current.getHeight() <= screenSize.height) {
 						full = current;
 					} else if (current.getWidth() == full.getWidth() && current.getWidth() <= screenSize.getWidth()) {
 						if (current.getHeight() > full.getHeight()) {
